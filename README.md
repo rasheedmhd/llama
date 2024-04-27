@@ -264,7 +264,6 @@ baconAndToast.serve("Dear Reader");
 # Inheritance
 
 ```
-
 class Brunch < Breakfast {
 drink() {
 print "How about a Bloody Mary?";
@@ -283,7 +282,4 @@ super.init(meat, bread);
 this.drink = drink;
 }
 }
-
-```
-
 ```
