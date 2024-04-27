@@ -260,6 +260,7 @@ class Breakfast {
 var baconAndToast = Breakfast("bacon", "toast");
 baconAndToast.serve("Dear Reader");
 // "Enjoy your bacon and toast, Dear Reader."
+```
 
 # Inheritance
 
