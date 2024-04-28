@@ -36,15 +36,15 @@ false; // Not _not_ false
 "123"; // This is a string, not a number.
 ```
 
-# No value
+# No Value
 
 ```
 nil | Null
 ```
 
-## ﻿Expressions
+## Expressions
 
-# ﻿Arithmetic
+# Arithmetic
 
 ```
 add + me;
@@ -55,7 +55,7 @@ divide / me;
 -negateMe;
 ```
 
-## ﻿Comparison and equality
+## Comparison and Equality
 
 # Comparison Operators.
 
@@ -73,7 +73,7 @@ greaterThan >= orEqual;
 123 == "123"; // false
 ```
 
-## ﻿Logical operators
+## Logical operators
 
 ```
 !true; // false.
@@ -92,7 +92,7 @@ true or false; // true.
 var average = (min + max) / 2;
 ```
 
-# ﻿Statements
+# Statements
 
 ```
 print "Hello, world!";
@@ -110,7 +110,7 @@ print "Hello, world!";
 
 var breakfast 		= "bagels";
 print breakfast; // "bagels".
-breakfast 				= "beignets";
+breakfast 			= "beignets";
 print breakfast; // "beignets".
 
 ```
@@ -120,7 +120,7 @@ print breakfast; // "beignets".
 # if
 
 ```
-﻿if (condition) {
+if (condition) {
 	print "yes";
 } else {
 	print "no";
@@ -149,8 +149,8 @@ for (var a = 1; a < 10; a = a + 1) {
 
 ```
 makeBreakfast(bacon, eggs, toast);
-// ﻿You can also call a function without passing anything to it.
-﻿makeBreakfast();
+// You can also call a function without passing anything to it.
+makeBreakfast();
 ```
 
 # fun keyword
@@ -185,14 +185,14 @@ fun outerFunction() {
 }
 
 fun returnFunction() {
-	var outside = "outside";
+var outside = "outside";
 
 	fun inner() {
-			print outside;
-		}
-
-		return inner;
+		print outside;
 	}
+
+	return inner;
+}
 
 var fn = returnFunction();
 fn();
@@ -201,12 +201,12 @@ fn();
 ## Classes
 
 ```
-// ﻿The body of a class contains its methods.
+// The body of a class contains its methods.
 // They look like function declarations but without the fun keyword.
 class Breakfast {
 
 	cook() {
-			print "Eggs a-fryin'!";
+			print "Eggs frying!";
 		}
 
 		serve(who) {
@@ -227,7 +227,7 @@ someFunction(Breakfast);
 # Class Instances
 
 ```
-// ﻿Calling a class like a function, produces a new instance of itself.
+// Calling a class like a function, produces a new instance of itself.
 var breakfast = Breakfast();
 print breakfast; // "Breakfast instance".
 ```
@@ -235,11 +235,11 @@ print breakfast; // "Breakfast instance".
 # Instantiation and Initialization
 
 ```
-// ﻿Assigning to a field creates it if it doesn’t already exist
+// Assigning to a field creates it if it doesn’t already exist
 breakfast.meat = "sausage";
 breakfast.bread = "sourdough";
 
-// ﻿If you want to access a field or method on the current object
+// If you want to access a field or method on the current object
 // from within a method, you use good old this.
 class Breakfast {
 	serve(who) {
@@ -266,21 +266,21 @@ baconAndToast.serve("Dear Reader");
 
 ```
 class Brunch < Breakfast {
-drink() {
-print "How about a Bloody Mary?";
-}
+	drink() {
+		print "How about a Bloody Mary?";
+	}
 }
 
-// ﻿Every method defined in the superclass is also available to its subclasses.
+// Every method defined in the superclass is also available to its subclasses.
 var benedict = Brunch("ham", "English muffin");
 benedict.serve("Noble Reader");
 
-// ﻿Even the init() method gets inherited.
-// In practice, the subclass usually wantsto define its own init() method too.
+// Even the init() method gets inherited.
+// In practice, the subclass usually wants to define its own init() method too.
 class Brunch < Breakfast {
-init(meat, bread, drink) {
-super.init(meat, bread);
-this.drink = drink;
-}
+	init(meat, bread, drink) {
+		super.init(meat, bread);
+		this.drink = drink;
+	}
 }
 ```
