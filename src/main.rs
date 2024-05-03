@@ -5,14 +5,23 @@ use std::fs;
 use std::io::{stdin, stdout};
 use std::process;
 
+// Defined inside the class
+// To Do 
+// Gotta handle this right
+// with traits probably
+static mut HAD_ERROR: bool = false;
+// if HAD_ERROR {
+//     process::exit(65);
+// }
+
 fn main() {
     println!("Llama - A programming language impl from Robert Nystrom's Crafting Interpreters");
-    get();
+    start();
 }
 
 // Exit Codes
 // https://man.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
-pub fn get() {
+pub fn start() {
     let args: Vec<String> = env::args().collect();
     
     if args.len() > 2 {
@@ -45,6 +54,11 @@ fn run_prompt() {
         let mut input_stream_reader = String::new();
         stdin().read_line(&mut input_stream_reader).expect("Enter Command");
         run(input_stream_reader.clone());
+        // We need to reset this flag in the interactive loop. 
+        // If the user makes a mistake, it shouldn’t kill their entire session.
+        unsafe {
+            HAD_ERROR = false;
+        }
     }
 }
 
@@ -78,3 +92,16 @@ fn run(source: String) {
     }
 }
 
+// Error Handling
+fn error(line: u64, message: String) {
+    report(line, "".to_string(),  message);
+}
+
+fn report(line: u64, location: String,  message: String) {
+
+    eprintln!("[line {line}] Error {location}: {message}]");
+
+    unsafe {
+        HAD_ERROR = true;
+    }
+}
