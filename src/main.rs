@@ -1,9 +1,7 @@
 #[allow(unused_variables)]
 use std::env;
 use std::fs;
-use std::io::{
-    stdin, Result
-};
+use std::io::stdin;
 use std::process;
 
 fn main() {
@@ -16,14 +14,13 @@ fn main() {
 pub fn get() {
     let args: Vec<String> = env::args().collect();
     
-    if args.len() > 1 {
-        println!("Usage: llama [script]");
+    if args.len() > 2 {
+        println!("Usage: llama [script] {:?}", args.len());
         process::exit(64);
-    } else if args.len() == 1 {
-        run_file(args[0].clone());
+    } else if args.len() == 2 {
+        run_file(args[1].clone());
     } else {
-        // run_prompt();
-        process::exit(63)
+        run_prompt();
     }
 }
 
@@ -35,19 +32,21 @@ pub fn get() {
 // byte[] bytes = Files.readAllBytes(Paths.get(path));
 // run(new String(bytes, Charset.defaultCharset()));
 // }
-fn run_file(path: String) -> Result<()>{
+fn run_file(path: String) {
     let code = fs::read_to_string(path).expect("file doesn't exist");
-    // run(String::from(code));
-    println!("{:#?}",code);
-    Ok(())
+    run(code);
 }
 
-fn run_prompt() -> Result<()> {
-    print!("> ");
-    let mut input_stream_reader = String::new();
-    stdin().read_line(&mut input_stream_reader).expect("Enter Command");
-    Ok(())
+fn run_prompt() {
+
+    loop {
+        println!(" > ");
+        let mut input_stream_reader = String::new();
+        stdin().read_line(&mut input_stream_reader).expect("Enter Command");
+        run(input_stream_reader.clone());
+    }
 }
-fn run(_bytes: String) {
-    // unimplemented!()
+
+fn run(code: String) {
+    println!("interpreting .... {:?}", code.trim());
 }
