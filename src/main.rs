@@ -1,7 +1,8 @@
 #[allow(unused_variables)]
 use std::env;
+use std::fmt::Debug;
 use std::fs;
-use std::io::stdin;
+use std::io::{stdin, stdout};
 use std::process;
 
 fn main() {
@@ -47,6 +48,33 @@ fn run_prompt() {
     }
 }
 
-fn run(code: String) {
-    println!("interpreting .... {:?}", code.trim());
+struct Scanner {
+
 }
+#[derive(Debug)]
+enum Token {
+
+}
+
+impl Scanner {
+    fn new() -> Self {
+        Scanner {}
+    }
+    fn from(source: String) -> Self {
+        Scanner {}
+    }
+
+    fn scan_tokens(&self) -> Vec<Token> {
+        let tokens: Vec<Token> = Vec::new();
+        tokens
+    }
+}
+
+fn run(source: String) {
+    let scanner = Scanner::from(source);
+    let tokens= scanner.scan_tokens();
+    for token in &tokens {
+        println!("{:#?}", token);
+    }
+}
+
