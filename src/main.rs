@@ -4,7 +4,7 @@ use std::fmt::Debug;
 use std::fs;
 use std::io::{stdin, stdout};
 use std::process;
-
+use llama::token_type::TokenType;
 // Defined inside the class
 // To Do 
 // Gotta handle this right
@@ -65,10 +65,7 @@ fn run_prompt() {
 struct Scanner {
 
 }
-#[derive(Debug)]
-enum Token {
 
-}
 
 impl Scanner {
     fn new() -> Self {
@@ -78,8 +75,8 @@ impl Scanner {
         Scanner {}
     }
 
-    fn scan_tokens(&self) -> Vec<Token> {
-        let tokens: Vec<Token> = Vec::new();
+    fn scan_tokens(&self) -> Vec<TokenType> {
+        let tokens: Vec<TokenType> = Vec::new();
         tokens
     }
 }
