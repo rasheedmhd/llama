@@ -5,7 +5,8 @@ use std::env;
 use std::fs;
 use std::io::stdin;
 use std::process;
-use llama::token_type::TokenType;
+
+use llama::scanner::Scanner;
 
 static mut HAD_ERROR: bool = false;
 
@@ -63,8 +64,8 @@ impl Llama {
     }
 
     fn run(source: String) {
-        let scanner = Scanner::from(source);
-        let tokens= scanner.scan_tokens();
+        let mut scanner = Scanner::from(source);
+        let tokens = scanner.scan_tokens();
         for token in &tokens {
             println!("{:#?}", token);
         }
@@ -88,25 +89,6 @@ impl Llama {
         }
     }
 
-}
-
-struct Scanner {
-
-}
-
-
-impl Scanner {
-    fn new() -> Self {
-        Scanner {}
-    }
-    fn from(source: String) -> Self {
-        Scanner {}
-    }
-
-    fn scan_tokens(&self) -> Vec<TokenType> {
-        let tokens: Vec<TokenType> = Vec::new();
-        tokens
-    }
 }
 
 
