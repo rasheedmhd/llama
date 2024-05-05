@@ -30,7 +30,7 @@ impl Scanner {
     #[allow(dead_code)]
     pub fn from(source: String) -> Self {
         Self {
-            source: source,
+            source,
             start:      0,
             current:    0,
             line:       1,
@@ -65,7 +65,8 @@ impl Scanner {
             Some('+') => self.add_token(TokenType::PLUS),
             Some(';') => self.add_token(TokenType::SEMICOLON),
             Some('*') => self.add_token(TokenType::STAR),
-            _   => todo!()
+            // _   => Llama::error(line, "Unexpected Character"),
+            _   => eprintln!("{}, Unexpected Character", self.line),
         }
     }
 

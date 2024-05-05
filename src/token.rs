@@ -1,5 +1,4 @@
 use crate::token_type::TokenType;
-// use std::any::Any;
 #[allow(dead_code)]
 
 #[derive(Debug)]
