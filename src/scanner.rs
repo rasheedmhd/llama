@@ -12,7 +12,7 @@ pub struct Scanner {
     // tracks what source line current is on so we 
     // can produce tokens that know their location
     line:       usize,
-    tokens:     Vec<Token>,
+    pub tokens:     Vec<Token>,
 }
 
 
@@ -34,10 +34,18 @@ impl Scanner {
             start:      0,
             current:    0,
             line:       1,
-            tokens: Vec::new(),
+            tokens:     Vec::new(),
         }
     }
 
+    fn is_at_end(&self) -> bool {
+        self.current >= self.source.len()
+    }
+
+    // Starting at the first character of the source code,
+    // the scanner figures out what lexeme the character belongs to, 
+    // and consumes it and any following characters that are part of that lexeme. 
+    // When it reaches the end of that lexeme, it emits a token.
     pub fn scan_tokens(&mut self) -> Vec<Token> {
         while !self.is_at_end() {
             // We are at the beginning of the next lexeme
@@ -46,12 +54,13 @@ impl Scanner {
         }
 
         let eof_token = Token::new(TokenType::EOF, "".to_string(), self.line, None);
-        let  mut tokens: Vec<Token> = Vec::new();
-        tokens.push(eof_token);
-        tokens
+        self.tokens.push(eof_token);
+        self.tokens.clone()
     }
 
     // Recognizing Lexemes
+    // The lexemes are only the raw substrings of the source code. 
+    // [var] [language] [=] ["Llama"] [;]
     fn scan_token(&mut self) {
         let char = self.advance();
         match char {
@@ -70,16 +79,17 @@ impl Scanner {
         }
     }
 
-    fn is_at_end(&self) -> bool {
-        self.current >= self.source.len()
-    }
-
     fn advance(&mut self) -> Option<char> {
         let next_char = self.source.chars().nth(self.current);
         self.current += 1;
         next_char
     }
     
+    // The lexemes are only the raw substrings of the source code. 
+    // However, in the process of grouping character sequences into lexemes, 
+    // we also stumble upon some other useful information. 
+    // When we take the lexeme and bundle it together with that other data, 
+    // the result is a token. It includes useful stuff like:
     fn add_token(&mut self, token_type: TokenType) {
         self.add_token_with_literal(token_type, None)
     }

@@ -38,7 +38,7 @@ impl Llama {
         let mut scanner = Scanner::from(source);
         let tokens = scanner.scan_tokens();
         for token in &tokens {
-            println!("{:#?}", token);
+            println!("{:?}", token);
         }
     }
 
@@ -78,9 +78,7 @@ impl Llama {
 
     #[allow(dead_code)]
     fn report(line: usize, location: String,  message: String) {
-
         eprintln!("line {line} Error {location}: {message}");
-
         unsafe {
             HAD_ERROR = true;
         }
