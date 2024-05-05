@@ -51,11 +51,40 @@ impl Scanner {
         tokens
     }
 
+    // Recognizing Lexemes
+    fn scan_token(&mut self) {
+        let char = self.advance();
+        match char {
+            Some('(') => self.add_token(TokenType::LeftPAREN),
+            Some(')') => self.add_token(TokenType::RightPAREN),
+            Some('{') => self.add_token(TokenType::LeftBRACE),
+            Some('}') => self.add_token(TokenType::RightBRACE),
+            Some(',') => self.add_token(TokenType::COMMA),
+            Some('.') => self.add_token(TokenType::DOT),
+            Some('-') => self.add_token(TokenType::MINUS),
+            Some('+') => self.add_token(TokenType::PLUS),
+            Some(';') => self.add_token(TokenType::SEMICOLON),
+            Some('*') => self.add_token(TokenType::STAR),
+            _   => todo!()
+        }
+    }
+
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
 
-    fn scan_token(&self) {
-        unimplemented!();
+    fn advance(&mut self) -> Option<char> {
+        let next_char = self.source.chars().nth(self.current);
+        self.current += 1;
+        next_char
+    }
+    
+    fn add_token(&mut self, token_type: TokenType) {
+        self.add_token_with_literal(token_type, None)
+    }
+
+    fn add_token_with_literal(&mut self, token_type: TokenType, literal: Option<String> ) {
+        let text = self.source[self.start..self.current].to_string();
+        self.tokens.push(Token::new(token_type, text, self.line, literal));
     }
 }
