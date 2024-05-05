@@ -1,14 +1,6 @@
 use crate::token_type::TokenType;
 use crate::token::Token;
 
-// import static com.craftinginterpreters.lox.TokenType.*;
-// class Scanner {
-// private final String source;
-// private final List<Token> tokens = new ArrayList<>();
-// Scanner(String source) {
-// this.source = source;
-// }
-// }
 #[allow(dead_code)]
 pub struct Scanner {
     source:     String,
@@ -54,22 +46,16 @@ impl Scanner {
         }
 
         let eof_token = Token::new(TokenType::EOF, "".to_string(), self.line, None);
-        self.tokens.push(eof_token);
-        self.tokens
+        let  mut tokens: Vec<Token> = Vec::new();
+        tokens.push(eof_token);
+        tokens
     }
 
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
+
+    fn scan_token(&self) {
+        unimplemented!();
+    }
 }
-
-
-// List<Token> scanTokens() {
-//     while (!isAtEnd()) {
-//     // We are at the beginning of the next lex
-//     start = current;
-//     scanToken();
-//     } 
-//     tokens.add(new Token(EOF, "", null, line));
-//     return tokens;
-// }

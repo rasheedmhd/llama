@@ -2,6 +2,7 @@ use crate::token_type::TokenType;
 // use std::any::Any;
 #[allow(dead_code)]
 
+#[derive(Debug)]
 pub struct Token {
     token_type: TokenType,
     lexeme: String,

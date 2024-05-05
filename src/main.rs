@@ -1,5 +1,4 @@
 #[allow(unused_variables)]
-#[allow(dead_code)]
 
 use std::env;
 use std::fs;
@@ -76,10 +75,12 @@ impl Llama {
     // Error: Unexpected "," in argument list.
     // 15 | function(first, second,);
     //                            ^-- Here
+    #[allow(dead_code)]
     fn error(line: u64, message: String) {
         Llama::report(line, "".to_string(),  message);
     }
-
+    
+    #[allow(dead_code)]
     fn report(line: u64, location: String,  message: String) {
 
         eprintln!("[line {line}] Error {location}: {message}]");
