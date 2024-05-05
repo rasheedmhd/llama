@@ -1,6 +1,7 @@
 #[derive(Debug)]
 pub enum TokenType {
     // Single-character tokens.
+    // ( ) { } , . - + ; / *
     LeftPAREN, 
     RightPAREN, 
     LeftBRACE, 
@@ -14,6 +15,7 @@ pub enum TokenType {
     STAR,
 
     // One or two character tokens.
+    // ! != = == > >= < <=
     BANG, 
     BangEQUAL,
     EQUAL, 
@@ -24,6 +26,7 @@ pub enum TokenType {
     LessEQUAL,
 
     // Literals.
+    // IDENTIFIER "" 1
     IDENTIFIER, 
     STRING, 
     NUMBER,
@@ -45,5 +48,6 @@ pub enum TokenType {
     TRUE, 
     VAR, 
     WHILE,
+    
     EOF
 }
