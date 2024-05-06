@@ -1,5 +1,8 @@
 use crate::token_type::TokenType;
 use crate::token::Token;
+// To Do
+use crate::repl::Llama;
+
 
 #[allow(dead_code)]
 pub struct Scanner {
@@ -74,7 +77,8 @@ impl Scanner {
             Some('+') => self.add_token(TokenType::PLUS),
             Some(';') => self.add_token(TokenType::SEMICOLON),
             Some('*') => self.add_token(TokenType::STAR),
-            // _   => Llama::error(line, "Unexpected Character"),
+            // To Do
+            // _   => Llama.error(self.line, "Unexpected Character"),
             _   => eprintln!("{}, Unexpected Character", self.line),
         }
     }
