@@ -50,6 +50,7 @@ impl Llama {
         loop {
             print!("> ");
             let _ = stdout().flush();
+            // stdin().read_line(&mut code_snippet.trim()).unwrap();
             let mut code_snippet = String::new();
             stdin().read_line(&mut code_snippet).unwrap();
             Llama::run(code_snippet.clone());
@@ -67,7 +68,7 @@ impl Llama {
     // 15 | function(first, second,);
     //                            ^-- Here
     #[allow(dead_code)]
-    pub fn error(&self, line: usize, message: String) {
+    pub fn error(line: usize, message: String) {
         Llama::report(line, "".to_string(),  message);
     }
 

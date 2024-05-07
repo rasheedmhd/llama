@@ -1,7 +1,5 @@
 use crate::token_type::TokenType;
 use crate::token::Token;
-// To Do
-use crate::repl::Llama;
 
 
 #[allow(dead_code)]
@@ -64,6 +62,9 @@ impl Scanner {
     // Recognizing Lexemes
     // The lexemes are only the raw substrings of the source code. 
     // [var] [language] [=] ["Llama"] [;]
+    // To Do
+    // Next Char returns wih a \n char which the scanner doesn't recognize
+    // There throwing an error
     fn scan_token(&mut self) {
         let char = self.advance();
         match char {
@@ -77,14 +78,12 @@ impl Scanner {
             Some('+') => self.add_token(TokenType::PLUS),
             Some(';') => self.add_token(TokenType::SEMICOLON),
             Some('*') => self.add_token(TokenType::STAR),
-            // To Do
-            // _   => Llama.error(self.line, "Unexpected Character"),
-            _   => eprintln!("{}, Unexpected Character", self.line),
+            _   => crate::repl::Llama::error(self.line, "Unexpected Character".to_string()),
         }
     }
 
     fn advance(&mut self) -> Option<char> {
-        let next_char = self.source.chars().nth(self.current);
+        let next_char = self.source.trim().chars().nth(self.current);
         self.current += 1;
         next_char
     }
