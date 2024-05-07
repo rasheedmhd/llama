@@ -111,10 +111,12 @@ impl Scanner {
                         while self.peek() != '\n' && !self.is_at_end() {
                             self.advance();                            
                         } 
-                } else if !self.match_char('/') {
-                    self.add_token(TokenType::SLASH);
+                    } else if !self.match_char('/') {
+                        self.add_token(TokenType::SLASH);
+                    }
                 }
-            }
+            Some(' ') | Some('\r') | Some('\t')  => {},
+            Some('\n') => self.line += 1,
             _   => crate::repl::Llama::error(self.line, "Unexpected Character".to_string()),
         }
     }
