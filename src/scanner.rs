@@ -117,6 +117,7 @@ impl Scanner {
                 }
             Some(' ') | Some('\r') | Some('\t')  => {},
             Some('\n') => self.line += 1,
+            Some('"') => self.string(),
             _   => crate::repl::Llama::error(self.line, "Unexpected Character".to_string()),
         }
     }
@@ -146,6 +147,37 @@ impl Scanner {
         if self.is_at_end() { return '\0'; }
         return self.source.chars().nth(self.current).unwrap();
     }
+
+    fn string(&mut self) {
+        while self.peek() != '"' && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1;
+            }
+            self.advance();
+        }
+        if self.is_at_end() {
+            crate::repl::Llama::error(self.line, "Unterminated string.".to_string());
+        }
+        self.advance();
+        let value: String = self.source[self.start +1..self.current-1].to_string();
+        self.add_token_with_literal(TokenType::STRING, Some(value))
+    }
+    
+    // private void string() {
+    //     while (peek() != '"' && !isAtEnd()) {
+    //     if (peek() == '\n') line++;
+    //     advance();
+    //     } i
+    //     f (isAtEnd()) {
+    //     Lox.error(line, "Unterminated string.");
+    //     return;
+    //     } /
+    //     / The closing ".
+    //     advance();
+    //     // Trim the surrounding quotes.
+    //     String value = source.substring(start + 1, current - 1);
+    //     addToken(STRING, value);
+    //     }
 
     
     // The lexemes are only the raw substrings of the source code. 
