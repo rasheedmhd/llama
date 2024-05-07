@@ -38,27 +38,6 @@ impl Scanner {
             tokens:     Vec::new(),
         }
     }
-        // private boolean match(char expected) {
-        // if (isAtEnd()) return false;
-        // if (source.charAt(current) != expected) return false;
-        // current++;
-        // return true;
-        // }
-
-    fn match_char(&mut self, expected: char) -> bool {
-        if self.is_at_end() {
-           return false;
-        } 
-        if self.source.chars().nth(self.current) != Some(expected) {
-            return false;
-        }
-        self.current += 1;
-        true
-    }
-
-    fn is_at_end(&self) -> bool {
-        self.current >= self.source.len()
-    }
 
     // Starting at the first character of the source code,
     // the scanner figures out what lexeme the character belongs to, 
@@ -96,6 +75,8 @@ impl Scanner {
             Some(';') => self.add_token(TokenType::SEMICOLON),
             Some('*') => self.add_token(TokenType::STAR),
             // Operators 
+            // To Do
+            // Add a ++ for adding 1 to a value
             Some('!') => {
                     if self.match_char('=') {
                         self.add_token(TokenType::BangEQUAL)
@@ -124,8 +105,22 @@ impl Scanner {
                         self.add_token(TokenType::GREATER)
                     }
                 }
+            Some('/') => {
+                    if self.match_char('/') {
+                        // A comment goes until the end of the line
+                        while self.peek() != '\n' && !self.is_at_end() {
+                            self.advance();                            
+                        } 
+                } else if !self.match_char('/') {
+                    self.add_token(TokenType::SLASH);
+                }
+            }
             _   => crate::repl::Llama::error(self.line, "Unexpected Character".to_string()),
         }
+    }
+
+    fn is_at_end(&self) -> bool {
+        self.current >= self.source.len()
     }
 
     fn advance(&mut self) -> Option<char> {
@@ -133,6 +128,23 @@ impl Scanner {
         self.current += 1;
         next_char
     }
+
+    fn match_char(&mut self, expected: char) -> bool {
+        if self.is_at_end() {
+           return false;
+        } 
+        if self.source.chars().nth(self.current) != Some(expected) {
+            return false;
+        }
+        self.current += 1;
+        true
+    }
+
+    fn peek(&self) -> char {
+        if self.is_at_end() { return '\0'; }
+        return self.source.chars().nth(self.current).unwrap();
+    }
+
     
     // The lexemes are only the raw substrings of the source code. 
     // However, in the process of grouping character sequences into lexemes, 
