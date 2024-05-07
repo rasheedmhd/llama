@@ -38,6 +38,23 @@ impl Scanner {
             tokens:     Vec::new(),
         }
     }
+        // private boolean match(char expected) {
+        // if (isAtEnd()) return false;
+        // if (source.charAt(current) != expected) return false;
+        // current++;
+        // return true;
+        // }
+
+    fn match_char(&mut self, expected: char) -> bool {
+        if self.is_at_end() {
+           return false;
+        } 
+        if self.source.chars().nth(self.current) != Some(expected) {
+            return false;
+        }
+        self.current += 1;
+        true
+    }
 
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
@@ -78,12 +95,41 @@ impl Scanner {
             Some('+') => self.add_token(TokenType::PLUS),
             Some(';') => self.add_token(TokenType::SEMICOLON),
             Some('*') => self.add_token(TokenType::STAR),
+            // Operators 
+            Some('!') => {
+                    if self.match_char('=') {
+                        self.add_token(TokenType::BangEQUAL)
+                    } else if !self.match_char('=') {
+                        self.add_token(TokenType::BANG)
+                    }
+                }
+            Some('=') => {
+                    if self.match_char('=') {
+                        self.add_token(TokenType::EqualEQUAL)
+                    } else if !self.match_char('=') {
+                        self.add_token(TokenType::EQUAL)
+                    }
+                }
+            Some('<') => {
+                    if self.match_char('=') {
+                        self.add_token(TokenType::LessEQUAL)
+                    } else if !self.match_char('=') {
+                        self.add_token(TokenType::LESS)
+                    }
+                }
+            Some('>') => {
+                    if self.match_char('=') {
+                        self.add_token(TokenType::GreaterEQUAL)
+                    } else if !self.match_char('=') {
+                        self.add_token(TokenType::GREATER)
+                    }
+                }
             _   => crate::repl::Llama::error(self.line, "Unexpected Character".to_string()),
         }
     }
 
     fn advance(&mut self) -> Option<char> {
-        let next_char = self.source.trim().chars().nth(self.current);
+        let next_char = self.source.chars().nth(self.current);
         self.current += 1;
         next_char
     }
