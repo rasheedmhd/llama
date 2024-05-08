@@ -118,18 +118,41 @@ impl Scanner {
             Some(' ') | Some('\r') | Some('\t')  => {},
             Some('\n') => self.line += 1,
             Some('"') => self.string(),
-            // Some('0'..='9') => {
-            //     self.number();
-            // },
             _   => {
                 if self.is_digit(char) {
                     self.number();
+                } else
+                if self.is_alpha(char) {
+                    self.identifier();
                 }
                 crate::repl::Llama::error(self.line, "Unexpected Character".to_string())
             },
         }
     }
 
+    // private void identifier() {
+    //     while (isAlphaNumeric(peek())) advance();
+    //     addToken(IDENTIFIER);
+    // }
+    fn identifier(&mut self) {
+        while self.peek().is_alphanumeric() {
+        // while is_aphanumeric(self.peek()) {
+            self.advance();
+            self.add_token(TokenType::IDENTIFIER)
+        }
+    }
+
+    fn is_alpha(&self, char: Option<char>) -> bool {
+        return 
+         (char.unwrap() >= 'a' && char.unwrap() <= 'z') ||
+         (char.unwrap() >= 'A' && char.unwrap() <= 'Z') ||
+         char.unwrap() == '_';
+    }
+
+    // fn is_alphanumeric(&self, char: char) -> bool {
+    //     self.is_alpha(Some(char)) || self.is_digit(Some(char))
+    // }
+ 
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
