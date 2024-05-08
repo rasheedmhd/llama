@@ -130,16 +130,12 @@ impl Scanner {
         }
     }
 
-    // private void identifier() {
-    //     while (isAlphaNumeric(peek())) advance();
-    //     addToken(IDENTIFIER);
-    // }
     fn identifier(&mut self) {
-        while self.peek().is_alphanumeric() {
-        // while is_aphanumeric(self.peek()) {
+        // while self.peek().is_alphanumeric() {
+        while self.is_alphanumeric(self.peek()) {
             self.advance();
-            self.add_token(TokenType::IDENTIFIER)
         }
+        self.add_token(TokenType::IDENTIFIER)
     }
 
     fn is_alpha(&self, char: Option<char>) -> bool {
@@ -149,9 +145,9 @@ impl Scanner {
          char.unwrap() == '_';
     }
 
-    // fn is_alphanumeric(&self, char: char) -> bool {
-    //     self.is_alpha(Some(char)) || self.is_digit(Some(char))
-    // }
+    fn is_alphanumeric(&self, char: char) -> bool {
+        self.is_alpha(Some(char)) || self.is_digit(Some(char))
+    }
  
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
