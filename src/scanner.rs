@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+use lazy_static::lazy_static;
 use crate::token_type::TokenType;
 use crate::token::Token;
 
@@ -14,6 +16,29 @@ pub struct Scanner {
     // can produce tokens that know their location
     line:       usize,
     tokens:     Vec<Token>,
+}
+
+lazy_static! {
+    static ref KEYWORDS: HashMap<&'static str, TokenType> = {
+        let mut keywords = HashMap::new();
+        keywords.insert("and", TokenType::AND);
+        keywords.insert("class", TokenType::CLASS);
+        keywords.insert("else", TokenType::ELSE);
+        keywords.insert("false", TokenType::FALSE);
+        keywords.insert("for", TokenType::FOR);
+        keywords.insert("fun", TokenType::FUN);
+        keywords.insert("if", TokenType::IF);
+        keywords.insert("nil", TokenType::NIL);
+        keywords.insert("or", TokenType::OR);
+        keywords.insert("print", TokenType::PRINT);
+        keywords.insert("return", TokenType::RETURN);
+        keywords.insert("super", TokenType::SUPER);
+        keywords.insert("this", TokenType::THIS);
+        keywords.insert("true", TokenType::TRUE);
+        keywords.insert("var", TokenType::VAR);
+        keywords.insert("while", TokenType::WHILE);
+        keywords
+    };
 }
 
 
@@ -132,10 +157,20 @@ impl Scanner {
 
     fn identifier(&mut self) {
         // while self.peek().is_alphanumeric() {
+
         while self.is_alphanumeric(self.peek()) {
             self.advance();
         }
-        self.add_token(TokenType::IDENTIFIER)
+        // String text = source.substring(start, current);
+        // TokenType type = keywords.get(text);
+        // if (type == null) type = IDENTIFIER;
+        // self.source[self.start..self.current];
+        let identifier_literal = self.source[self.start..self.current].to_string();
+        let mut token_type = KEYWORDS.get(&self.source[self.start..self.current]);
+        if token_type == None {
+            token_type = Some(&TokenType::IDENTIFIER);
+        }
+        self.add_token_with_literal(token_type.unwrap().clone(), Some(identifier_literal))
     }
 
     fn is_alpha(&self, char: Option<char>) -> bool {
