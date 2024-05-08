@@ -13,7 +13,7 @@ pub struct Scanner {
     // tracks what source line current is on so we 
     // can produce tokens that know their location
     line:       usize,
-    pub tokens:     Vec<Token>,
+    tokens:     Vec<Token>,
 }
 
 
@@ -118,7 +118,15 @@ impl Scanner {
             Some(' ') | Some('\r') | Some('\t')  => {},
             Some('\n') => self.line += 1,
             Some('"') => self.string(),
-            _   => crate::repl::Llama::error(self.line, "Unexpected Character".to_string()),
+            // Some('0'..='9') => {
+            //     self.number();
+            // },
+            _   => {
+                if self.is_digit(char) {
+                    self.number();
+                }
+                crate::repl::Llama::error(self.line, "Unexpected Character".to_string())
+            },
         }
     }
 
@@ -158,27 +166,41 @@ impl Scanner {
         if self.is_at_end() {
             crate::repl::Llama::error(self.line, "Unterminated string.".to_string());
         }
+        // The closing "
         self.advance();
-        let value: String = self.source[self.start +1..self.current-1].to_string();
+        // Trim the surrounding quotes.
+        let value: String = self.source[self.start+1..self.current-1].to_string();
         self.add_token_with_literal(TokenType::STRING, Some(value))
     }
-    
-    // private void string() {
-    //     while (peek() != '"' && !isAtEnd()) {
-    //     if (peek() == '\n') line++;
-    //     advance();
-    //     } i
-    //     f (isAtEnd()) {
-    //     Lox.error(line, "Unterminated string.");
-    //     return;
-    //     } /
-    //     / The closing ".
-    //     advance();
-    //     // Trim the surrounding quotes.
-    //     String value = source.substring(start + 1, current - 1);
-    //     addToken(STRING, value);
-    //     }
 
+    fn is_digit(&self, char: Option<char>) ->  bool {
+        char.unwrap() >= '0' && char.unwrap() <= '9'
+    }
+
+    fn number(&mut self) {
+        while self.is_digit(Some(self.peek())) {
+            self.advance();
+        }
+        // Look for a fractional part.
+        if self.peek() == '.' && self.is_digit(self.peek_next()) {
+            // consume the "."
+            self.advance();
+            while self.is_digit(Some(self.peek())) {
+                self.advance();
+            }
+        }
+        let number = self.source.to_string();
+        // let number = self.source[self.start+1..self.current-1].parse::<f64>().unwrap();
+        // self.add_token(TokenType::NUMBER);
+        self.add_token_with_literal(TokenType::NUMBER, Some(number))
+    }
+
+    fn peek_next(&self) -> Option<char> {
+        if self.current+1 >= self.source.len() {
+            return Some('\0');
+        }
+        return self.source.chars().nth(self.current+1)
+    }
     
     // The lexemes are only the raw substrings of the source code. 
     // However, in the process of grouping character sequences into lexemes, 
