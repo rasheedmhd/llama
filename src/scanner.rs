@@ -3,6 +3,10 @@ use lazy_static::lazy_static;
 use crate::token_type::TokenType;
 use crate::token::Token;
 
+// TO DO
+// Add support to Llamaʼs scanner for C-style /* ... */ block comments. 
+// + handle newlines in them. + nesting.
+// Is adding support for nesting more work than you expected? Why?
 
 #[allow(dead_code)]
 pub struct Scanner {
@@ -161,13 +165,10 @@ impl Scanner {
         while self.is_alphanumeric(self.peek()) {
             self.advance();
         }
-        // String text = source.substring(start, current);
-        // TokenType type = keywords.get(text);
-        // if (type == null) type = IDENTIFIER;
-        // self.source[self.start..self.current];
+
         let identifier_literal = self.source[self.start..self.current].to_string();
         let mut token_type = KEYWORDS.get(&self.source[self.start..self.current]);
-        if token_type == None {
+        if token_type.is_none() {
             token_type = Some(&TokenType::IDENTIFIER);
         }
         self.add_token_with_literal(token_type.unwrap().clone(), Some(identifier_literal))
