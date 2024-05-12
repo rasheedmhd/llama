@@ -1,14 +1,34 @@
-﻿breakfast → protein "with" breakfast "on the side" ;
-breakfast → protein ;
-breakfast → bread ;
-protein → crispiness "crispy" "bacon" ;
-protein → "sausage" ;
-protein → cooked "eggs" ;
-crispiness → "really" ;
-crispiness → "really" crispiness ;
-cooked → "scrambled" ;
-cooked → "poached" ;
-cooked → "fried" ;
-﻿bread → "toast" ;
-bread → "biscuits" ;
-bread → "English muffin" ;
+﻿breakfast       → protein "with" breakfast "on the side" ;
+breakfast       → protein ;
+breakfast       → bread ;
+protein         → crispiness "crispy" "bacon" ;
+protein         → "sausage" ;
+protein         → cooked "eggs" ;
+crispiness      → "really" ;
+crispiness      → "really" crispiness ;
+cooked          → "scrambled" ;
+cooked          → "poached" ;
+cooked          → "fried" ;
+
+bread           → "toast" ;
+bread           → "biscuits" ;
+bread           → "English muffin" ;
+
+Enhancing Notation 
+additional |
+bread           → "toast" | "biscuits" | "English muffin" ;
+grouping ()
+protein         → ( "scrambled" | "poached" | "fried" ) eggs ;
+recursion *
+crispiness      → "really" "really"* ;
+at least once +
+crispiness      → "really"+ ;
+option ?
+breakfast       → protein ( "with" breakfast "on the side" )? ;
+
+breakfast       → protein ( "with" breakfast "on the side" )?
+                | bread ;
+protein         → "really"+ "crispy" "bacon"
+                | "sausage"
+                | ( "scrambled" | "poached" | "fried" ) "eggs" ;
+bread           → "toast" | "biscuits" | "English muffin" ;
