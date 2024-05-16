@@ -32,3 +32,14 @@ protein         → "really"+ "crispy" "bacon"
                 | "sausage"
                 | ( "scrambled" | "poached" | "fried" ) "eggs" ;
 bread           → "toast" | "biscuits" | "English muffin" ;
+
+expression → literal
+            | unary
+            | binary
+            | grouping ;
+literal     → NUMBER | STRING | "true" | "false" | "nil" ;
+grouping    → "(" expression ")" ;
+unary       → ( "-" | "!" ) expression ;
+binary      → expression operator expression ;
+operator    → "==" | "!=" | "<" | "<=" | ">" | ">="
+            | "+" | "-" | "*" | "/" ;
