@@ -11,23 +11,28 @@
     // } // Other expressions...
 // }
 
-// pub struct GenerateAst {}
+pub struct GenerateAst {}
 
-// impl GenerateAst {
-// }
-
-fn main(args: Vec<String>) {
-    if args.len() != 1 {
-        eprintln!("Usage: generate_ast <output directory>");
-        process::exit(64);
+impl GenerateAst {
+    fn generate_ast() {
+        let args: Vec<String> = env::args().collect();
+    
+        if args.len() != 1 {
+            eprintln!("Usage: generate_ast <output directory>");
+            process::exit(64);
+        }
+        let output_dir = &args[0];
+        define_ast(output_dir, "Expr",
+            vec![
+                "Binary : Expr left, Token operator, Expr right",
+                "Grouping : Expr expression",
+                "Literal : Object value",
+                "Unary : Token operator, Expr right"
+            ]
+        );
     }
-    let output_dir = args[0];
-    define_ast(output_dir, 
-        vec![
-            "Binary : Expr left, Token operator, Expr right",
-            "Grouping : Expr expression",
-            "Literal : Object value",
-            "Unary : Token operator, Expr right"
-        ]
-    );
+
+    fn define_ast(output_dir: String, base_name: String, types: Vec) {
+        let path = format!("{}/{}.rs", output_dir,base_name);
+    }
 }
