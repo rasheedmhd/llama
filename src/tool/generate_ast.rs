@@ -32,7 +32,12 @@ impl GenerateAst {
         );
     }
 
-    fn define_ast(output_dir: String, base_name: String, types: Vec) {
-        let path = format!("{}/{}.rs", output_dir,base_name);
+    fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) {
+        let path = format!("{}/{}.rs", output_dir, base_name);
+        let mut file = File::create(&path)?;
+        let content = b"struct {base_name} {
+
+        }";
+        file.write_all(content)?;
     }
 }
