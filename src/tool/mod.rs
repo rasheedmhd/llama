@@ -1,3 +1,10 @@
+use std::fs::File;
+use std::io::prelude::*;
+use std::env;
+use std::process;
+
+#[allow(dead_code)]
+
 // abstract class Expr {
     // static class Binary extends Expr {
     // Binary(Expr left, Token operator, Expr right) {
@@ -11,9 +18,11 @@
     // } // Other expressions...
 // }
 
+
 pub struct GenerateAst {}
 
 impl GenerateAst {
+    #[allow(dead_code)]
     fn generate_ast() {
         let args: Vec<String> = env::args().collect();
     
@@ -21,8 +30,8 @@ impl GenerateAst {
             eprintln!("Usage: generate_ast <output directory>");
             process::exit(64);
         }
-        let output_dir = &args[0];
-        define_ast(output_dir, "Expr",
+        let output_dir = &args[1];
+        GenerateAst::define_ast(output_dir, "Expr",
             vec![
                 "Binary : Expr left, Token operator, Expr right",
                 "Grouping : Expr expression",
@@ -34,10 +43,21 @@ impl GenerateAst {
 
     fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) {
         let path = format!("{}/{}.rs", output_dir, base_name);
-        let mut file = File::create(&path)?;
+        let mut file = File::create(&path).unwrap();
         let content = b"struct {base_name} {
 
         }";
-        file.write_all(content)?;
+        // The AST classes.
+        // for (String type : types) {
+        //     String className = type.split(":")[0].trim();
+        //     String fields = type.split(":")[1].trim();
+        //     defineType(writer, baseName, className, fields);
+        // }
+
+        for t in types {
+            println!("{:}", t)
+        }
+
+        file.write_all(content).unwrap();
     }
 }
