@@ -44,9 +44,7 @@ impl GenerateAst {
     fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) {
         let path = format!("{}/{}.rs", output_dir, base_name);
         let mut file = File::create(&path).unwrap();
-        let content = b"struct {base_name} {
-
-        }";
+        file.write_all(b"struct {base_name} {").unwrap();
         // The AST classes.
         // for (String type : types) {
         //     String className = type.split(":")[0].trim();
@@ -55,9 +53,15 @@ impl GenerateAst {
         // }
 
         for t in types {
-            println!("{:}", t)
+            let parts: Vec<&str> = t.split(":").collect();
+            let class_name = parts[0].trim();
+            let fields = parts[1].trim();
+            println!("{:} {:}", class_name, fields);    
+            define_type(base_name, class_name, fields);
         }
-
-        file.write_all(content).unwrap();
+        file.write(b"}").unwrap();
+    }
+    fn define_type(writer: String, base_name: String, class_name: String, fields: Vec<String>) {
+        todo!();
     }
 }
