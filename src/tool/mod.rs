@@ -1,6 +1,7 @@
 use std::env;
 use std::fs::File;
 use std::io::{self, Write};
+use std::iter::Enumerate;
 use std::path::Path;
 
 fn main() -> io::Result<()> {
@@ -39,6 +40,8 @@ fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) -> io::Result
     writeln!(file, "    }}")?;
     writeln!(file)?;
 
+    define_visitor(&mut file, base_name, &types)?;
+
     for type_def in &types {
         let enum_name = type_def.split(':').next().unwrap().trim();
         let fields = type_def.split(':').nth(1).unwrap().trim();
@@ -75,6 +78,27 @@ fn define_type<W: Write>(writer: &mut W, base_name: &str, struct_name: &str, fie
     writeln!(writer, "    }}")?;
     writeln!(writer)?;
 
+    writeln!(writer, "    impl {} for {}{} {{", base_name, struct_name, base_name)?;
+    writeln!(writer, "        fn accept<T>(&self, visitor: &mut dyn Visitor<T>) -> T {{")?;
+    writeln!(writer, "            visitor.visit_{}_{}(self)", struct_name.to_lowercase(), base_name.to_lowercase())?;
+    writeln!(writer, "        }}")?;
+    writeln!(writer, "    }}")?;
+    writeln!(writer)?;
+
+    Ok(())
+}
+
+fn define_visitor<W: Write>(writer: &mut W, base_name: &str, types: &[&str]) -> io::Result<()> {
+    writeln!(writer, "    pub trait Visitor<T> {{")?;
+
+    for type_def in types {
+        let type_name = type_def.split(':').next().unwrap().trim();
+        writeln!(writer, "        fn visit_{}_{}(&mut self, {}: &{}{}) -> T;",
+                 type_name.to_lowercase(), base_name.to_lowercase(),
+                 base_name.to_lowercase(), type_name, base_name)?;
+    }
+
+    writeln!(writer, "    }}")?;
     writeln!(writer)?;
 
     Ok(())
