@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
-use std::env;
+use std::{env, io};
 use std::process;
 
 #[allow(dead_code)]
@@ -45,23 +45,37 @@ impl GenerateAst {
         let path = format!("{}/{}.rs", output_dir, base_name);
         let mut file = File::create(&path).unwrap();
         file.write_all(b"struct {base_name} {").unwrap();
-        // The AST classes.
-        // for (String type : types) {
-        //     String className = type.split(":")[0].trim();
-        //     String fields = type.split(":")[1].trim();
-        //     defineType(writer, baseName, className, fields);
-        // }
 
         for t in types {
             let parts: Vec<&str> = t.split(":").collect();
             let class_name = parts[0].trim();
             let fields = parts[1].trim();
             println!("{:} {:}", class_name, fields);    
-            define_type(base_name, class_name, fields);
+            Self::define_type(writer, base_name, class_name, fields);
         }
         file.write(b"}").unwrap();
     }
-    fn define_type(writer: String, base_name: String, class_name: String, fields: Vec<String>) {
-        todo!();
+    fn define_type(writer: &mut dyn Write, base_name: &str, class_name: &str, fields: &str) -> io::Result<()> {
+        // Write the struct definition
+        writeln!(writer, "struct {} {{", struct_name)?;
+        let fields: Vec<&str> = field_list.split(", ").collect();
+        for field in &fields {
+            writeln!(writer, "    pub {},", field)?;
+        }
+        writeln!(writer, "}}")?;
+
+        // Write the impl block
+        writeln!(writer, "impl {} {{", struct_name)?;
+        writeln!(writer, "    pub fn new({}) -> Self {{", field_list)?;
+        writeln!(writer, "        Self {{")?;
+        for field in &fields {
+            let name = field.split_whitespace().nth(1).unwrap();
+            writeln!(writer, "            {},", name)?;
+        }
+        writeln!(writer, "        }}")?;
+        writeln!(writer, "    }}")?;
+        writeln!(writer, "}}")?;
+
+        Ok(())
     }
 }
