@@ -39,8 +39,6 @@ fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) -> io::Result
     writeln!(file, "    }}")?;
     writeln!(file)?;
 
-    // define_visitor(&mut file, base_name, &types)?;
-
     for type_def in &types {
         let enum_name = type_def.split(':').next().unwrap().trim();
         let fields = type_def.split(':').nth(1).unwrap().trim();
@@ -48,6 +46,36 @@ fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) -> io::Result
     }
 
     writeln!(file, "}}")?;
+
+    Ok(())
+}
+
+
+fn define_type<W: Write>(writer: &mut W, base_name: &str, struct_name: &str, field_list: &str) -> io::Result<()> {
+    writeln!(writer)?;
+    writeln!(writer, "    pub struct {}{} {{", struct_name, base_name)?;
+
+    for field in field_list.split(", ") {
+        writeln!(writer, "        pub {},", field)?;
+    }
+
+    writeln!(writer, "    }}")?;
+    writeln!(writer)?;
+
+    writeln!(writer, "    impl {}{} {{", struct_name, base_name)?;
+    writeln!(writer, "        pub fn new({}) -> Self {{", field_list)?;
+
+    writeln!(writer, "            Self {{")?;
+    for field in field_list.split(", ") {
+        let name = field.split(' ').nth(1).unwrap();
+        writeln!(writer, "                {},", name)?;
+    }
+    writeln!(writer, "            }}")?;
+    writeln!(writer, "        }}")?;
+    writeln!(writer, "    }}")?;
+    writeln!(writer)?;
+
+    writeln!(writer)?;
 
     Ok(())
 }
