@@ -3,3 +3,4 @@ pub mod token;
 pub mod scanner;
 pub mod repl;
 mod tool;
+mod expr;
