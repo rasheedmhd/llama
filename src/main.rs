@@ -1,5 +1,3 @@
-mod expr;
-
 use llama::repl::Llama;
 
 fn main() {

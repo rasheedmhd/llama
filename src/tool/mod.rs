@@ -1,7 +1,6 @@
 use std::env;
 use std::fs::File;
 use std::io::{self, Write};
-use std::iter::Enumerate;
 use std::path::Path;
 
 fn main() -> io::Result<()> {
@@ -69,10 +68,12 @@ fn define_type<W: Write>(writer: &mut W, base_name: &str, struct_name: &str, fie
     writeln!(writer, "        pub fn new({}) -> Self {{", field_list)?;
 
     writeln!(writer, "            Self {{")?;
+
     for field in field_list.split(", ") {
         let name = field.split(' ').nth(1).unwrap();
         writeln!(writer, "                {},", name)?;
     }
+
     writeln!(writer, "            }}")?;
     writeln!(writer, "        }}")?;
     writeln!(writer, "    }}")?;
@@ -92,10 +93,10 @@ fn define_visitor<W: Write>(writer: &mut W, base_name: &str, types: &[&str]) -> 
     writeln!(writer, "    pub trait Visitor<T> {{")?;
 
     for type_def in types {
-        let type_name = type_def.split(':').next().unwrap().trim();
-        writeln!(writer, "        fn visit_{}_{}(&mut self, {}: &{}{}) -> T;",
-                 type_name.to_lowercase(), base_name.to_lowercase(),
-                 base_name.to_lowercase(), type_name, base_name)?;
+         let type_name = type_def.split(':').next().unwrap().trim();
+         writeln!(writer, "        fn visit_{}_{}(&mut self, {}: &{}{}) -> T;",
+         type_name.to_lowercase(), base_name.to_lowercase(),
+         base_name.to_lowercase(), type_name, base_name)?;
     }
 
     writeln!(writer, "    }}")?;
