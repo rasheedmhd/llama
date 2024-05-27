@@ -52,9 +52,9 @@ fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) -> io::Result
     Ok(())
 }
 
-fn define_type<W: Write>(writer: &mut W, base_name: &str, class_name: &str, field_list: &str) -> io::Result<()> {
+fn define_type<W: Write>(writer: &mut W, base_name: &str, struct_name: &str, field_list: &str) -> io::Result<()> {
     writeln!(writer)?;
-    writeln!(writer, "    pub struct {}{} {{", class_name, base_name)?;
+    writeln!(writer, "    pub struct {}{} {{", struct_name, base_name)?;
 
     for field in field_list.split(", ") {
         writeln!(writer, "        pub {},", field)?;
@@ -63,7 +63,7 @@ fn define_type<W: Write>(writer: &mut W, base_name: &str, class_name: &str, fiel
     writeln!(writer, "    }}")?;
     writeln!(writer)?;
 
-    writeln!(writer, "    impl {}{} {{", class_name, base_name)?;
+    writeln!(writer, "    impl {}{} {{", struct_name, base_name)?;
     writeln!(writer, "        pub fn new({}) -> Self {{", field_list)?;
 
     writeln!(writer, "            Self {{")?;
@@ -77,9 +77,9 @@ fn define_type<W: Write>(writer: &mut W, base_name: &str, class_name: &str, fiel
     writeln!(writer, "    }}")?;
     writeln!(writer)?;
 
-    writeln!(writer, "    impl<T> Visitor<T> for {}{} {{", class_name, base_name)?;
+    writeln!(writer, "    impl<T> Visitor<T> for {}{} {{", struct_name, base_name)?;
     writeln!(writer, "        fn accept<T>(&self, visitor: &mut dyn Visitor<T>) -> T {{")?;
-    writeln!(writer, "            visitor.visit_{}_{}(self)", class_name.to_lowercase(), base_name.to_lowercase())?;
+    writeln!(writer, "            visitor.visit_{}_{}(self)", struct_name.to_lowercase(), base_name.to_lowercase())?;
     writeln!(writer, "        }}")?;
     writeln!(writer, "    }}")?;
     writeln!(writer)?;
