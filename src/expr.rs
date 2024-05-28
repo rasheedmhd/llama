@@ -7,8 +7,10 @@
 //     // Add other variants as needed
 // }
 
+
 pub mod ast {
 
+    type ExprBoxed = Box<Expr>;
     use crate::token::Token;
 
     pub enum Expr {
@@ -38,13 +40,13 @@ pub mod ast {
 
 
     pub struct BinaryExpr {
-        pub left : Box<Expr>,
+        pub left : ExprBoxed,
         pub operator : Token,
-        pub right : Box<Expr>,
+        pub right : ExprBoxed,
     }
 
     impl BinaryExpr {
-        pub fn new(left : Box<Expr>, operator : Token, right : Box<Expr>) -> Self {
+        pub fn new(left : ExprBoxed, operator : Token, right : ExprBoxed) -> Self {
             Self {
                 left,
                 operator,
@@ -55,11 +57,11 @@ pub mod ast {
 
 
     pub struct GroupingExpr {
-        pub expression : Box<Expr>,
+        pub expression : ExprBoxed,
     }
 
     impl GroupingExpr {
-        pub fn new(expression : Box<Expr>) -> Self {
+        pub fn new(expression : ExprBoxed) -> Self {
             Self {
                 expression,
             }
@@ -82,11 +84,11 @@ pub mod ast {
 
     pub struct UnaryExpr {
         pub operator : Token,
-        pub right : Box<Expr>,
+        pub right : ExprBoxed,
     }
 
     impl UnaryExpr {
-        pub fn new(operator : Token, right : Box<Expr>) -> Self {
+        pub fn new(operator : Token, right : ExprBoxed) -> Self {
             Self {
                 operator,
                 right,
