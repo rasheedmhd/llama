@@ -1,8 +1,8 @@
 
-use crate::expr::ast::{BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr, Visitor};
+use crate::expr::ast::{BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr, ASTVisitor};
 struct ast_printer;
 
-impl<String>  Visitor<String> for  ast_printer {
+impl<String>  ASTVisitor<String> for  ast_printer {
     fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> String {
         // return expr.new();
         todo!()
