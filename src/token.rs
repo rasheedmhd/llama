@@ -3,9 +3,9 @@ use crate::token_type::TokenType;
 
 #[derive(Debug, Clone)]
 pub struct Token {
-    token_type: TokenType,
+    pub token_type: TokenType,
     pub lexeme: String,
-    line: usize,
+    pub line: usize,
     // TO DO
     // literal: dyn Any,  
     // create an enum to handle all TokenLiteral types
@@ -15,7 +15,7 @@ pub struct Token {
     // by a . and one or more trailing digits as Some("number_literal")
     // Subsequent code using the number literal should convert it into a float 
     // That is how Llama store numbers in memory  
-    literal: Option<String>,  
+    pub literal: Option<String>,  
 }
 
 impl Token {

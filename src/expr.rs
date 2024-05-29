@@ -11,6 +11,9 @@
 pub mod ast {
 
     type ExprBoxed = Box<Expr>;
+    use core::fmt;
+    use std::fmt::write;
+
     use crate::token::Token;
 
     #[derive(Clone)]
@@ -20,6 +23,12 @@ pub mod ast {
         Literal(LiteralExpr),
         Unary(UnaryExpr),
     }
+
+    // impl std::fmt::Display for Expr {
+    //     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+    //         writeln!(fmt, "{}", self.0.join(" "));
+    //     }
+    // }
 
     pub trait ASTVisitor<T> {
         fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> T;
