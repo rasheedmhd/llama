@@ -4,7 +4,7 @@ use crate::token_type::TokenType;
 #[derive(Debug, Clone)]
 pub struct Token {
     token_type: TokenType,
-    lexeme: String,
+    pub lexeme: String,
     line: usize,
     // TO DO
     // literal: dyn Any,  

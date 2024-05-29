@@ -13,6 +13,7 @@ pub mod ast {
     type ExprBoxed = Box<Expr>;
     use crate::token::Token;
 
+    #[derive(Clone)]
     pub enum Expr {
         Binary(BinaryExpr),
         Grouping(GroupingExpr),
@@ -62,7 +63,7 @@ pub mod ast {
         }
     }
 
-
+    #[derive(Clone)]
     pub struct BinaryExpr {
         pub left : ExprBoxed,
         pub operator : Token,
@@ -79,7 +80,7 @@ pub mod ast {
         }
     }
 
-
+    #[derive(Clone)]
     pub struct GroupingExpr {
         pub expression : ExprBoxed,
     }
@@ -92,7 +93,7 @@ pub mod ast {
         }
     }
 
-
+    #[derive(Clone)]
     pub struct LiteralExpr {
         pub value : String,
     }
@@ -105,7 +106,7 @@ pub mod ast {
         }
     }
 
-
+    #[derive(Clone)]
     pub struct UnaryExpr {
         pub operator : Token,
         pub right : ExprBoxed,
