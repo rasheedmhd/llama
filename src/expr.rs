@@ -9,14 +9,13 @@
 
 
 pub mod ast {
+    use std::fmt;
 
     type ExprBoxed = Box<Expr>;
-    use core::fmt;
-    use std::fmt::write;
 
     use crate::token::Token;
 
-    #[derive(Clone)]
+    #[derive(Clone, Debug)]
     pub enum Expr {
         Binary(BinaryExpr),
         Grouping(GroupingExpr),
@@ -72,7 +71,7 @@ pub mod ast {
         }
     }
 
-    #[derive(Clone)]
+    #[derive(Clone, Debug)]
     pub struct BinaryExpr {
         pub left : ExprBoxed,
         pub operator : Token,
@@ -89,7 +88,7 @@ pub mod ast {
         }
     }
 
-    #[derive(Clone)]
+    #[derive(Clone, Debug)]
     pub struct GroupingExpr {
         pub expression : ExprBoxed,
     }
@@ -102,7 +101,7 @@ pub mod ast {
         }
     }
 
-    #[derive(Clone)]
+    #[derive(Clone, Debug)]
     pub struct LiteralExpr {
         pub value : String,
     }
@@ -115,7 +114,7 @@ pub mod ast {
         }
     }
 
-    #[derive(Clone)]
+    #[derive(Clone, Debug)]
     pub struct UnaryExpr {
         pub operator : Token,
         pub right : ExprBoxed,
@@ -130,4 +129,44 @@ pub mod ast {
         }
     }
 
+    // FORMATTING
+    impl fmt::Display for BinaryExpr {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "({} {} {})", self.left, self.operator, self.right)
+        }
+    }
+    
+    impl fmt::Display for GroupingExpr {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "(group {})", self.expression)
+        }
+    }
+    
+    impl fmt::Display for LiteralExpr {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", self.value)
+        }
+    }
+    
+    impl fmt::Display for UnaryExpr {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "({} {})", self.operator, self.right)
+        }
+    }
+
+    impl fmt::Display for Expr {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match self {
+                Expr::Binary(expr) => write!(f, "({} {} {})", expr.operator.lexeme, expr.left,  expr.right),
+                Expr::Unary(expr) => write!(f, "({} {})", expr.operator.lexeme, expr.right),
+                Expr::Literal(expr) => write!(f, "{}", expr.value),
+                Expr::Grouping(expr) => write!(f, "(group {})", expr.expression),
+            }
+        }
+    }
+
+
 }
+
+
+

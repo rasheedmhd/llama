@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Single-character tokens.
@@ -50,4 +52,51 @@ pub enum TokenType {
     WHILE,
     
     EOF
+}
+
+impl fmt::Display for TokenType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let token_str = match self {
+            TokenType::LeftPAREN => "(",
+            TokenType::RightPAREN => ")",
+            TokenType::LeftBRACE => "{",
+            TokenType::RightBRACE => "}",
+            TokenType::COMMA => ",",
+            TokenType::DOT => ".",
+            TokenType::MINUS => "-",
+            TokenType::PLUS => "+",
+            TokenType::SEMICOLON => ";",
+            TokenType::SLASH => "/",
+            TokenType::STAR => "*",
+            TokenType::BANG => "!",
+            TokenType::BangEQUAL => "!=",
+            TokenType::EQUAL => "=",
+            TokenType::EqualEQUAL => "==",
+            TokenType::GREATER => ">",
+            TokenType::GreaterEQUAL => ">=",
+            TokenType::LESS => "<",
+            TokenType::LessEQUAL => "<=",
+            TokenType::IDENTIFIER => "identifier",
+            TokenType::STRING => "string",
+            TokenType::NUMBER => "number",
+            TokenType::AND => "and",
+            TokenType::CLASS => "class",
+            TokenType::ELSE => "else",
+            TokenType::FALSE => "false",
+            TokenType::FUN => "fun",
+            TokenType::FOR => "for",
+            TokenType::IF => "if",
+            TokenType::NIL => "nil",
+            TokenType::OR => "or",
+            TokenType::PRINT => "print",
+            TokenType::RETURN => "return",
+            TokenType::SUPER => "super",
+            TokenType::THIS => "this",
+            TokenType::TRUE => "true",
+            TokenType::VAR => "var",
+            TokenType::WHILE => "while",
+            TokenType::EOF => "EOF",
+        };
+        write!(f, "{}", token_str)
+    }
 }

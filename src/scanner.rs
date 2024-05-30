@@ -1,25 +1,25 @@
-use std::collections::HashMap;
-use lazy_static::lazy_static;
-use crate::token_type::TokenType;
 use crate::token::Token;
+use crate::token_type::TokenType;
+use lazy_static::lazy_static;
+use std::collections::HashMap;
 
 // TO DO
-// Add support to Llamaʼs scanner for C-style /* ... */ block comments. 
+// Add support to Llamaʼs scanner for C-style /* ... */ block comments.
 // + handle newlines in them. + nesting.
 // Is adding support for nesting more work than you expected? Why?
 
 #[allow(dead_code)]
 pub struct Scanner {
-    source:     String,
-    // The start and current fields are offsets that index into the string. 
+    source: String,
+    // The start and current fields are offsets that index into the string.
     // points to the first character in the lexeme being scanned,
-    start:      usize,
-    // points at the character currently being considered. 
-    current:    usize,
-    // tracks what source line current is on so we 
+    start: usize,
+    // points at the character currently being considered.
+    current: usize,
+    // tracks what source line current is on so we
     // can produce tokens that know their location
-    line:       usize,
-    tokens:     Vec<Token>,
+    line: usize,
+    tokens: Vec<Token>,
 }
 
 lazy_static! {
@@ -45,14 +45,13 @@ lazy_static! {
     };
 }
 
-
 impl Scanner {
     pub fn new() -> Self {
         Scanner {
             source: String::new(),
-            start:      0,
-            current:    0,
-            line:       1,
+            start: 0,
+            current: 0,
+            line: 1,
             tokens: Vec::new(),
         }
     }
@@ -61,16 +60,16 @@ impl Scanner {
     pub fn from(source: String) -> Self {
         Self {
             source,
-            start:      0,
-            current:    0,
-            line:       1,
-            tokens:     Vec::new(),
+            start: 0,
+            current: 0,
+            line: 1,
+            tokens: Vec::new(),
         }
     }
 
     // Starting at the first character of the source code,
-    // the scanner figures out what lexeme the character belongs to, 
-    // and consumes it and any following characters that are part of that lexeme. 
+    // the scanner figures out what lexeme the character belongs to,
+    // and consumes it and any following characters that are part of that lexeme.
     // When it reaches the end of that lexeme, it emits a token.
     pub fn scan_tokens(&mut self) -> Vec<Token> {
         while !self.is_at_end() {
@@ -85,7 +84,7 @@ impl Scanner {
     }
 
     // Recognizing Lexemes
-    // The lexemes are only the raw substrings of the source code. 
+    // The lexemes are only the raw substrings of the source code.
     // [var] [language] [=] ["Llama"] [;]
     // To Do
     // Next Char returns wih a \n char which the scanner doesn't recognize
@@ -103,59 +102,58 @@ impl Scanner {
             Some('+') => self.add_token(TokenType::PLUS),
             Some(';') => self.add_token(TokenType::SEMICOLON),
             Some('*') => self.add_token(TokenType::STAR),
-            // Operators 
+            // Operators
             // To Do
             // Add a ++ for adding 1 to a value
             Some('!') => {
-                    if self.match_char('=') {
-                        self.add_token(TokenType::BangEQUAL)
-                    } else if !self.match_char('=') {
-                        self.add_token(TokenType::BANG)
-                    }
+                if self.match_char('=') {
+                    self.add_token(TokenType::BangEQUAL)
+                } else if !self.match_char('=') {
+                    self.add_token(TokenType::BANG)
                 }
+            }
             Some('=') => {
-                    if self.match_char('=') {
-                        self.add_token(TokenType::EqualEQUAL)
-                    } else if !self.match_char('=') {
-                        self.add_token(TokenType::EQUAL)
-                    }
+                if self.match_char('=') {
+                    self.add_token(TokenType::EqualEQUAL)
+                } else if !self.match_char('=') {
+                    self.add_token(TokenType::EQUAL)
                 }
+            }
             Some('<') => {
-                    if self.match_char('=') {
-                        self.add_token(TokenType::LessEQUAL)
-                    } else if !self.match_char('=') {
-                        self.add_token(TokenType::LESS)
-                    }
+                if self.match_char('=') {
+                    self.add_token(TokenType::LessEQUAL)
+                } else if !self.match_char('=') {
+                    self.add_token(TokenType::LESS)
                 }
+            }
             Some('>') => {
-                    if self.match_char('=') {
-                        self.add_token(TokenType::GreaterEQUAL)
-                    } else if !self.match_char('=') {
-                        self.add_token(TokenType::GREATER)
-                    }
+                if self.match_char('=') {
+                    self.add_token(TokenType::GreaterEQUAL)
+                } else if !self.match_char('=') {
+                    self.add_token(TokenType::GREATER)
                 }
+            }
             Some('/') => {
-                    if self.match_char('/') {
-                        // A comment goes until the end of the line
-                        while self.peek() != '\n' && !self.is_at_end() {
-                            self.advance();                            
-                        } 
-                    } else if !self.match_char('/') {
-                        self.add_token(TokenType::SLASH);
+                if self.match_char('/') {
+                    // A comment goes until the end of the line
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        self.advance();
                     }
+                } else if !self.match_char('/') {
+                    self.add_token(TokenType::SLASH);
                 }
-            Some(' ') | Some('\r') | Some('\t')  => {},
+            }
+            Some(' ') | Some('\r') | Some('\t') => {}
             Some('\n') => self.line += 1,
             Some('"') => self.string(),
-            _   => {
+            _ => {
                 if self.is_digit(char) {
                     self.number();
-                } else
-                if self.is_alpha(char) {
+                } else if self.is_alpha(char) {
                     self.identifier();
                 }
                 crate::repl::Llama::error(self.line, "Unexpected Character".to_string())
-            },
+            }
         }
     }
 
@@ -175,16 +173,15 @@ impl Scanner {
     }
 
     fn is_alpha(&self, char: Option<char>) -> bool {
-        return 
-         (char.unwrap() >= 'a' && char.unwrap() <= 'z') ||
-         (char.unwrap() >= 'A' && char.unwrap() <= 'Z') ||
-         char.unwrap() == '_';
+        return (char.unwrap() >= 'a' && char.unwrap() <= 'z')
+            || (char.unwrap() >= 'A' && char.unwrap() <= 'Z')
+            || char.unwrap() == '_';
     }
 
     fn is_alphanumeric(&self, char: char) -> bool {
         self.is_alpha(Some(char)) || self.is_digit(Some(char))
     }
- 
+
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
@@ -197,8 +194,8 @@ impl Scanner {
 
     fn match_char(&mut self, expected: char) -> bool {
         if self.is_at_end() {
-           return false;
-        } 
+            return false;
+        }
         if self.source.chars().nth(self.current) != Some(expected) {
             return false;
         }
@@ -207,7 +204,9 @@ impl Scanner {
     }
 
     fn peek(&self) -> char {
-        if self.is_at_end() { return '\0'; }
+        if self.is_at_end() {
+            return '\0';
+        }
         return self.source.chars().nth(self.current).unwrap();
     }
 
@@ -224,11 +223,11 @@ impl Scanner {
         // The closing "
         self.advance();
         // Trim the surrounding quotes.
-        let value: String = self.source[self.start+1..self.current-1].to_string();
+        let value: String = self.source[self.start + 1..self.current - 1].to_string();
         self.add_token_with_literal(TokenType::STRING, Some(value))
     }
 
-    fn is_digit(&self, char: Option<char>) ->  bool {
+    fn is_digit(&self, char: Option<char>) -> bool {
         char.unwrap() >= '0' && char.unwrap() <= '9'
     }
 
@@ -251,23 +250,24 @@ impl Scanner {
     }
 
     fn peek_next(&self) -> Option<char> {
-        if self.current+1 >= self.source.len() {
+        if self.current + 1 >= self.source.len() {
             return Some('\0');
         }
-        return self.source.chars().nth(self.current+1)
+        return self.source.chars().nth(self.current + 1);
     }
-    
-    // The lexemes are only the raw substrings of the source code. 
-    // However, in the process of grouping character sequences into lexemes, 
-    // we also stumble upon some other useful information. 
-    // When we take the lexeme and bundle it together with that other data, 
+
+    // The lexemes are only the raw substrings of the source code.
+    // However, in the process of grouping character sequences into lexemes,
+    // we also stumble upon some other useful information.
+    // When we take the lexeme and bundle it together with that other data,
     // the result is a token. It includes useful stuff like:
     fn add_token(&mut self, token_type: TokenType) {
         self.add_token_with_literal(token_type, None)
     }
 
-    fn add_token_with_literal(&mut self, token_type: TokenType, literal: Option<String> ) {
+    fn add_token_with_literal(&mut self, token_type: TokenType, literal: Option<String>) {
         let text = self.source[self.start..self.current].to_string();
-        self.tokens.push(Token::new(token_type, text, self.line, literal));
+        self.tokens
+            .push(Token::new(token_type, text, self.line, literal));
     }
 }

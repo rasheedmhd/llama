@@ -18,6 +18,18 @@ pub struct Token {
     pub literal: Option<String>,  
 }
 
+impl std::fmt::Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} {} {}",
+            self.token_type,
+            self.lexeme,
+            self.literal.clone().unwrap_or_default()
+        )
+    }
+}
+
 impl Token {
     #[allow(dead_code)]
     pub fn new(token_type: TokenType, lexeme: String, line: usize, literal: Option<String>) -> Self {

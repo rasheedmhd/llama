@@ -3,9 +3,14 @@ use crate::expr::ast::{BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr, ASTVisi
 use crate::expr::ast::Expr;
 use crate::token::Token;
 use crate::token_type::TokenType;
-struct AstPrinter;
+
+pub struct AstPrinter;
 
 impl AstPrinter {
+
+    // pub fn print(&mut self, expr: Expr) -> String {
+    //     expr.accept(self)
+    // }
 
     fn parenthesize(&mut self, name: &str, exprs: &[Box<Expr>]) -> String {
         let mut builder = String::new();
@@ -18,15 +23,62 @@ impl AstPrinter {
         builder.push(')');
         builder
     }
+
+    pub fn main() -> String {
+        let expression = Box::new(Expr::Binary(
+            BinaryExpr { 
+                left: Box::new(
+                    Expr::Unary(
+                        UnaryExpr { 
+                            operator: Token { 
+                                token_type: TokenType::MINUS,
+                                lexeme: "-".to_string(),
+                                line: 1,
+                                literal: None
+                            } ,
+                            right: Box::new(
+                                Expr::Literal(
+                                    LiteralExpr { value: "123".to_string() }
+                                )
+                            )
+                        }
+                    )
+                ),
+                operator: Token {
+                    token_type: TokenType::STAR,
+                    lexeme: "*".to_string(),
+                    line: 1,
+                    literal: None
+                } ,
+                right: Box::new(
+                    Expr::Grouping(
+                        GroupingExpr {
+                            expression: Box::new(
+                                Expr::Literal(
+                                    LiteralExpr { value: "45.67".to_string() }
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        ));
+
+        println!(" Expression: {}", expression);
+        let expressions: &[Box<Expr>] = &[expression.clone()]; // Create a slice with one element
+        let string = AstPrinter::parenthesize(&mut AstPrinter, "", expressions);
+
+        println!(" Parenthesized Expression: {string}");
+        string
+        // expression
+    }
     
 }
 
 impl ASTVisitor<String> for  AstPrinter {
-    // fn print(expr: Expr) {
-    //     expr.accept(self)
-    // }
+
     fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> String {
-        AstPrinter.parenthesize(&expr.operator.lexeme, &[expr.left.clone(), expr.left.clone()])
+        AstPrinter.parenthesize(&expr.operator.lexeme, &[expr.left.clone(), expr.right.clone()])
     }
 
     fn visit_grouping_expr(&mut self, expr: &GroupingExpr) -> String {
@@ -34,8 +86,6 @@ impl ASTVisitor<String> for  AstPrinter {
     }
 
     fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> String {
-        // if (expr.value == null) return "nil";
-        // return expr.value.toString();
         if expr.value.is_empty() {
             return "nil".to_string();
         }
@@ -46,66 +96,4 @@ impl ASTVisitor<String> for  AstPrinter {
         AstPrinter.parenthesize(&expr.operator.lexeme, &[expr.right.clone()])
     }
 
-    // private String parenthesize(String name, Expr... exprs) {
-    //     StringBuilder builder = new StringBuilder();
-    //     builder.append("(").append(name);
-    //     for (Expr expr : exprs) {
-    //     builder.append(" ");
-    //     builder.append(expr.accept(this));
-    //     }
-    //     builder.append(")");
-    //     return builder.toString();
-    // }
-
-
-}
-
-// public static void main(String[] args) {
-//     Expr expression = new Expr.Binary(
-//     new Expr.Unary(
-//     new Token(TokenType.MINUS, "-", null, 1),
-//     new Expr.Literal(123)),
-//     new Token(TokenType.STAR, "*", null, 1),
-//     new Expr.Grouping(
-//     new Expr.Literal(45.67)));
-
-fn main() -> Expr {
-    let expression = Expr::Binary(
-        BinaryExpr { 
-            left: Box::new(
-                Expr::Unary(
-                    UnaryExpr { 
-                        operator: Token { 
-                            token_type: TokenType::MINUS, lexeme: "-".to_string(), 
-                            line: 1, 
-                            literal: Some("-".to_string())  
-                        } , 
-                        right: Box::new(
-                            Expr::Literal(
-                                LiteralExpr { value: "123".to_string() }
-                            )
-                        )
-                    }
-                )
-            ),
-            operator: Token { 
-                token_type: TokenType::STAR, lexeme: "*".to_string(), 
-                line: 1, 
-                literal: Some("*".to_string())  
-            } , 
-            right: Box::new(
-                Expr::Grouping(
-                    GroupingExpr {
-                        expression: Box::new(
-                            Expr::Literal(
-                                LiteralExpr { value: "45.67".to_string() }
-                            )
-                        )
-                    }
-                )
-            )
-        }
-    );
-
-    expression
 }
