@@ -131,25 +131,27 @@ pub mod ast {
 
     // FORMATTING
     impl fmt::Display for BinaryExpr {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "({} {} {})", self.left, self.operator, self.right)
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            // write!(f, "({} {} {})", self.left, self.operator, self.right)
+            // Reverse Police Notation
+            write!(f, "({} {} {})", self.left, self.right, self.operator)
         }
     }
-    
+
     impl fmt::Display for GroupingExpr {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             write!(f, "(group {})", self.expression)
         }
     }
-    
+
     impl fmt::Display for LiteralExpr {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             write!(f, "{}", self.value)
         }
     }
-    
+
     impl fmt::Display for UnaryExpr {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             write!(f, "({} {})", self.operator, self.right)
         }
     }
