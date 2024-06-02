@@ -18,19 +18,19 @@ impl Parser {
         }
     }
 
-    fn expression(&self) -> Expr {
+    fn expression(&mut self) -> Expr {
         self.equality()
     }
 
     // equality → comparison ( ( "!=" | "==" ) comparison )* ;
-    fn equality(&self) -> Expr {
+    fn equality(&mut self) -> Expr {
 
-        let expr = comparison();
+        let mut expr = comparison();
 
-        while self.match_token(TokenType::BangEQUAL, TokenType::EqualEQUAL) {
+        while self.match_token(&[TokenType::BangEQUAL, TokenType::EqualEQUAL]) {
             let operator = self.previous();
             let right: ExprBoxed = comparison();
-            let expr = Expr::Binary(
+            expr = Expr::Binary(
                BinaryExpr {
                    left: expr,
                    operator,
@@ -42,42 +42,44 @@ impl Parser {
         expr
     }
 
-    fn match_token(&self, types: &[Box<TokenType>]) -> bool {
+    fn match_token(&mut self, types: &[TokenType]) -> bool {
         for t_type in types {
-            if check(t_type) {
-                advance();
+            if self.check(t_type.clone()) {
+                self.advance();
                 return true;
             }
         }
         return false;
     }
 
-    fn check(token_type: TokenType) -> bool {
-        if is_at_end() { return flase; }
-        return peek().type == toke_type;
+    fn check(&self, token_type: TokenType) -> bool {
+        if self.is_at_end() { return false; }
+        // To Do
+        // return peek().type == toke_type;
 
     }
 
     fn advance(&mut self) -> Token {
-        if !is_at_end() { self.current += 1; }
-        return previous();
+        if !self.is_at_end() { self.current += 1; }
+        return self.previous();
     }
 
-    fn is_at_end() -> bool {
+    fn is_at_end(&self) -> bool {
         // To Do
-        let peek = peek();
-        type_of(&peek) == TokenType::EOF;
-        peek
+        // let peek = peek();
+        // type_of(&peek) == TokenType::EOF;
+        // peek
+        true
     }
 
     fn peek(&self) -> Token {
-        // self.tokens.get(self.current).clone().unwrap().clone()
-        self.tokens.get(self.current).unwrap_or_default().clone()
+        self.tokens.get(self.current).clone().unwrap().clone()
+        // self.tokens.get(self.current).unwrap_or_default().clone()
     }
 
     fn previous(&self) -> Token {
-        // self.tokens.get(self.current - 1).clone().unwrap().clone()
-        self.tokens.get(self.current).unwrap_or_default().clone()
+        self.tokens.get(self.current - 1).clone().unwrap().clone()
+        // self.tokens.get(self.current).unwrap_or_default().clone()
 
     }
 
