@@ -53,18 +53,18 @@ impl Parser {
     }
 
     fn check(&self, token_type: TokenType) -> bool {
-        if self.is_at_end() { return false; }
+        if Self::is_at_end() { return false; }
         // To Do
         // return peek().type == toke_type;
-
+true
     }
 
     fn advance(&mut self) -> Token {
-        if !self.is_at_end() { self.current += 1; }
+        if !Self::is_at_end() { self.current += 1; }
         return self.previous();
     }
 
-    fn is_at_end(&self) -> bool {
+    fn is_at_end() -> bool {
         // To Do
         // let peek = peek();
         // type_of(&peek) == TokenType::EOF;
