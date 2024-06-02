@@ -1,6 +1,8 @@
 use crate::expr::ast::{BinaryExpr, Expr};
 use crate::token::Token;
 use crate::token_type::TokenType;
+use std::any::type_name;
+
 
 
 type  ExprBoxed = Box<Expr>;
@@ -74,12 +76,15 @@ true
 
     fn peek(&self) -> Token {
         self.tokens.get(self.current).clone().unwrap().clone()
+        // To Do
+        type_name::<peek()>()
+        // Impl a default value for tokens to use
         // self.tokens.get(self.current).unwrap_or_default().clone()
     }
 
     fn previous(&self) -> Token {
         self.tokens.get(self.current - 1).clone().unwrap().clone()
-        // self.tokens.get(self.current).unwrap_or_default().clone()
+        // self.tokens.get(self.current-1).unwrap_or_default().clone()
 
     }
 

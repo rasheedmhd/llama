@@ -49,7 +49,7 @@ nil | Null
 ```
 add + me;
 subtract - me;
-multiply \* me;
+multiply * me;
 divide / me;
 
 -negateMe;
