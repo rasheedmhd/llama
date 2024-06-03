@@ -20,33 +20,34 @@ impl Parser {
         }
     }
 
-    fn expression(&mut self) -> Expr {
+    fn expression(&mut self) -> Box<Expr> {
         self.equality()
     }
 
     // equality → comparison ( ( "!=" | "==" ) comparison )* ;
-    fn equality(&mut self) -> Expr {
+    fn equality(&mut self) -> Box<Expr> {
 
-        let mut expr = comparison();
+        let mut expr = Box::new(self.comparison());
 
         while self.match_token(&[TokenType::BangEQUAL, TokenType::EqualEQUAL]) {
             let operator = self.previous();
-            let right: ExprBoxed = comparison();
-            expr = Expr::Binary(
+            let right: ExprBoxed =  Box::new(self.comparison());
+
+            expr = Box::new(Expr::Binary(
                BinaryExpr {
                    left: expr,
                    operator,
                    right,
                }
-            );
+            ));
         }
 
         expr
     }
 
     fn match_token(&mut self, types: &[TokenType]) -> bool {
-        for t_type in types {
-            if self.check(t_type.clone()) {
+        for r#type in types {
+            if self.check(r#type.clone()) {
                 self.advance();
                 return true;
             }
@@ -58,7 +59,7 @@ impl Parser {
         if Self::is_at_end() { return false; }
         // To Do
         // return peek().type == toke_type;
-true
+        true
     }
 
     fn advance(&mut self) -> Token {
@@ -77,7 +78,7 @@ true
     fn peek(&self) -> Token {
         self.tokens.get(self.current).clone().unwrap().clone()
         // To Do
-        type_name::<peek()>()
+        // type_name::<peek()>()
         // Impl a default value for tokens to use
         // self.tokens.get(self.current).unwrap_or_default().clone()
     }
@@ -86,6 +87,10 @@ true
         self.tokens.get(self.current - 1).clone().unwrap().clone()
         // self.tokens.get(self.current-1).unwrap_or_default().clone()
 
+    }
+
+    fn comparison(&self) -> Expr {
+        todo!()
     }
 
 
