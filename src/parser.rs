@@ -47,11 +47,11 @@ impl Parser {
     // comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
     fn comparison(&mut self) -> Box<Expr> {
 
-        let mut expr = Box::new(self.term());
+        let mut expr = self.term();
 
         while self.match_token(&[TokenType::GREATER, TokenType::GreaterEQUAL, TokenType::LESS, TokenType::LessEQUAL]) {
             let operator = self.previous();
-            let right: ExprBoxed =  Box::new(self.term());
+            let right: ExprBoxed =  self.term();
 
             expr = Box::new(Expr::Binary(
                BinaryExpr {
@@ -66,13 +66,13 @@ impl Parser {
     }
 
     // term            → factor ( ( "-" | "+" ) factor )* ;
-    fn term(&mut self) -> Expr {
+    fn term(&mut self) -> Box<Expr> {
 
-        let mut expr = Box::new(self.factor());
+        let mut expr = self.factor();
 
         while self.match_token(&[TokenType::MINUS, TokenType::PLUS]) {
             let operator = self.previous();
-            let right: ExprBoxed =  Box::new(self.factor());
+            let right: ExprBoxed =  self.factor();
 
             expr = Box::new(Expr::Binary(
                 BinaryExpr {
@@ -84,6 +84,32 @@ impl Parser {
         }
 
         expr
+    }
+
+
+    fn factor(&mut self) -> Box<Expr> {
+
+        let mut expr = self.unary();
+
+        while self.match_token(&[TokenType::SLASH, TokenType::STAR]) {
+            let operator = self.previous();
+            let right: ExprBoxed =  self.unary();
+
+            expr = Box::new(Expr::Binary(
+                BinaryExpr {
+                    left: expr,
+                    operator,
+                    right,
+                }
+            ));
+        }
+
+        expr
+    }
+
+    // factor          → unary ( ( "/" | "*" ) unary )* ;
+    fn unary(&mut self) -> Box<Expr> {
+        todo!()
     }
     
     fn match_token(&mut self, types: &[TokenType]) -> bool {
