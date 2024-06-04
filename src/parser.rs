@@ -67,7 +67,23 @@ impl Parser {
 
     // term            → factor ( ( "-" | "+" ) factor )* ;
     fn term(&mut self) -> Expr {
-        todo!()
+
+        let mut expr = Box::new(self.factor());
+
+        while self.match_token(&[TokenType::MINUS, TokenType::PLUS]) {
+            let operator = self.previous();
+            let right: ExprBoxed =  Box::new(self.factor());
+
+            expr = Box::new(Expr::Binary(
+                BinaryExpr {
+                    left: expr,
+                    operator,
+                    right,
+                }
+            ));
+        }
+
+        expr
     }
     
     fn match_token(&mut self, types: &[TokenType]) -> bool {
