@@ -1,8 +1,6 @@
 use crate::expr::ast::{BinaryExpr, Expr};
 use crate::token::Token;
 use crate::token_type::TokenType;
-use std::any::type_name;
-
 
 
 type  ExprBoxed = Box<Expr>;
@@ -20,6 +18,7 @@ impl Parser {
         }
     }
 
+    // expression      → equality
     fn expression(&mut self) -> Box<Expr> {
         self.equality()
     }
@@ -72,17 +71,13 @@ impl Parser {
     fn peek(&self) -> Token {
         self.tokens.get(self.current).clone().unwrap().clone()
     }
-    // fn peek(&self) -> &Token {
-    //     &self.tokens.get(self.current).unwrap()
-    // }
+
     fn previous(&self) -> Token {
         self.tokens.get(self.current - 1).clone().unwrap().clone()
-
     }
 
     fn comparison(&self) -> Expr {
         todo!()
     }
-
 
 }

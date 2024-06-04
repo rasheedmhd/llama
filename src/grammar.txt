@@ -28,14 +28,14 @@ AT MOST +
 crispiness      → "really"+ ;
 
 OPTION ?
-breakfast       → protein ( "with" breakfast "on the side" )? ;
+breakfast       → protein ( "with" breakfast "on the side" )?;
 
 breakfast       → protein ( "with" breakfast "on the side" )?
                 | bread ;
 
 protein         → "really"+ "crispy" "bacon"
                 | "sausage"
-                | ( "scrambled" | "poached" | "fried" ) "eggs" ;
+                | ( "scrambled" | "poached" | "fried" ) "eggs";
 
 bread           → "toast" | "biscuits" | "English muffin" ;
 
@@ -66,7 +66,7 @@ primary    → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
 
 Unary operators can nest — !!true is a valid if weird expression — the operand
 can itself be a unary operator. A recursive rule handles that nicely.
-unary → ( "!" | "-" ) unary | primary ;
+unary → ( "!" | "-" ) unary | primary;
 
 factor → unary ( ( "/" | "*" ) unary )* ;
 
@@ -77,3 +77,22 @@ term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "!" | "-" ) unary | primary ;
 primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+
+
+(1) pick a non-terminal symbol, α, in the prototype string;
+(2) choose a grammar rule, α → β; and
+(3) rewrite α with β.
+
+Ambiguity
+Stmt     → if Expr then Stmt
+         | if Expr then Stmt else Stmt
+         | Other
+
+
+FIXING Ambiguity
+Stmt     → if Expr then Stmt
+         | if Expr then WithElse else Stmt
+         | Other
+
+WithElse → if Expr then WithElse else WithElse
+         | Other
