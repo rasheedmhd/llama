@@ -14,31 +14,66 @@ bread           → "toast" ;
 bread           → "biscuits" ;
 bread           → "English muffin" ;
 
-Enhancing Notation 
-additional |
+ENHANCING NOTATION
+ADDITIONAL |
 bread           → "toast" | "biscuits" | "English muffin" ;
-grouping ()
+
+GROUPING ()
 protein         → ( "scrambled" | "poached" | "fried" ) eggs ;
-recursion *
+
+RECURSION (KEENE STAR) *
 crispiness      → "really" "really"* ;
-at least once +
+
+AT MOST +
 crispiness      → "really"+ ;
-option ?
+
+OPTION ?
 breakfast       → protein ( "with" breakfast "on the side" )? ;
 
 breakfast       → protein ( "with" breakfast "on the side" )?
                 | bread ;
+
 protein         → "really"+ "crispy" "bacon"
                 | "sausage"
                 | ( "scrambled" | "poached" | "fried" ) "eggs" ;
+
 bread           → "toast" | "biscuits" | "English muffin" ;
 
+EVALUATING EXPRESSIONS
 expression → literal
             | unary
             | binary
             | grouping ;
+
 literal     → NUMBER | STRING | "true" | "false" | "nil" ;
+
 grouping    → "(" expression ")" ;
+
 unary       → ( "-" | "!" ) expression ;
+
 binary      → expression operator expression ;
+
 operator    → "==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/" ;
+
+DISAMBIGUATING GRAMMAR
+
+The top expression rule matches any expression at any precedence
+level. Since equality has the lowest precedence, if we match that, then it
+covers everything.
+expression → equality
+
+primary    → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+
+Unary operators can nest — !!true is a valid if weird expression — the operand
+can itself be a unary operator. A recursive rule handles that nicely.
+unary → ( "!" | "-" ) unary | primary ;
+
+factor → unary ( ( "/" | "*" ) unary )* ;
+
+expression      → equality ;
+equality        → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term            → factor ( ( "-" | "+" ) factor )* ;
+factor          → unary ( ( "/" | "*" ) unary )* ;
+unary           → ( "!" | "-" ) unary | primary ;
+primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
