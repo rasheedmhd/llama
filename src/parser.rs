@@ -47,7 +47,7 @@ impl Parser {
 
     fn match_token(&mut self, types: &[TokenType]) -> bool {
         for r#type in types {
-            if self.check(r#type.clone()) {
+            if self.check(r#type) {
                 self.advance();
                 return true;
             }
@@ -55,37 +55,28 @@ impl Parser {
         return false;
     }
 
-    fn check(&self, token_type: TokenType) -> bool {
-        if Self::is_at_end() { return false; }
-        // To Do
-        // return peek().type == toke_type;
-        true
+    fn check(&self, token_type: &TokenType) -> bool {
+        if self.is_at_end() { return false; }
+        &self.peek().token_type == token_type
     }
 
     fn advance(&mut self) -> Token {
-        if !Self::is_at_end() { self.current += 1; }
+        if !self.is_at_end() { self.current += 1; }
         return self.previous();
     }
 
-    fn is_at_end() -> bool {
-        // To Do
-        // let peek = peek();
-        // type_of(&peek) == TokenType::EOF;
-        // peek
-        true
+    fn is_at_end(&self) -> bool {
+        matches!(self.peek().token_type, TokenType::EOF)
     }
 
     fn peek(&self) -> Token {
         self.tokens.get(self.current).clone().unwrap().clone()
-        // To Do
-        // type_name::<peek()>()
-        // Impl a default value for tokens to use
-        // self.tokens.get(self.current).unwrap_or_default().clone()
     }
-
+    // fn peek(&self) -> &Token {
+    //     &self.tokens.get(self.current).unwrap()
+    // }
     fn previous(&self) -> Token {
         self.tokens.get(self.current - 1).clone().unwrap().clone()
-        // self.tokens.get(self.current-1).unwrap_or_default().clone()
 
     }
 
