@@ -26,11 +26,11 @@ impl Parser {
     // equality → comparison ( ( "!=" | "==" ) comparison )* ;
     fn equality(&mut self) -> Box<Expr> {
 
-        let mut expr = Box::new(self.comparison());
+        let mut expr = self.comparison();
 
         while self.match_token(&[TokenType::BangEQUAL, TokenType::EqualEQUAL]) {
             let operator = self.previous();
-            let right: ExprBoxed =  Box::new(self.comparison());
+            let right: ExprBoxed =  self.comparison();
 
             expr = Box::new(Expr::Binary(
                BinaryExpr {
@@ -44,6 +44,32 @@ impl Parser {
         expr
     }
 
+    // comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+    fn comparison(&mut self) -> Box<Expr> {
+
+        let mut expr = Box::new(self.term());
+
+        while self.match_token(&[TokenType::GREATER, TokenType::GreaterEQUAL, TokenType::LESS, TokenType::LessEQUAL]) {
+            let operator = self.previous();
+            let right: ExprBoxed =  Box::new(self.term());
+
+            expr = Box::new(Expr::Binary(
+               BinaryExpr {
+                   left: expr,
+                   operator,
+                   right,
+               }
+            ));
+        }
+
+        expr
+    }
+
+    // term            → factor ( ( "-" | "+" ) factor )* ;
+    fn term(&mut self) -> Expr {
+        todo!()
+    }
+    
     fn match_token(&mut self, types: &[TokenType]) -> bool {
         for r#type in types {
             if self.check(r#type) {
@@ -74,10 +100,6 @@ impl Parser {
 
     fn previous(&self) -> Token {
         self.tokens.get(self.current - 1).clone().unwrap().clone()
-    }
-
-    fn comparison(&self) -> Expr {
-        todo!()
     }
 
 }
