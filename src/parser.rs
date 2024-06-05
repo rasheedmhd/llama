@@ -1,4 +1,4 @@
-use crate::expr::ast::{BinaryExpr, Expr};
+use crate::expr::ast::{BinaryExpr, Expr, UnaryExpr};
 use crate::token::Token;
 use crate::token_type::TokenType;
 
@@ -86,7 +86,7 @@ impl Parser {
         expr
     }
 
-
+    // factor          → unary ( ( "/" | "*" ) unary )* ;
     fn factor(&mut self) -> Box<Expr> {
 
         let mut expr = self.unary();
@@ -107,11 +107,26 @@ impl Parser {
         expr
     }
 
-    // factor          → unary ( ( "/" | "*" ) unary )* ;
+    // unary → ( "!" | "-" ) unary | primary ;
     fn unary(&mut self) -> Box<Expr> {
+        if self.match_token(&[TokenType::BANG, TokenType::MINUS]) {
+            let operator = self.previous();
+            let right: ExprBoxed =  self.unary();
+            let expr = Box::new(Expr::Unary(
+                UnaryExpr {
+                    operator,
+                    right,
+                }
+            ));
+
+            return expr;
+        };
+        self.primary()
+    }
+
+    fn primary(&mut self) -> Box<Expr> {
         todo!()
     }
-    
     fn match_token(&mut self, types: &[TokenType]) -> bool {
         for r#type in types {
             if self.check(r#type) {
