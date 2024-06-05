@@ -23,12 +23,6 @@ pub mod ast {
         Unary(UnaryExpr),
     }
 
-    // impl std::fmt::Display for Expr {
-    //     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-    //         writeln!(fmt, "{}", self.0.join(" "));
-    //     }
-    // }
-
     pub trait ASTVisitor<T> {
         fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> T;
         fn visit_grouping_expr(&mut self, expr: &GroupingExpr) -> T;

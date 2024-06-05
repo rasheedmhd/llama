@@ -1,4 +1,4 @@
-use crate::expr::ast::{BinaryExpr, Expr, UnaryExpr};
+use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
 use crate::token::Token;
 use crate::token_type::TokenType;
 
@@ -44,7 +44,7 @@ impl Parser {
         expr
     }
 
-    // comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+    // comparison  → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
     fn comparison(&mut self) -> Box<Expr> {
 
         let mut expr = self.term();
@@ -65,7 +65,7 @@ impl Parser {
         expr
     }
 
-    // term            → factor ( ( "-" | "+" ) factor )* ;
+    // term  → factor ( ( "-" | "+" ) factor )* ;
     fn term(&mut self) -> Box<Expr> {
 
         let mut expr = self.factor();
@@ -86,7 +86,7 @@ impl Parser {
         expr
     }
 
-    // factor          → unary ( ( "/" | "*" ) unary )* ;
+    // factor  → unary ( ( "/" | "*" ) unary )* ;
     fn factor(&mut self) -> Box<Expr> {
 
         let mut expr = self.unary();
@@ -121,12 +121,62 @@ impl Parser {
 
             return expr;
         };
-        self.primary()
+        self.primary().unwrap()
     }
 
-    fn primary(&mut self) -> Box<Expr> {
-        todo!()
+    // primary  → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+    fn primary(&mut self) -> Option<Box<Expr>> {
+
+        if self.match_token(&[TokenType::FALSE]) {
+            let expr = Box::new(Expr::Literal(
+                LiteralExpr {
+                    value: "false".to_string()
+                }
+            ));
+            return Some(expr);
+        }
+
+        if self.match_token(&[TokenType::TRUE]) {
+            let expr = Box::new(Expr::Literal(
+                LiteralExpr {
+                    value: "true".to_string()
+                }
+            ));
+            return Some(expr);
+        }
+
+        if self.match_token(&[TokenType::NIL]) {
+            let expr = Box::new(Expr::Literal(
+                LiteralExpr {
+                    value: "None".to_string()
+                }
+            ));
+            return Some(expr);
+        }
+
+        if self.match_token(&[TokenType::NUMBER, TokenType::STRING]) {
+            let expr = Box::new(Expr::Literal(
+                LiteralExpr {
+                    value: self.previous().literal.unwrap()
+                }
+            ));
+            return Some(expr);
+        }
+
+        if self.match_token(&[TokenType::LeftPAREN]) {
+            let expr = self.expression();
+            // self.consume(TokenType::RightPAREN, "Expect ')' after expression.")
+            let expr = Box::new(Expr::Grouping(
+                GroupingExpr {
+                    expression: expr
+                }
+            ));
+            return  Some(expr);
+        }
+
+        None
     }
+
     fn match_token(&mut self, types: &[TokenType]) -> bool {
         for r#type in types {
             if self.check(r#type) {
