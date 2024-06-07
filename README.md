@@ -39,7 +39,7 @@ false; // Not _not_ false
 # No Value
 
 ```
-nil | Null
+nil
 ```
 
 ## Expressions
@@ -68,7 +68,7 @@ greaterThan >= orEqual;
 1 == 2; // false.
 "cat" != "dog"; // true
 
-314 == "pi"; // fal
+314 == "pi"; // false
 
 123 == "123"; // false
 ```
@@ -98,8 +98,8 @@ var average = (min + max) / 2;
 print "Hello, world!";
 
 {
-	print "One statement.";
-	print "Two statements.";
+    print "One statement.";
+    print "Two statements.";
 }
 
 ```
@@ -108,9 +108,10 @@ print "Hello, world!";
 
 ```
 
-var breakfast 		= "bagels";
+var breakfast 	= "bagels";
 print breakfast; // "bagels".
-breakfast 			= "beignets";
+
+breakfast 	= "beignets";
 print breakfast; // "beignets".
 
 ```
@@ -121,9 +122,9 @@ print breakfast; // "beignets".
 
 ```
 if (condition) {
-	print "yes";
+    print "yes";
 } else {
-	print "no";
+    print "no";
 }
 ```
 
@@ -131,9 +132,10 @@ if (condition) {
 
 ```
 var a = 1;
+
 while (a < 10) {
-	print a;
-	a = a + 1;
+    print a;
+    a = a + 1;
 }
 ```
 
@@ -141,15 +143,17 @@ while (a < 10) {
 
 ```
 for (var a = 1; a < 10; a = a + 1) {
-	print a;
+    print a;
 }
 ```
 
 ## Functions
 
 ```
+// Functions that take arguments
 makeBreakfast(bacon, eggs, toast);
-// You can also call a function without passing anything to it.
+
+// Functions that do not toake arguments
 makeBreakfast();
 ```
 
@@ -157,11 +161,11 @@ makeBreakfast();
 
 ```
 fun printSum(a, b) {
-	print a + b;
+    print a + b;
 }
 
 fun returnSum(a, b) {
-	return a + b;
+    return a + b;
 }
 ```
 
@@ -169,29 +173,29 @@ fun returnSum(a, b) {
 
 ```
 fun addPair(a, b) {
-	return a + b;
+    return a + b;
 }
 fun identity(a) {
-	return a;
+    return a;
 }
 
 print identity(addPair)(1, 2); // Prints "3"
 
 fun outerFunction() {
-	fun localFunction() {
-		print "I'm local!";
-	}
-	localFunction();
+    fun localFunction() {
+        print "I'm local!";
+    }
+    localFunction();
 }
 
 fun returnFunction() {
 var outside = "outside";
-
-	fun inner() {
-		print outside;
-	}
-
-	return inner;
+    
+    fun inner() {
+        print outside;
+    }
+    
+    return inner;
 }
 
 var fn = returnFunction();
@@ -204,23 +208,25 @@ fn();
 // The body of a class contains its methods.
 // They look like function declarations but without the fun keyword.
 class Breakfast {
-
-	cook() {
-			print "Eggs frying!";
-		}
-
-		serve(who) {
-			print "Enjoy your breakfast, " + who + ".";
-		}
+    
+    cook() {
+        print "Eggs frying!";
+    }
+    
+    serve(who) {
+        print "Enjoy your breakfast, " + who + ".";
+    }
+    
 }
 ```
 
-# Classes are first class
+# Classes are First Class
 
 ```
-// Store it in variables.
+// Storing Classes in Variables.
 var someVariable = Breakfast;
-// Pass it to functions.
+
+// Passing Classes to Functions.
 someFunction(Breakfast);
 ```
 
@@ -241,23 +247,25 @@ breakfast.bread = "sourdough";
 
 // If you want to access a field or method on the current object
 // from within a method, you use good old this.
+
 class Breakfast {
-	serve(who) {
-		print "Enjoy your " + this.meat + " and " +
-		this.bread + ", " + who + ".";
-	}
-	// ...
+    serve(who) {
+        print "Enjoy your " + this.meat + " and " +
+        this.bread + ", " + who + ".";
+    }
+    // ...
 }
 
 class Breakfast {
-	init(meat, bread) {
-		this.meat = meat;
-		this.bread = bread;
-	}
- // ...
+    init(meat, bread) {
+        this.meat = meat;
+        this.bread = bread;
+    }
+    // ...
 }
 
 var baconAndToast = Breakfast("bacon", "toast");
+
 baconAndToast.serve("Dear Reader");
 // "Enjoy your bacon and toast, Dear Reader."
 ```
@@ -266,9 +274,9 @@ baconAndToast.serve("Dear Reader");
 
 ```
 class Brunch < Breakfast {
-	drink() {
-		print "How about a Bloody Mary?";
-	}
+    drink() {
+        print "How about a Bloody Mary?";
+    }
 }
 
 // Every method defined in the superclass is also available to its subclasses.
@@ -278,9 +286,9 @@ benedict.serve("Noble Reader");
 // Even the init() method gets inherited.
 // In practice, the subclass usually wants to define its own init() method too.
 class Brunch < Breakfast {
-	init(meat, bread, drink) {
-		super.init(meat, bread);
-		this.drink = drink;
-	}
+    init(meat, bread, drink) {
+        super.init(meat, bread);
+        this.drink = drink;
+    }
 }
 ```

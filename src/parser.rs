@@ -148,7 +148,7 @@ impl Parser {
         if self.match_token(&[TokenType::NIL]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: "None".to_string()
+                    value: "Nil".to_string()
                 }
             ));
             return Some(expr);
@@ -207,6 +207,22 @@ impl Parser {
 
     fn previous(&self) -> Token {
         self.tokens.get(self.current - 1).clone().unwrap().clone()
+    }
+
+    // private Token consume(TokenType type, String message) {
+    // if (check(type)) return advance();
+    // throw error(peek(), message);
+
+    fn consume(&mut self, r#type: &TokenType, message: String ) -> Token {
+        if self.check(r#type) {
+            return self.advance()
+        };
+
+        self.error(self.peek(), message);
+    }
+
+    fn error(&mut self, token: Token, message: String) {
+        todo!()
     }
 
 }
