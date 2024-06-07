@@ -152,7 +152,10 @@ impl Scanner {
                 } else if self.is_alpha(char) {
                     self.identifier();
                 }
-                crate::repl::Llama::error(self.line, "Unexpected Character".to_string())
+                crate::repl::Llama::error(
+                    Token::new(TokenType::EOF, "".to_string(), self.line, None),
+                    "Unexpected Character"
+                )
             }
         }
     }
@@ -218,7 +221,9 @@ impl Scanner {
             self.advance();
         }
         if self.is_at_end() {
-            crate::repl::Llama::error(self.line, "Unterminated string.".to_string());
+            crate::repl::Llama::error(
+                Token::new(TokenType::EOF, "".to_string(), self.line, None),
+                "Unterminated string.");
         }
         // The closing "
         self.advance();

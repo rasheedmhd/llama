@@ -6,6 +6,8 @@ use std::io::{stdin, stdout, Write};
 use std::process;
 
 use crate::scanner::Scanner;
+use crate::token::Token;
+use crate::token_type::TokenType;
 
 static mut HAD_ERROR: bool = false;
 
@@ -66,18 +68,36 @@ impl Llama {
     // Example
     // Error: Unexpected "," in argument list.
     // 15 | function(first, second,);
-    //                            ^-- Here
-    #[allow(dead_code)]
-    pub fn error(line: usize, message: String) {
-        Llama::report(line, "".to_string(),  message);
-    }
+    //
+    //
+    // static void error(Token token, String message) {
+    // if (token.type == TokenType.EOF) {
+    // report(token.line,
+    // " at end"
+    // , message);
+    // } else {
+    // report(token.line,
+    // " at '" + token.lexeme + "'"
+    // , message);
+    // }
+    // }                          ^-- Here
 
     #[allow(dead_code)]
-    fn report(line: usize, location: String,  message: String) {
+    fn report(line: usize, location: String,  message: &str) {
         eprintln!("line {line} Error {location}: {message}");
         unsafe {
             HAD_ERROR = true;
         }
     }
+
+    pub fn error(token: Token,  message: &str) {
+        if token.token_type == TokenType::EOF {
+            Llama::report(token.line, "at end".to_string(),  message);
+        } else {
+            Llama::report(token.line, format!("at '{}'", token.lexeme ),  message);
+
+        }
+    }
+
 
 }

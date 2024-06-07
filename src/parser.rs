@@ -1,4 +1,5 @@
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
+use crate::repl::Llama;
 use crate::token::Token;
 use crate::token_type::TokenType;
 
@@ -148,7 +149,7 @@ impl Parser {
         if self.match_token(&[TokenType::NIL]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: "Nil".to_string()
+                    value: "nil".to_string()
                 }
             ));
             return Some(expr);
@@ -165,7 +166,7 @@ impl Parser {
 
         if self.match_token(&[TokenType::LeftPAREN]) {
             let expr = self.expression();
-            // self.consume(TokenType::RightPAREN, "Expect ')' after expression.")
+            self.consume(&TokenType::RightPAREN, "Expect ')' after expression.");
             let expr = Box::new(Expr::Grouping(
                 GroupingExpr {
                     expression: expr
@@ -213,16 +214,20 @@ impl Parser {
     // if (check(type)) return advance();
     // throw error(peek(), message);
 
-    fn consume(&mut self, r#type: &TokenType, message: String ) -> Token {
+    fn consume(&mut self, r#type: &TokenType, message: &str ) -> Result<Token, Err> {
         if self.check(r#type) {
-            return self.advance()
+            return Ok(self.advance())
         };
 
-        self.error(self.peek(), message);
+        Err(self.error(self.peek(), message));
     }
 
-    fn error(&mut self, token: Token, message: String) {
-        todo!()
+    // private ParseError error(Token token, String message) {
+    // Lox.error(token, message);
+    // return new ParseError();
+    // }
+
+    fn error(&mut self, token: Token, message: &str) {
     }
 
 }
