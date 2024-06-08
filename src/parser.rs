@@ -224,5 +224,43 @@ impl Parser {
         );
         LlamaParseError::new()
     }
+    // advance();
+    // while (!isAtEnd()) {
+    // if (previous().type == SEMICOLON) return;
+    // switch (peek().type) {
+    //     case CLASS:
+    //     case FUN:
+    //     case VAR:
+    //     case FOR:
+    //     case IF:
+    //     case WHILE:
+    //     case PRINT:
+    //     case RETURN:
+    //     return;
+    // }
+    // advance();
+
+    fn synchronize(&mut self) {
+        self.advance();
+        while !self.is_at_end() {
+            if self.previous().token_type == TokenType::SEMICOLON {
+                return;
+            }
+            match self.peek().token_type {
+                TokenType::CLASS |
+                TokenType::FUN   |
+                TokenType::VAR   |
+                TokenType::FOR   |
+                TokenType::IF    |
+                TokenType::WHILE |
+                TokenType::PRINT |
+                TokenType::RETURN => {
+                    return;
+                }
+                _ => {}
+            }
+            self.advance();
+        }
+    }
 
 }

@@ -1,3 +1,5 @@
+💡
+
 If you wanted to turn Lox into an actual useful language, the very first thing you
 should do is flesh this out. String manipulation, trigonometric functions, file
 I/O, networking, heck, even reading input from the user would help. But we don’t
