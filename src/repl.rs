@@ -1,7 +1,7 @@
 #[allow(unused_variables)]
 
 use std::env;
-use std::fs;
+use std::{fmt, fs};
 use std::io::{stdin, stdout, Write};
 use std::process;
 
@@ -68,19 +68,7 @@ impl Llama {
     // Example
     // Error: Unexpected "," in argument list.
     // 15 | function(first, second,);
-    //
-    //
-    // static void error(Token token, String message) {
-    // if (token.type == TokenType.EOF) {
-    // report(token.line,
-    // " at end"
-    // , message);
-    // } else {
-    // report(token.line,
-    // " at '" + token.lexeme + "'"
-    // , message);
-    // }
-    // }                          ^-- Here
+    //                            ^-- Here
 
     #[allow(dead_code)]
     fn report(line: usize, location: String,  message: &str) {
@@ -101,3 +89,21 @@ impl Llama {
 
 
 }
+
+pub struct LlamaParseError;
+
+impl LlamaParseError {
+    pub fn new() -> Self { Self }
+}
+impl fmt::Display for LlamaParseError {
+    fn fmt(&self, f: &mut fmt::Formatter ) -> fmt::Result {
+        write!(f, "Parse Error")
+    }
+}
+
+impl fmt::Debug for LlamaParseError {
+    fn fmt(&self, f: &mut fmt::Formatter ) -> fmt::Result {
+        write!(f, "Parse Error")
+    }
+}
+
