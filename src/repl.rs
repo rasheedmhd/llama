@@ -107,3 +107,5 @@ impl fmt::Debug for LlamaParseError {
     }
 }
 
+// impl std::error::Error for LlamaParseError {}
+

@@ -42,8 +42,13 @@ impl Parser {
                }
             ));
         }
-
         expr
+    }
+
+    fn previous(&self) -> Token {
+        self.tokens.get(self.current - 1).unwrap().clone()
+        // To Do, Use Less Cloning and Borrow More = Idiomatic Rust
+        // &self.tokens[self.current - 1]
     }
 
     // comparison  → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -63,7 +68,6 @@ impl Parser {
                }
             ));
         }
-
         expr
     }
 
@@ -167,7 +171,7 @@ impl Parser {
 
         if self.match_token(&[TokenType::LeftPAREN]) {
             let mut expr = self.expression();
-            self.consume(&TokenType::RightPAREN, "Expect ')' after expression.")?;
+            self.consume(&TokenType::RightPAREN, "Expect ')' after expression.").unwrap();
             expr = Box::new(Expr::Grouping(
                 GroupingExpr {
                     expression: expr
@@ -175,7 +179,6 @@ impl Parser {
             ));
             return  Some(expr);
         }
-
         None
     }
 
@@ -189,6 +192,14 @@ impl Parser {
         return false;
     }
 
+    fn is_at_end(&self) -> bool {
+        matches!(self.peek().token_type, TokenType::EOF)
+    }
+
+    fn peek(&self) -> Token {
+        self.tokens.get(self.current).unwrap().clone()
+    }
+
     fn check(&self, token_type: &TokenType) -> bool {
         if self.is_at_end() { return false; }
         &self.peek().token_type == token_type
@@ -199,24 +210,11 @@ impl Parser {
         return self.previous();
     }
 
-    fn is_at_end(&self) -> bool {
-        matches!(self.peek().token_type, TokenType::EOF)
-    }
-
-    fn peek(&self) -> Token {
-        self.tokens.get(self.current).clone().unwrap().clone()
-    }
-
-    fn previous(&self) -> Token {
-        self.tokens.get(self.current - 1).clone().unwrap().clone()
-    }
-
-
     fn consume(&mut self, r#type: &TokenType, message: &str ) -> Result<Token, LlamaParseError> {
         if self.check(r#type) {
             return Ok(self.advance())
         };
-        Err(self.error(self.peek(), message)?)
+        Err(self.error(self.peek(), message))
     }
 
     fn error(&mut self, token: Token, message: &str) -> LlamaParseError {

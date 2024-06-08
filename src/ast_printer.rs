@@ -8,10 +8,6 @@ pub struct AstPrinter;
 
 impl AstPrinter {
 
-    // pub fn print(&mut self, expr: Expr) -> String {
-    //     expr.accept(self)
-    // }
-
     fn parenthesize(&mut self, name: &str, exprs: &[Box<Expr>]) -> String {
         let mut builder = String::new();
         builder.push('(');
