@@ -4,10 +4,12 @@ use std::env;
 use std::{fmt, fs};
 use std::io::{stdin, stdout, Write};
 use std::process;
+use crate::ast_printer::AstPrinter;
 
 use crate::scanner::Scanner;
 use crate::token::Token;
 use crate::token_type::TokenType;
+use crate::parser::Parser;
 
 static mut HAD_ERROR: bool = false;
 
@@ -16,11 +18,11 @@ pub struct Llama {
 }
 
 impl Llama {
-    // Exit Codes   
+    // Exit Codes
     // https://man.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
     pub fn start() {
         let args: Vec<String> = env::args().collect();
-        
+
         if args.len() > 2 {
             println!("Usage: llama [script] {:?}", args.len());
             process::exit(64);
@@ -31,32 +33,40 @@ impl Llama {
         }
     }
 
-    fn run(source: String) {
+    pub fn run(source: String) {
         let mut scanner = Scanner::from(source);
         let tokens = scanner.scan_tokens();
-        for token in &tokens {
-            println!("{:?}", token);
+        let mut parser = Parser::new(tokens);
+        let expression = parser.parse();
+        // for token in &tokens {
+        //     println!("{:?}", token);
+        // }
+        unsafe {
+            if HAD_ERROR { return };
         }
+
+        let expression = AstPrinter::print(&mut AstPrinter, *expression);
+
+        println!("{expression}");
     }
 
-    
-    // Llama is a scripting language, which means it executes directly from source. 
+
+    // Llama is a scripting language, which means it executes directly from source.
     // Our interpreter supports two ways of running code. If you start llama from the
     // command line and give it a path to a file, it reads the file and executes it
     fn run_file(path: String) {
         let code = fs::read_to_string(path).expect("File doesn't exist");
         Llama::run(code);
     }
-    
+
     fn run_prompt() {
         loop {
             print!("> ");
             let _ = stdout().flush();
-            // stdin().read_line(&mut code_snippet.trim()).unwrap();
             let mut code_snippet = String::new();
             stdin().read_line(&mut code_snippet).unwrap();
             Llama::run(code_snippet.clone());
-            // We need to reset this flag in the interactive loop. 
+            // We need to reset this flag in the interactive loop.
             // If the user makes a mistake, it shouldn’t kill their entire session.
             unsafe {
                 HAD_ERROR = false;
@@ -108,4 +118,3 @@ impl fmt::Debug for LlamaParseError {
 }
 
 // impl std::error::Error for LlamaParseError {}
-

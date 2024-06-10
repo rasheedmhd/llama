@@ -8,7 +8,11 @@ pub struct AstPrinter;
 
 impl AstPrinter {
 
-    fn parenthesize(&mut self, name: &str, exprs: &[Box<Expr>]) -> String {
+    pub fn print(&mut self, expr: Expr) -> String {
+        expr.accept(self)
+    }
+
+    pub fn parenthesize(&mut self, name: &str, exprs: &[Box<Expr>]) -> String {
         let mut builder = String::new();
         builder.push('(');
         builder.push_str(name);
@@ -62,11 +66,11 @@ impl AstPrinter {
 
         println!(" Expression: {}", expression);
         let expressions: &[Box<Expr>] = &[expression.clone()]; // Create a slice with one element
-        let string = AstPrinter::parenthesize(&mut AstPrinter, "", expressions);
+        let expression_as_a_string = AstPrinter::parenthesize(&mut AstPrinter, "", expressions);
 
-        println!(" Parenthesized Expression: {string}");
-        string
-        // expression
+        // println!(" Parenthesized Expression: {expression}");
+        // string
+        expression_as_a_string
     }
     
 }

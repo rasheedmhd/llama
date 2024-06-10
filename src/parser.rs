@@ -13,7 +13,7 @@ pub struct Parser {
 }
 
 impl Parser {
-    fn new(&mut self, tokens: Vec<Token>) -> Self {
+    pub fn new(tokens: Vec<Token>) -> Self {
         Parser {
             current: 0,
             tokens,
@@ -127,7 +127,7 @@ impl Parser {
 
             return expr;
         };
-        self.primary().unwrap()
+        self.primary().expect("No valid expression found")
     }
 
     // primary  → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
@@ -169,6 +169,7 @@ impl Parser {
             return Some(expr);
         }
 
+
         if self.match_token(&[TokenType::LeftPAREN]) {
             let mut expr = self.expression();
             self.consume(&TokenType::RightPAREN, "Expect ')' after expression.").unwrap();
@@ -179,6 +180,7 @@ impl Parser {
             ));
             return  Some(expr);
         }
+        self.error(self.peek(), "Expect expression");
         None
     }
 
@@ -224,21 +226,6 @@ impl Parser {
         );
         LlamaParseError::new()
     }
-    // advance();
-    // while (!isAtEnd()) {
-    // if (previous().type == SEMICOLON) return;
-    // switch (peek().type) {
-    //     case CLASS:
-    //     case FUN:
-    //     case VAR:
-    //     case FOR:
-    //     case IF:
-    //     case WHILE:
-    //     case PRINT:
-    //     case RETURN:
-    //     return;
-    // }
-    // advance();
 
     fn synchronize(&mut self) {
         self.advance();
@@ -262,5 +249,16 @@ impl Parser {
             self.advance();
         }
     }
+
+    pub fn parse(&mut self) -> Box<Expr> {
+        self.expression()
+        // match self.expression() {
+        //     Ok(expr) => Some(expr),
+        //     Err(_) => None,
+        // }
+    }
+
+
+
 
 }
