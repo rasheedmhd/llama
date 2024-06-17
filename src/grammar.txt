@@ -60,6 +60,7 @@ DISAMBIGUATING GRAMMAR
 The top expression rule matches any expression at any precedence
 level. Since equality has the lowest precedence, if we match that, then it
 covers everything.
+
 expression → equality
 
 primary    → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;

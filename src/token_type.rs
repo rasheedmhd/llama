@@ -3,54 +3,52 @@ use std::fmt;
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Single-character tokens.
-    // ( ) { } , . - + ; / *
-    LeftPAREN, 
-    RightPAREN, 
-    LeftBRACE, 
-    RightBRACE,
-    COMMA, 
-    DOT, 
-    MINUS, 
-    PLUS, 
-    SEMICOLON,
-    SLASH, 
-    STAR,
+    LeftPAREN,  // (
+    RightPAREN, // )
+    LeftBRACE,  // {
+    RightBRACE, // }
+    COMMA,      // ,
+    DOT,        // .
+    MINUS,      // -
+    PLUS,       // +
+    SEMICOLON,  // ;
+    SLASH,      // /
+    STAR,       // *
 
     // One or two character tokens.
-    // ! != = == > >= < <=
-    BANG, 
-    BangEQUAL,
-    EQUAL, 
-    EqualEQUAL,
-    GREATER,
-    GreaterEQUAL,
-    LESS, 
-    LessEQUAL,
+    BANG,        // !
+    BangEQUAL,   // !=
+    EQUAL,       // =
+    EqualEQUAL,  // ==
+    GREATER,     // >
+    GreaterEQUAL,// >=
+    LESS,        // <
+    LessEQUAL,   // <=
 
     // Literals.
     // IDENTIFIER "" 1
-    IDENTIFIER, 
-    STRING, 
+    IDENTIFIER,
+    STRING,
     NUMBER,
 
     // Keywords.
-    AND, 
-    CLASS, 
-    ELSE, 
-    FALSE, 
-    FUN, 
-    FOR, 
-    IF, 
-    NIL, 
-    OR,
-    PRINT, 
-    RETURN, 
-    SUPER, 
-    THIS, 
-    TRUE, 
-    VAR, 
-    WHILE,
-    
+    AND,         // and
+    CLASS,       // class
+    ELSE,        // else
+    FALSE,       // false
+    FUN,         // fun
+    FOR,         // for
+    IF,          // if
+    NIL,         // nil
+    OR,          // or
+    PRINT,       // print
+    RETURN,      // return
+    SUPER,       // super
+    THIS,        // this
+    TRUE,        // true
+    VAR,         // var
+    WHILE,       // while
+
     EOF
 }
 

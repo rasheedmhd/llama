@@ -10,9 +10,11 @@ pub struct Token {
     // literal: dyn Any,  
     // create an enum to handle all TokenLiteral types
     // TO DO
-    // The current number scanning stores number literals 
-    // which are supposed to be A number literal is a series of digits optionally followed
+    // The current number scanning stores number literals.
+    // A number literal is a series of digits optionally followed
     // by a . and one or more trailing digits as Some("number_literal")
+    // A number literal in regex
+    // [0-9]+[.]?[0-9]+
     // Subsequent code using the number literal should convert it into a float 
     // That is how Llama store numbers in memory  
     pub literal: Option<String>,  

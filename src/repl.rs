@@ -13,7 +13,6 @@ use crate::parser::Parser;
 
 static mut HAD_ERROR: bool = false;
 
-
 pub struct Llama {
 }
 
@@ -34,20 +33,20 @@ impl Llama {
     }
 
     pub fn run(source: String) {
-        let mut scanner = Scanner::from(source);
-        let tokens = scanner.scan_tokens();
-        let mut parser = Parser::new(tokens);
-        let expression = parser.parse();
-        // for token in &tokens {
-        //     println!("{:?}", token);
-        // }
-        unsafe {
-            if HAD_ERROR { return };
+        let mut scanner   = Scanner::from(source);
+        let tokens     = scanner.scan_tokens();
+        // let mut parser     = Parser::new(tokens);
+        // let expression  = parser.parse();
+        for token in &tokens {
+            println!("{:?}", token);
         }
-
-        let expression = AstPrinter::print(&mut AstPrinter, *expression);
-
-        println!("{expression}");
+        // unsafe {
+        //     if HAD_ERROR { return };
+        // }
+        //
+        // let expression = AstPrinter::print(&mut AstPrinter, *expression);
+        //
+        // println!("{expression}");
     }
 
 
