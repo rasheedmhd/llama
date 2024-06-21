@@ -4,13 +4,14 @@ use std::env;
 use std::{fmt, fs};
 use std::io::{stdin, stdout, Write};
 use std::process;
-use crate::ast_printer::AstPrinter;
 
 use crate::scanner::Scanner;
 use crate::token::Token;
 use crate::token_type::TokenType;
-use crate::parser::Parser;
 
+// TO DO
+// Use AtomicBool
+// https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html
 static mut HAD_ERROR: bool = false;
 
 pub struct Llama {
@@ -33,6 +34,11 @@ impl Llama {
     }
 
     pub fn run(source: String) {
+        // There is a Scanner::new associated method
+        // I try to make to follow Rust's method/function name convention
+        // so Scanner::new only declares the Scanner
+        // I use Scanner::from to initialize the Scanner, with the source
+        // of the input language
         let mut scanner   = Scanner::from(source);
         let tokens     = scanner.scan_tokens();
         // let mut parser     = Parser::new(tokens);

@@ -7,7 +7,9 @@ use std::collections::HashMap;
 // Add support to Llamaʼs scanner for C-style /* ... */ block comments.
 // + handle newlines in them. + nesting.
 // Is adding support for nesting more work than you expected? Why?
-
+// TO DO
+// Use BufReader to improve Performance
+// Eng a Comp -> p70
 #[allow(dead_code)]
 pub struct Scanner {
     source: String,
@@ -18,10 +20,30 @@ pub struct Scanner {
     current: usize,
     // tracks what source line current is on so we
     // can produce tokens that know their location
+    // TO DO
+    // refactor to use std::num::NonZeroUsize
+    // https://doc.rust-lang.org/std/num/type.NonZeroUsize.html
     line: usize,
     tokens: Vec<Token>,
 }
 
+// TO DO
+// Use OnceLock
+// It is now possible to easily replicate this crate's functionality in Rust's standard library with std::sync::OnceLock. The example above could be also be written as:
+
+// use std::collections::HashMap;
+// use std::sync::OnceLock;
+
+// fn hashmap() -> &'static HashMap<u32, &'static str> {
+//     static HASHMAP: OnceLock<HashMap<u32, &str>> = OnceLock::new();
+//     HASHMAP.get_or_init(|| {
+//         let mut m = HashMap::new();
+//         m.insert(0, "foo");
+//         m.insert(1, "bar");
+//         m.insert(2, "baz");
+//         m
+//     })
+// }
 lazy_static! {
     static ref KEYWORDS: HashMap<&'static str, TokenType> = {
         let mut keywords = HashMap::new();
@@ -154,7 +176,7 @@ impl Scanner {
                 }
                 crate::repl::Llama::error(
                     Token::new(TokenType::EOF, "".to_string(), self.line, None),
-                    "Unexpected Character"
+                    "Unexpected Character",
                 )
             }
         }
@@ -190,9 +212,9 @@ impl Scanner {
     }
 
     fn advance(&mut self) -> Option<char> {
-        let next_char = self.source.chars().nth(self.current);
+        let next_char = self.source.chars().nth(self.current).unwrap();
         self.current += 1;
-        next_char
+        Some(next_char)
     }
 
     fn match_char(&mut self, expected: char) -> bool {
@@ -223,7 +245,8 @@ impl Scanner {
         if self.is_at_end() {
             crate::repl::Llama::error(
                 Token::new(TokenType::EOF, "".to_string(), self.line, None),
-                "Unterminated string.");
+                "Unterminated string.",
+            );
         }
         // The closing "
         self.advance();
