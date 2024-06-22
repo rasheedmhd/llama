@@ -4,6 +4,9 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 
 // TO DO
+// Fix Error Impl
+
+// TO DO
 // Add support to Llamaʼs scanner for C-style /* ... */ block comments.
 // + handle newlines in them. + nesting.
 // Is adding support for nesting more work than you expected? Why?
@@ -33,6 +36,8 @@ pub struct Scanner {
 
 // use std::collections::HashMap;
 // use std::sync::OnceLock;
+// https://github.com/rust-lang-nursery/lazy-static.rs
+// https://doc.rust-lang.org/std/sync/struct.OnceLock.html
 
 // fn hashmap() -> &'static HashMap<u32, &'static str> {
 //     static HASHMAP: OnceLock<HashMap<u32, &str>> = OnceLock::new();
@@ -166,10 +171,12 @@ impl Scanner {
                 }
             }
             Some(' ') | Some('\r') | Some('\t') => {}
+            // TO DO
+            // Behaving weird it repl mode
             Some('\n') => self.line += 1,
             Some('"') => self.string(),
             _ => {
-                if self.is_digit(char) {
+                if self.is_digit(char.unwrap()) {
                     self.number();
                 } else if self.is_alpha(char) {
                     self.identifier();
@@ -204,17 +211,24 @@ impl Scanner {
     }
 
     fn is_alphanumeric(&self, char: char) -> bool {
-        self.is_alpha(Some(char)) || self.is_digit(Some(char))
+        self.is_alpha(Some(char)) || self.is_digit(char)
     }
 
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
 
+    // TO DO
+    // Remove the Option and return a
+    // and handle the None returned by
+    // chars.nth()
     fn advance(&mut self) -> Option<char> {
-        let next_char = self.source.chars().nth(self.current).unwrap();
+        // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.nth
+        // nth() will return None if n is greater than or equal to the length of the iterator.
+        // Note that all preceding elements, as well as the returned element, will be consumed from the iterator. That means that the preceding elements will be discarded, and also that calling nth(0) multiple times on the same iterator will return different elements.
+        let next_char = self.source.chars().nth(self.current);
         self.current += 1;
-        Some(next_char)
+        next_char
     }
 
     fn match_char(&mut self, expected: char) -> bool {
@@ -235,6 +249,8 @@ impl Scanner {
         return self.source.chars().nth(self.current).unwrap();
     }
 
+    // TO DO
+    // Make llama recognize emojis 😂 in strings
     fn string(&mut self) {
         while self.peek() != '"' && !self.is_at_end() {
             if self.peek() == '\n' {
@@ -255,19 +271,19 @@ impl Scanner {
         self.add_token_with_literal(TokenType::STRING, Some(value))
     }
 
-    fn is_digit(&self, char: Option<char>) -> bool {
-        char.unwrap() >= '0' && char.unwrap() <= '9'
+    fn is_digit(&self, char: char) -> bool {
+        char >= '0' && char <= '9'
     }
 
     fn number(&mut self) {
-        while self.is_digit(Some(self.peek())) {
+        while self.is_digit(self.peek()) {
             self.advance();
         }
         // Look for a fractional part.
         if self.peek() == '.' && self.is_digit(self.peek_next()) {
             // consume the "."
             self.advance();
-            while self.is_digit(Some(self.peek())) {
+            while self.is_digit(self.peek()) {
                 self.advance();
             }
         }
@@ -277,11 +293,12 @@ impl Scanner {
         self.add_token_with_literal(TokenType::NUMBER, Some(number))
     }
 
-    fn peek_next(&self) -> Option<char> {
+    fn peek_next(&self) -> char {
         if self.current + 1 >= self.source.len() {
-            return Some('\0');
+            return '\0';
+        } else {
+            self.source.chars().nth(self.current + 1).unwrap()
         }
-        return self.source.chars().nth(self.current + 1);
     }
 
     // The lexemes are only the raw substrings of the source code.
