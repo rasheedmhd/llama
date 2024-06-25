@@ -1,6 +1,7 @@
 
 use crate::expr::ast::{BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr, ASTVisitor, Accept};
 use crate::expr::ast::Expr;
+use crate::expr::LiteralValue;
 use crate::token::Token;
 use crate::token_type::TokenType;
 
@@ -34,11 +35,11 @@ impl AstPrinter {
                                 token_type: TokenType::MINUS,
                                 lexeme: "-".to_string(),
                                 line: 1,
-                                literal: None
+                                literal: LiteralValue::Nil
                             } ,
                             right: Box::new(
                                 Expr::Literal(
-                                    LiteralExpr { value: "123".to_string() }
+                                    LiteralExpr { value:  LiteralValue::r#String("123".to_string())  }
                                 )
                             )
                         }
@@ -48,14 +49,14 @@ impl AstPrinter {
                     token_type: TokenType::STAR,
                     lexeme: "*".to_string(),
                     line: 1,
-                    literal: None
+                    literal: LiteralValue::Nil
                 } ,
                 right: Box::new(
                     Expr::Grouping(
                         GroupingExpr {
                             expression: Box::new(
                                 Expr::Literal(
-                                    LiteralExpr { value: "45.67".to_string() }
+                                    LiteralExpr { value:  LiteralValue::r#String("123".to_string())  }
                                 )
                             )
                         }
@@ -86,8 +87,9 @@ impl ASTVisitor<String> for  AstPrinter {
     }
 
     fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> String {
-        if expr.value.is_empty() {
-            return "nil".to_string();
+        if Some(expr.value.clone()).is_some() {
+            // return LiteralValue::Nil;
+            return "Nil".to_string();
         }
         expr.value.to_string()
     }

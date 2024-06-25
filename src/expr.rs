@@ -1,15 +1,17 @@
 // To Do
 // Type refactor for literal value
-// pub enum LiteralValue {
-//     Integer(i32),
-//     Float(f64),
-//     String(String),
-//     // Add other variants as needed
-// }
+#[derive(Clone, Debug)]
+pub enum LiteralValue {
+    r#String(String),
+    Number(f64),
+    Bool(bool),
+    Nil
+}
 
 
 pub mod ast {
     use std::fmt;
+    use crate::expr::LiteralValue;
 
     type ExprBoxed = Box<Expr>;
 
@@ -97,11 +99,11 @@ pub mod ast {
 
     #[derive(Clone, Debug)]
     pub struct LiteralExpr {
-        pub value : String,
+        pub value : LiteralValue,
     }
 
     impl LiteralExpr {
-        pub fn new(value : String) -> Self {
+        pub fn new(value : LiteralValue) -> Self {
             Self {
                 value,
             }
@@ -141,6 +143,12 @@ pub mod ast {
     impl fmt::Display for LiteralExpr {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             write!(f, "{}", self.value)
+        }
+    }
+
+    impl fmt::Display for LiteralValue {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "{}", self)
         }
     }
 

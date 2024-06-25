@@ -1,4 +1,5 @@
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
+use crate::expr::LiteralValue;
 use crate::repl::Llama;
 use crate::token::Token;
 use crate::token_type::TokenType;
@@ -136,7 +137,7 @@ impl Parser {
         if self.match_token(&[TokenType::FALSE]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: "false".to_string()
+                    value: LiteralValue::Bool(false)
                 }
             ));
             return Some(expr);
@@ -145,7 +146,7 @@ impl Parser {
         if self.match_token(&[TokenType::TRUE]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: "true".to_string()
+                    value: LiteralValue::Bool(true)
                 }
             ));
             return Some(expr);
@@ -154,7 +155,7 @@ impl Parser {
         if self.match_token(&[TokenType::NIL]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: "nil".to_string()
+                    value: LiteralValue::Nil
                 }
             ));
             return Some(expr);
@@ -163,7 +164,7 @@ impl Parser {
         if self.match_token(&[TokenType::NUMBER, TokenType::STRING]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: self.previous().literal.unwrap()
+                    value: self.previous().literal
                 }
             ));
             return Some(expr);

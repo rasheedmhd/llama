@@ -1,3 +1,4 @@
+use crate::expr::LiteralValue;
 use crate::token_type::TokenType;
 #[allow(dead_code)]
 
@@ -17,24 +18,25 @@ pub struct Token {
     // [0-9]+[.]?[0-9]+
     // Subsequent code using the number literal should convert it into a float 
     // That is how Llama store numbers in memory  
-    pub literal: Option<String>,  
+    pub literal: LiteralValue,
 }
 
 impl std::fmt::Display for Token {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
             "{} {} {}",
             self.token_type,
             self.lexeme,
-            self.literal.clone().unwrap_or_default()
+            self.literal
         )
     }
 }
 
 impl Token {
     #[allow(dead_code)]
-    pub fn new(token_type: TokenType, lexeme: String, line: usize, literal: Option<String>) -> Self {
+    pub fn new(token_type: TokenType, lexeme: String, line: usize, literal: Option<LiteralValue>) -> Self {
+        let literal = literal.unwrap_or_else(|| LiteralValue::Nil);
         Token {
             token_type,
             lexeme,
@@ -43,21 +45,10 @@ impl Token {
         }
     }
 
-    pub fn to_string(&self, token_type: TokenType, lexeme: String, literal: String) -> String {
+    pub fn to_string(&self, token_type: TokenType, lexeme: String, literal: LiteralValue) -> String {
         // TO DO
         let token_string: String = format!("{:?} {} {}", token_type, lexeme, literal);
         token_string
     }
 }
-
-// fn print_type(value: &dyn Any) {
-//     if let Some(v) = value.downcast_ref::<i32>() {
-//         println!("This is an i32: {}", v);
-//     } else if let Some(v) = value.downcast_ref::<String>() {
-//         println!("This is a String: {}", v);
-//     } else {
-//         println!("Unknown type");
-//     }
-// }
-
 

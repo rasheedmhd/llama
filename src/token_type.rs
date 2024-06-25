@@ -53,7 +53,7 @@ pub enum TokenType {
 }
 
 impl fmt::Display for TokenType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let token_str = match self {
             TokenType::LeftPAREN => "(",
             TokenType::RightPAREN => ")",

@@ -2,6 +2,7 @@ use crate::token::Token;
 use crate::token_type::TokenType;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
+use crate::expr::LiteralValue;
 
 // TO DO
 // Fix Error Impl
@@ -201,7 +202,7 @@ impl Scanner {
         if token_type.is_none() {
             token_type = Some(&TokenType::IDENTIFIER);
         }
-        self.add_token_with_literal(token_type.unwrap().clone(), Some(identifier_literal))
+        self.add_token_with_literal(token_type.unwrap().clone(), Some(LiteralValue::r#String(identifier_literal)))
     }
 
     fn is_alpha(&self, char: Option<char>) -> bool {
@@ -268,7 +269,7 @@ impl Scanner {
         self.advance();
         // Trim the surrounding quotes.
         let value: String = self.source[self.start + 1..self.current - 1].to_string();
-        self.add_token_with_literal(TokenType::STRING, Some(value))
+        self.add_token_with_literal(TokenType::STRING, Some(LiteralValue::r#String(value)))
     }
 
     fn is_digit(&self, char: char) -> bool {
@@ -290,7 +291,7 @@ impl Scanner {
         let number = self.source.to_string();
         // let number = self.source[self.start+1..self.current-1].parse::<f64>().unwrap();
         // self.add_token(TokenType::NUMBER);
-        self.add_token_with_literal(TokenType::NUMBER, Some(number))
+        self.add_token_with_literal(TokenType::NUMBER, Some(LiteralValue::r#String(number)))
     }
 
     fn peek_next(&self) -> char {
@@ -310,7 +311,7 @@ impl Scanner {
         self.add_token_with_literal(token_type, None)
     }
 
-    fn add_token_with_literal(&mut self, token_type: TokenType, literal: Option<String>) {
+    fn add_token_with_literal(&mut self, token_type: TokenType, literal: Option<LiteralValue>) {
         let text = self.source[self.start..self.current].to_string();
         self.tokens
             .push(Token::new(token_type, text, self.line, literal));
