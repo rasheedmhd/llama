@@ -4,5 +4,4 @@ pub mod token;
 pub mod scanner;
 pub mod repl;
 mod tool;
-pub mod ast_printer;
 pub mod parser;
