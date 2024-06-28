@@ -1,5 +1,5 @@
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
-use crate::expr::LiteralValue;
+use crate::expr::ast::LiteralValue;
 use crate::repl::Llama;
 use crate::token::Token;
 use crate::token_type::TokenType;
