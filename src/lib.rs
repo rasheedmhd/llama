@@ -5,3 +5,4 @@ pub mod scanner;
 pub mod repl;
 mod tool;
 pub mod parser;
+mod visit;
