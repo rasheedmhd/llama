@@ -104,22 +104,3 @@ impl Llama {
 
 
 }
-
-pub struct LlamaParseError;
-
-impl LlamaParseError {
-    pub fn new() -> Self { Self }
-}
-impl fmt::Display for LlamaParseError {
-    fn fmt(&self, f: &mut fmt::Formatter ) -> fmt::Result {
-        write!(f, "Parse Error")
-    }
-}
-
-impl fmt::Debug for LlamaParseError {
-    fn fmt(&self, f: &mut fmt::Formatter ) -> fmt::Result {
-        write!(f, "Parse Error")
-    }
-}
-
-// impl std::error::Error for LlamaParseError {}

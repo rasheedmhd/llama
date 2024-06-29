@@ -25,6 +25,7 @@ fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) -> io::Result
     let mut file = File::create(&path)?;
 
     writeln!(file, "pub mod llama_ast {{")?;
+
     writeln!(file)?;
     writeln!(file, "    use super::token::Token;")?;
     writeln!(file)?;

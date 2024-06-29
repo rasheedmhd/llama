@@ -1,7 +1,7 @@
 pub mod ast {
 
     use crate::token::Token;
-    type ExprBoxed = Box<Expr>;
+    type BoxedExpr = Box<Expr>;
 
     // EXPRESSIONS
     #[derive(Clone, Debug)]
@@ -14,9 +14,14 @@ pub mod ast {
 
     #[derive(Clone, Debug)]
     pub struct BinaryExpr {
-        pub left : ExprBoxed,
+        pub left : BoxedExpr,
         pub operator : Token,
-        pub right : ExprBoxed,
+        pub right : BoxedExpr,
+    }
+
+    #[derive(Clone, Debug)]
+    pub struct GroupingExpr {
+        pub expression : BoxedExpr,
     }
 
     #[derive(Clone, Debug)]
@@ -28,11 +33,6 @@ pub mod ast {
     }
 
     #[derive(Clone, Debug)]
-    pub struct GroupingExpr {
-        pub expression : ExprBoxed,
-    }
-
-    #[derive(Clone, Debug)]
     pub struct LiteralExpr {
         pub value : LiteralValue,
     }
@@ -40,15 +40,15 @@ pub mod ast {
     #[derive(Clone, Debug)]
     pub struct UnaryExpr {
         pub operator : Token,
-        pub right : ExprBoxed,
+        pub right : BoxedExpr,
     }
 
     // EXPRESSION new IMPLEMENTATIONS
-    // Takes in the Expression's constituent parts
-    // and create a new Expression initializing it
+    // Takes the Expression's constituent parts as arguments
+    // and creates a new Expression initializing it
     // with the passed arguments.
     impl BinaryExpr {
-        pub fn new(left : ExprBoxed, operator : Token, right : ExprBoxed) -> Self {
+        pub fn new(left : BoxedExpr, operator : Token, right : BoxedExpr) -> Self {
             Self {
                 left,
                 operator,
@@ -58,7 +58,7 @@ pub mod ast {
     }
 
     impl GroupingExpr {
-        pub fn new(expression : ExprBoxed) -> Self {
+        pub fn new(expression : BoxedExpr) -> Self {
             Self {
                 expression,
             }
@@ -74,7 +74,7 @@ pub mod ast {
     }
 
     impl UnaryExpr {
-        pub fn new(operator : Token, right : ExprBoxed) -> Self {
+        pub fn new(operator : Token, right : BoxedExpr) -> Self {
             Self {
                 operator,
                 right,

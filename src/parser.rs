@@ -1,12 +1,27 @@
+use std::fmt;
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
 use crate::expr::ast::LiteralValue;
 use crate::repl::Llama;
 use crate::token::Token;
 use crate::token_type::TokenType;
-use crate::repl::LlamaParseError;
 
+type  BoxedExpr = Box<Expr>;
+pub struct ParseError;
 
-type  ExprBoxed = Box<Expr>;
+impl ParseError {
+    pub fn new() -> Self { Self }
+}
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter ) -> fmt::Result {
+        write!(f, "Parse Error")
+    }
+}
+
+impl fmt::Debug for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter ) -> fmt::Result {
+        write!(f, "Parse Error")
+    }
+}
 
 pub struct Parser {
     tokens: Vec<Token>,
@@ -33,7 +48,7 @@ impl Parser {
 
         while self.match_token(&[TokenType::BangEQUAL, TokenType::EqualEQUAL]) {
             let operator = self.previous();
-            let right: ExprBoxed =  self.comparison();
+            let right: BoxedExpr =  self.comparison();
 
             expr = Box::new(Expr::Binary(
                BinaryExpr {
@@ -59,7 +74,7 @@ impl Parser {
 
         while self.match_token(&[TokenType::GREATER, TokenType::GreaterEQUAL, TokenType::LESS, TokenType::LessEQUAL]) {
             let operator = self.previous();
-            let right: ExprBoxed =  self.term();
+            let right: BoxedExpr =  self.term();
 
             expr = Box::new(Expr::Binary(
                BinaryExpr {
@@ -79,7 +94,7 @@ impl Parser {
 
         while self.match_token(&[TokenType::MINUS, TokenType::PLUS]) {
             let operator = self.previous();
-            let right: ExprBoxed =  self.factor();
+            let right: BoxedExpr =  self.factor();
 
             expr = Box::new(Expr::Binary(
                 BinaryExpr {
@@ -100,7 +115,7 @@ impl Parser {
 
         while self.match_token(&[TokenType::SLASH, TokenType::STAR]) {
             let operator = self.previous();
-            let right: ExprBoxed =  self.unary();
+            let right: BoxedExpr =  self.unary();
 
             expr = Box::new(Expr::Binary(
                 BinaryExpr {
@@ -118,7 +133,7 @@ impl Parser {
     fn unary(&mut self) -> Box<Expr> {
         if self.match_token(&[TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
-            let right: ExprBoxed =  self.unary();
+            let right: BoxedExpr =  self.unary();
             let expr = Box::new(Expr::Unary(
                 UnaryExpr {
                     operator,
@@ -213,19 +228,19 @@ impl Parser {
         return self.previous();
     }
 
-    fn consume(&mut self, r#type: &TokenType, message: &str ) -> Result<Token, LlamaParseError> {
+    fn consume(&mut self, r#type: &TokenType, message: &str ) -> Result<Token, ParseError> {
         if self.check(r#type) {
             return Ok(self.advance())
         };
         Err(self.error(self.peek(), message))
     }
 
-    fn error(&mut self, token: Token, message: &str) -> LlamaParseError {
+    fn error(&mut self, token: Token, message: &str) -> ParseError {
         Llama::error(
             token,
             message
         );
-        LlamaParseError::new()
+        ParseError::new()
     }
 
     fn synchronize(&mut self) {
