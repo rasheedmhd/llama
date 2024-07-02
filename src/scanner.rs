@@ -22,8 +22,8 @@ pub struct Scanner {
     start: usize,
     // points at the character currently being considered.
     current: usize,
-    // tracks what source line current is on so we
-    // can produce tokens that know their location
+    // tracks what source line current is on
+    // So we can produce tokens that know their location
     // TO DO
     // refactor to use std::num::NonZeroUsize
     // https://doc.rust-lang.org/std/num/type.NonZeroUsize.html
@@ -260,6 +260,15 @@ impl Scanner {
             self.advance();
         }
         if self.is_at_end() {
+            // TO DO
+            // Impl better error msgs
+            // Eg:
+            //
+            // File "<stdin>", line 1
+            // "hell
+            //     ^
+            // SyntaxError: unterminated string literal (detected at line 1)
+
             crate::repl::Llama::error(
                 Token::new(TokenType::EOF, "".to_string(), self.line, None),
                 "Unterminated string.",

@@ -27,6 +27,16 @@ pub struct Parser {
     tokens: Vec<Token>,
     current: usize,
 }
+// THIS IS THE GRAMMAR
+// THE PARSER WORKS ON
+// expression      → equality ;
+// equality        → comparison ( ( "!=" | "==" ) comparison )* ;
+// comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+// term            → factor ( ( "-" | "+" ) factor )* ;
+// factor          → unary ( ( "/" | "*" ) unary )* ;
+// unary           → ( "!" | "-" ) unary | primary ;
+// primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
@@ -37,12 +47,12 @@ impl Parser {
     }
 
     // expression      → equality
-    fn expression(&mut self) -> Box<Expr> {
+    fn expression(&mut self) -> BoxedExpr {
         self.equality()
     }
 
     // equality → comparison ( ( "!=" | "==" ) comparison )* ;
-    fn equality(&mut self) -> Box<Expr> {
+    fn equality(&mut self) -> BoxedExpr {
 
         let mut expr = self.comparison();
 
@@ -68,7 +78,7 @@ impl Parser {
     }
 
     // comparison  → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-    fn comparison(&mut self) -> Box<Expr> {
+    fn comparison(&mut self) -> BoxedExpr {
 
         let mut expr = self.term();
 
@@ -88,7 +98,7 @@ impl Parser {
     }
 
     // term  → factor ( ( "-" | "+" ) factor )* ;
-    fn term(&mut self) -> Box<Expr> {
+    fn term(&mut self) -> BoxedExpr {
 
         let mut expr = self.factor();
 
@@ -109,7 +119,7 @@ impl Parser {
     }
 
     // factor  → unary ( ( "/" | "*" ) unary )* ;
-    fn factor(&mut self) -> Box<Expr> {
+    fn factor(&mut self) -> BoxedExpr {
 
         let mut expr = self.unary();
 
@@ -130,7 +140,7 @@ impl Parser {
     }
 
     // unary → ( "!" | "-" ) unary | primary ;
-    fn unary(&mut self) -> Box<Expr> {
+    fn unary(&mut self) -> BoxedExpr {
         if self.match_token(&[TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
             let right: BoxedExpr =  self.unary();
@@ -143,11 +153,14 @@ impl Parser {
 
             return expr;
         };
+        // To Do
+        // Propagate error up all the way to expression()
+        // unary will return a Result<BoxedExpr, ParseError>
         self.primary().expect("No valid expression found")
     }
 
     // primary  → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
-    fn primary(&mut self) -> Option<Box<Expr>> {
+    fn primary(&mut self) -> Result<BoxedExpr, ParseError> {
 
         if self.match_token(&[TokenType::FALSE]) {
             let expr = Box::new(Expr::Literal(
@@ -155,7 +168,7 @@ impl Parser {
                     value: LiteralValue::Bool(false)
                 }
             ));
-            return Some(expr);
+            return Ok(expr);
         }
 
         if self.match_token(&[TokenType::TRUE]) {
@@ -164,7 +177,7 @@ impl Parser {
                     value: LiteralValue::Bool(true)
                 }
             ));
-            return Some(expr);
+            return Ok(expr);
         }
 
         if self.match_token(&[TokenType::NIL]) {
@@ -173,7 +186,7 @@ impl Parser {
                     value: LiteralValue::Nil
                 }
             ));
-            return Some(expr);
+            return Ok(expr);
         }
 
         if self.match_token(&[TokenType::NUMBER, TokenType::STRING]) {
@@ -182,10 +195,13 @@ impl Parser {
                     value: self.previous().literal
                 }
             ));
-            return Some(expr);
+            return Ok(expr);
         }
 
-
+        // The interesting branch is the one for handling parentheses.
+        // After we match an opening ( and parse the expression inside it, we must find a ) token.
+        // If we don’t, that’s an error.
+        // Impl on day break
         if self.match_token(&[TokenType::LeftPAREN]) {
             let mut expr = self.expression();
             self.consume(&TokenType::RightPAREN, "Expect ')' after expression.").unwrap();
@@ -194,10 +210,9 @@ impl Parser {
                     expression: expr
                 }
             ));
-            return  Some(expr);
+            return  Ok(expr);
         }
-        self.error(self.peek(), "Expect expression");
-        None
+        Err(self.error(self.peek(), "Expect expression"))
     }
 
     fn match_token(&mut self, types: &[TokenType]) -> bool {
