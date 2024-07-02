@@ -56,11 +56,11 @@ impl Parser {
     // equality → comparison ( ( "!=" | "==" ) comparison )* ;
     fn equality(&mut self) -> ExprResult {
 
-        let mut expr = self.comparison().unwrap();
+        let mut expr = self.comparison()?;
 
         while self.match_token(&[TokenType::BangEQUAL, TokenType::EqualEQUAL]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.comparison().unwrap();
+            let right: BoxedExpr =  self.comparison()?;
 
             expr = Box::new(Expr::Binary(
                BinaryExpr {
@@ -86,7 +86,7 @@ impl Parser {
 
         while self.match_token(&[TokenType::GREATER, TokenType::GreaterEQUAL, TokenType::LESS, TokenType::LessEQUAL]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.term().unwrap();
+            let right: BoxedExpr =  self.term()?;
 
             expr = Box::new(Expr::Binary(
                BinaryExpr {
@@ -102,11 +102,11 @@ impl Parser {
     // term  → factor ( ( "-" | "+" ) factor )* ;
     fn term(&mut self) -> ExprResult {
 
-        let mut expr = self.factor().unwrap();
+        let mut expr = self.factor()?;
 
         while self.match_token(&[TokenType::MINUS, TokenType::PLUS]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.factor().unwrap();
+            let right: BoxedExpr =  self.factor()?;
 
             expr = Box::new(Expr::Binary(
                 BinaryExpr {
@@ -127,7 +127,7 @@ impl Parser {
 
         while self.match_token(&[TokenType::SLASH, TokenType::STAR]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.unary().unwrap();
+            let right: BoxedExpr =  self.unary()?;
 
             expr = Box::new(Expr::Binary(
                 BinaryExpr {
@@ -145,7 +145,7 @@ impl Parser {
     fn unary(&mut self) -> ExprResult {
         if self.match_token(&[TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
-            let right=  self.unary().unwrap();
+            let right=  self.unary()?;
             let expr = Box::new(Expr::Unary(
                 UnaryExpr {
                     operator,
@@ -153,7 +153,7 @@ impl Parser {
                 }
             ));
 
-            return Ok(BoxedExpr::from(expr));
+            return Ok(expr);
         };
         self.primary()
     }
@@ -202,8 +202,8 @@ impl Parser {
         // If we don’t, that’s an error.
         // Impl on day break
         if self.match_token(&[TokenType::LeftPAREN]) {
-            let mut expr = self.expression().unwrap();
-            self.consume(&TokenType::RightPAREN, "Expect ')' after expression.").unwrap();
+            let mut expr = self.expression()?;
+            self.consume(&TokenType::RightPAREN, "Expect ')' after expression.")?;
             expr = Box::new(Expr::Grouping(
                 GroupingExpr {
                     expression: expr
@@ -283,11 +283,11 @@ impl Parser {
     pub fn parse(&mut self) -> ExprResult {
         // Returns a ParseResult
         // Needs handling
-        self.expression()
-        // match self.expression() {
-        //     Ok(expr) => Some(expr),
-        //     Err(_) => None,
-        // }
+        // self.expression()
+        match self.expression() {
+            Ok(expr) => Ok(expr),
+            Err(_) => Err(ParseError),
+        }
     }
 
 
