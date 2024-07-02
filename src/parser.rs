@@ -23,6 +23,8 @@ impl fmt::Debug for ParseError {
     }
 }
 
+type ExprResult = Result<BoxedExpr, ParseError>;
+
 pub struct Parser {
     tokens: Vec<Token>,
     current: usize,
@@ -47,18 +49,18 @@ impl Parser {
     }
 
     // expression      → equality
-    fn expression(&mut self) -> BoxedExpr {
+    fn expression(&mut self) -> ExprResult {
         self.equality()
     }
 
     // equality → comparison ( ( "!=" | "==" ) comparison )* ;
-    fn equality(&mut self) -> BoxedExpr {
+    fn equality(&mut self) -> ExprResult {
 
-        let mut expr = self.comparison();
+        let mut expr = self.comparison().unwrap();
 
         while self.match_token(&[TokenType::BangEQUAL, TokenType::EqualEQUAL]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.comparison();
+            let right: BoxedExpr =  self.comparison().unwrap();
 
             expr = Box::new(Expr::Binary(
                BinaryExpr {
@@ -68,7 +70,7 @@ impl Parser {
                }
             ));
         }
-        expr
+        Ok(expr)
     }
 
     fn previous(&self) -> Token {
@@ -78,13 +80,13 @@ impl Parser {
     }
 
     // comparison  → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-    fn comparison(&mut self) -> BoxedExpr {
+    fn comparison(&mut self) -> ExprResult {
 
-        let mut expr = self.term();
+        let mut expr = self.term().unwrap();
 
         while self.match_token(&[TokenType::GREATER, TokenType::GreaterEQUAL, TokenType::LESS, TokenType::LessEQUAL]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.term();
+            let right: BoxedExpr =  self.term().unwrap();
 
             expr = Box::new(Expr::Binary(
                BinaryExpr {
@@ -94,17 +96,17 @@ impl Parser {
                }
             ));
         }
-        expr
+        Ok(expr)
     }
 
     // term  → factor ( ( "-" | "+" ) factor )* ;
-    fn term(&mut self) -> BoxedExpr {
+    fn term(&mut self) -> ExprResult {
 
-        let mut expr = self.factor();
+        let mut expr = self.factor().unwrap();
 
         while self.match_token(&[TokenType::MINUS, TokenType::PLUS]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.factor();
+            let right: BoxedExpr =  self.factor().unwrap();
 
             expr = Box::new(Expr::Binary(
                 BinaryExpr {
@@ -115,17 +117,17 @@ impl Parser {
             ));
         }
 
-        expr
+        Ok(expr)
     }
 
     // factor  → unary ( ( "/" | "*" ) unary )* ;
-    fn factor(&mut self) -> BoxedExpr {
+    fn factor(&mut self) -> ExprResult {
 
-        let mut expr = self.unary();
+        let mut expr = BoxedExpr::from(self.unary().unwrap());
 
         while self.match_token(&[TokenType::SLASH, TokenType::STAR]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.unary();
+            let right: BoxedExpr =  self.unary().unwrap();
 
             expr = Box::new(Expr::Binary(
                 BinaryExpr {
@@ -136,14 +138,14 @@ impl Parser {
             ));
         }
 
-        expr
+        Ok(expr)
     }
 
     // unary → ( "!" | "-" ) unary | primary ;
-    fn unary(&mut self) -> BoxedExpr {
+    fn unary(&mut self) -> ExprResult {
         if self.match_token(&[TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
-            let right: BoxedExpr =  self.unary();
+            let right=  self.unary().unwrap();
             let expr = Box::new(Expr::Unary(
                 UnaryExpr {
                     operator,
@@ -151,16 +153,13 @@ impl Parser {
                 }
             ));
 
-            return expr;
+            return Ok(BoxedExpr::from(expr));
         };
-        // To Do
-        // Propagate error up all the way to expression()
-        // unary will return a Result<BoxedExpr, ParseError>
-        self.primary().expect("No valid expression found")
+        self.primary()
     }
 
     // primary  → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
-    fn primary(&mut self) -> Result<BoxedExpr, ParseError> {
+    fn primary(&mut self) -> ExprResult {
 
         if self.match_token(&[TokenType::FALSE]) {
             let expr = Box::new(Expr::Literal(
@@ -203,7 +202,7 @@ impl Parser {
         // If we don’t, that’s an error.
         // Impl on day break
         if self.match_token(&[TokenType::LeftPAREN]) {
-            let mut expr = self.expression();
+            let mut expr = self.expression().unwrap();
             self.consume(&TokenType::RightPAREN, "Expect ')' after expression.").unwrap();
             expr = Box::new(Expr::Grouping(
                 GroupingExpr {
@@ -281,7 +280,7 @@ impl Parser {
         }
     }
 
-    pub fn parse(&mut self) -> Box<Expr> {
+    pub fn parse(&mut self) -> ExprResult {
         // Returns a ParseResult
         // Needs handling
         self.expression()

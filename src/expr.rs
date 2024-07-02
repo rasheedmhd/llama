@@ -1,8 +1,6 @@
 pub mod ast {
-
     use crate::token::Token;
     type BoxedExpr = Box<Expr>;
-
     // EXPRESSIONS
     #[derive(Clone, Debug)]
     pub enum Expr {
@@ -82,6 +80,3 @@ pub mod ast {
         }
     }
 }
-
-
-
