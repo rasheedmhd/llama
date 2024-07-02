@@ -282,6 +282,8 @@ impl Parser {
     }
 
     pub fn parse(&mut self) -> Box<Expr> {
+        // Returns a ParseResult
+        // Needs handling
         self.expression()
         // match self.expression() {
         //     Ok(expr) => Some(expr),
