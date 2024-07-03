@@ -20,24 +20,24 @@ impl<T> Accept<T> for Expr {
         }
     }
 }
-
-impl<T> Accept<T> for BinaryExpr {
-    fn accept<V: Visitor<T>>(&self, visitor: &mut V) -> T {
-        visitor.visit_binary_expr(self)
-    }
-}
-impl<T> Accept<T> for GroupingExpr {
-    fn accept<V: Visitor<T>>(&self, visitor: &mut V) -> T {
-        visitor.visit_grouping_expr(self)
-    }
-}
-impl<T> Accept<T> for LiteralExpr {
-    fn accept<V: Visitor<T>>(&self, visitor: &mut V) -> T {
-        visitor.visit_literal_expr(self)
-    }
-}
-impl<T> Accept<T> for UnaryExpr {
-    fn accept<V: Visitor<T>>(&self, visitor: &mut V) -> T {
-        visitor.visit_unary_expr(self)
-    }
-}
+//
+// impl<T> Accept<T> for BinaryExpr {
+//     fn accept<V: Visitor<T>>(&self, visitor: &mut V) -> T {
+//         visitor.visit_binary_expr(self)
+//     }
+// }
+// impl<T> Accept<T> for GroupingExpr {
+//     fn accept<V: Visitor<T>>(&self, visitor: &mut V) -> T {
+//         visitor.visit_grouping_expr(self)
+//     }
+// }
+// impl<T> Accept<T> for LiteralExpr {
+//     fn accept<V: Visitor<T>>(&self, visitor: &mut V) -> T {
+//         visitor.visit_literal_expr(self)
+//     }
+// }
+// impl<T> Accept<T> for UnaryExpr {
+//     fn accept<V: Visitor<T>>(&self, visitor: &mut V) -> T {
+//         visitor.visit_unary_expr(self)
+//     }
+// }
