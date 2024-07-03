@@ -2,7 +2,7 @@ use crate::expr::ast::LiteralValue;
 use crate::token_type::TokenType;
 #[allow(dead_code)]
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
     pub lexeme: String,
@@ -39,4 +39,3 @@ impl Token {
         token_string
     }
 }
-
