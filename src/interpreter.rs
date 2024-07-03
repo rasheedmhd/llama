@@ -25,6 +25,7 @@ impl Visitor<Box<dyn Any>> for Interpreter {
     fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> Box<dyn Any> {
         let left = self.evaluate(&expr.left);
         let right = self.evaluate(&expr.right);
+        return  right;
     }
 
     fn visit_grouping_expr(&mut self, expr: &GroupingExpr) -> Box<dyn Any> {
