@@ -1,7 +1,7 @@
 #[allow(unused_variables)]
 
 use std::env;
-use std::{fmt, fs};
+use std::fs;
 use std::io::{stdin, stdout, Write};
 use std::process;
 
