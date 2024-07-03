@@ -1,6 +1,5 @@
 pub mod ast {
     use crate::token::Token;
-    use crate::token_type::TokenType;
 
     type BoxedExpr = Box<Expr>;
     // EXPRESSIONS
