@@ -43,12 +43,17 @@ impl Visitor<Box<dyn Any>> for Interpreter {
         // and deference to get the value inside of it. -> an Expr
         // We downcast it into a Concrete type an Expr
         let operand = (&*right).downcast_ref::<f64>();
-        if expr.operator.token_type == TokenType::BANG {
-            return Box::new(!Self::is_truthy(right));
-        } else if expr.operator.token_type == TokenType::MINUS {
-            return Box::new(-operand.unwrap());
-        };
-        // unreachable
-        right
+        // if expr.operator.token_type == TokenType::BANG {
+        //     return Box::new(!Self::is_truthy(right));
+        // } else if expr.operator.token_type == TokenType::MINUS {
+        //     return Box::new(-operand.unwrap());
+        // };
+
+        match expr.operator.token_type {
+            TokenType::BANG => { Box::new(!Self::is_truthy(right)) },
+            TokenType::MINUS => { Box::new(-operand.unwrap()) },
+            // unreachable
+            _ => right
+        }
     }
 }
