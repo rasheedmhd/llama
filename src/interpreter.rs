@@ -8,25 +8,32 @@ use crate::runtime_error::RuntimeError;
 pub struct Interpreter;
 type ParseResult = Result<Expr, RuntimeError>;
 impl Interpreter {
-    // void interpret(Expr expression) {
-    // try {
-    // Object value = evaluate(expression);
-    // System.out.println(stringify(value));
-    // } catch (RuntimeError error) {
-    // Lox.runtimeError(error);
-    // }
-    // }
-    fn interpret(&mut self, expr: &Box<Expr>) {
-        let eval_box = self.evaluate(expr);
-        let eval_res = (&*eval_box).downcast_ref::<ParseResult>().unwrap();
-        match eval_res {
-            Ok(value) => { value },
-            Err(error) => {
-                // RuntimeError { token: , msg: "Lol, just kidding. No! Seriously we have a problem.".to_string() };
-                panic!("Lol, just kidding. No! Seriously we have a problem. {:?}", error);
+
+    fn stringify( expr: Box<dyn Any>) -> String {
+        if expr.is::<Option<()>>() { return "nil".to_string() };
+        if expr.is::<f64>() {
+            let mut text = expr.downcast_ref::<String>().unwrap().clone();
+            if text.ends_with(".0") {
+                text.truncate(text.len() -  2)
             }
         };
+        expr.downcast_ref::<String>().unwrap().clone()
     }
+
+    fn interpret(&mut self, expr: &Box<Expr>) {
+        let eval_box = self.evaluate(expr);
+        let value = Self::stringify(eval_box);
+        println!("{}", value)
+        // let eval_res = (&*eval_box).downcast_ref::<ParseResult>().unwrap();
+        // match eval_res {
+        //     Ok(value) => { value },
+        //     Err(error) => {
+        //         // RuntimeError { token: , msg: "Lol, just kidding. No! Seriously we have a problem.".to_string() };
+        //         panic!("Lol, just kidding. No! Seriously we have a problem. {:?}", error);
+        //     }
+        // };
+    }
+
     fn evaluate(&mut self, expr: &Box<Expr>) -> Box<dyn Any> {
         expr.accept(self)
     }
