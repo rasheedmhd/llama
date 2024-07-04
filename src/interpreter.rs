@@ -3,10 +3,30 @@ use crate::visit::{Accept, Visitor};
 use std::any::Any;
 use crate::token::Token;
 use crate::token_type::TokenType;
+use crate::runtime_error::RuntimeError;
 
 pub struct Interpreter;
-
+type ParseResult = Result<Expr, RuntimeError>;
 impl Interpreter {
+    // void interpret(Expr expression) {
+    // try {
+    // Object value = evaluate(expression);
+    // System.out.println(stringify(value));
+    // } catch (RuntimeError error) {
+    // Lox.runtimeError(error);
+    // }
+    // }
+    fn interpret(&mut self, expr: &Box<Expr>) {
+        let eval_box = self.evaluate(expr);
+        let eval_res = (&*eval_box).downcast_ref::<ParseResult>().unwrap();
+        match eval_res {
+            Ok(value) => { value },
+            Err(error) => {
+                // RuntimeError { token: , msg: "Lol, just kidding. No! Seriously we have a problem.".to_string() };
+                panic!("Lol, just kidding. No! Seriously we have a problem. {:?}", error);
+            }
+        };
+    }
     fn evaluate(&mut self, expr: &Box<Expr>) -> Box<dyn Any> {
         expr.accept(self)
     }
@@ -161,19 +181,5 @@ impl Visitor<Box<dyn Any>> for Interpreter {
             // unreachable
             _ => right
         }
-    }
-}
-
-struct RuntimeError {
-    token: Token,
-    msg: String
-}
-
-impl RuntimeError {
-    fn new(token: Token, msg: String ) -> Self {
-       Self {
-           token,
-           msg: String::new()
-       }
     }
 }
