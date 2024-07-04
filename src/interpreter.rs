@@ -6,7 +6,7 @@ use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
 
 pub struct Interpreter;
-type ParseResult = Result<Expr, RuntimeError>;
+type InterpretResult  = Result<Box<dyn Any>, RuntimeError>;
 impl Interpreter {
 
     fn stringify( expr: Box<dyn Any>) -> String {
@@ -78,30 +78,16 @@ impl Interpreter {
         // }
     }
 
-
-    fn check_number_operand(operator: &Token, operand: &Box<dyn Any>) {
-        // match operand.is::<f64>() {
-        //     f64 => {
-        //         return ()
-        //     },
-        //     Err(_) => {
-        //         Err(RuntimeError { token: operator, msg: "OOOps, I was expecting numbers.".to_string() })
-        //     }
-        // }.expect("TODO: panic message");
-        if operand.is::<f64>() { return (); };
+    fn check_number_operand(operator: &Token, operand: &Box<dyn Any>) -> Result<(), RuntimeError> {
+        if operand.is::<f64>() { return Ok(()); };
         // TO DO
-        // Copy Rust Error Ergonomics,
-        // Providing error codes to run that explains the Error
-        // Err(RuntimeError { token: operator, msg: "OOOps, I was expecting numbers.".to_string()})
-        panic!("OOOps, I was expecting numbers.");
+        // Copy Rust Error Ergonomics, Providing error codes to run that explains the Error
+        Err(RuntimeError { token: operator.clone(), msg: "OOOps, I was expecting numbers.".to_string()})
     }
 
-    fn check_number_operand_bin(operator: &Token, left: &Box<dyn Any>, right: &Box<dyn Any>) {
-        if left.is::<f64>() && right.is::<f64>() { return (); };
-        // Copy Rust Error Ergonomics,
-        // Providing error codes to run that explains the Error
-        // Err(RuntimeError { token: operator, msg: "OOOps, I was expecting numbers.".to_string()})
-        panic!("OOOps, I was expecting two numbers.");
+    fn check_number_operand_bin(operator: &Token, left: &Box<dyn Any>, right: &Box<dyn Any>) -> Result<(), RuntimeError> {
+        if left.is::<f64>() && right.is::<f64>() { return Ok(()); };
+        Err(RuntimeError { token: operator.clone(), msg: "OOOps, I was expecting numbers.".to_string()})
     }
 }
 
