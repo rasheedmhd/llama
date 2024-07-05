@@ -117,7 +117,7 @@ impl Scanner {
     // Next Char returns wih a \n char which the scanner doesn't recognize
     // There throwing an error
     fn scan_token(&mut self) {
-        let char = self.advance().unwrap();
+        let char = self.advance();
         match char {
             '(' => self.add_token(TokenType::LeftPAREN),
             ')' => self.add_token(TokenType::RightPAREN),
@@ -220,14 +220,14 @@ impl Scanner {
     // Remove the Option and return a
     // and handle the None returned by
     // chars.nth()
-    fn advance(&mut self) -> Option<char> {
+    fn advance(&mut self) -> char {
         // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.nth
         // nth() will return None if n is greater than or equal to the length of the iterator.
         // Note that all preceding elements, as well as the returned element, will be consumed from the iterator.
         // That means that the preceding elements will be discarded,
         // and also that calling nth(0) multiple times on the same iterator will return different elements.
+        let next_char = self.source.chars().nth(self.current).unwrap();
         self.current += 1;
-        let next_char = self.source.chars().nth(self.current);
         next_char
     }
 

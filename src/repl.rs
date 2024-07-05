@@ -45,17 +45,17 @@ impl Llama {
         // of the input language
         let mut scanner   = Scanner::from(source);
         let tokens     = scanner.scan_tokens();
-        // let mut parser     = Parser::new(tokens);
-        // let expression  = parser.parse().unwrap();
-        // let mut interpreter = Interpreter::new();
-        for token in &tokens {
-            println!("{:?}", token);
-        }
+        let mut parser     = Parser::new(tokens);
+        let expression  = parser.parse().unwrap();
+        let mut interpreter = Interpreter::new();
+        // for token in &tokens {
+        //     println!("{:?}", token);
+        // }
         unsafe {
             if HAD_ERROR { return };
         }
                 
-        // interpreter.interpret(&expression);
+        interpreter.interpret(&expression);
         
     }
 
