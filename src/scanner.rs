@@ -118,50 +118,50 @@ impl Scanner {
     // Next Char returns wih a \n char which the scanner doesn't recognize
     // There throwing an error
     fn scan_token(&mut self) {
-        let char = self.advance();
+        let char = self.advance().unwrap();
         match char {
-            Some('(') => self.add_token(TokenType::LeftPAREN),
-            Some(')') => self.add_token(TokenType::RightPAREN),
-            Some('{') => self.add_token(TokenType::LeftBRACE),
-            Some('}') => self.add_token(TokenType::RightBRACE),
-            Some(',') => self.add_token(TokenType::COMMA),
-            Some('.') => self.add_token(TokenType::DOT),
-            Some('-') => self.add_token(TokenType::MINUS),
-            Some('+') => self.add_token(TokenType::PLUS),
-            Some(';') => self.add_token(TokenType::SEMICOLON),
-            Some('*') => self.add_token(TokenType::STAR),
+            '(' => self.add_token(TokenType::LeftPAREN),
+            ')' => self.add_token(TokenType::RightPAREN),
+            '{' => self.add_token(TokenType::LeftBRACE),
+            '}' => self.add_token(TokenType::RightBRACE),
+            ',' => self.add_token(TokenType::COMMA),
+            '.' => self.add_token(TokenType::DOT),
+            '-' => self.add_token(TokenType::MINUS),
+            '+' => self.add_token(TokenType::PLUS),
+            ';' => self.add_token(TokenType::SEMICOLON),
+            '*' => self.add_token(TokenType::STAR),
             // Operators
             // To Do
             // Add a ++ for adding 1 to a value
-            Some('!') => {
+            '!' => {
                 if self.match_char('=') {
                     self.add_token(TokenType::BangEQUAL)
                 } else if !self.match_char('=') {
                     self.add_token(TokenType::BANG)
                 }
             }
-            Some('=') => {
+            '=' => {
                 if self.match_char('=') {
                     self.add_token(TokenType::EqualEQUAL)
                 } else if !self.match_char('=') {
                     self.add_token(TokenType::EQUAL)
                 }
             }
-            Some('<') => {
+            '<' => {
                 if self.match_char('=') {
                     self.add_token(TokenType::LessEQUAL)
                 } else if !self.match_char('=') {
                     self.add_token(TokenType::LESS)
                 }
             }
-            Some('>') => {
+            '>' => {
                 if self.match_char('=') {
                     self.add_token(TokenType::GreaterEQUAL)
                 } else if !self.match_char('=') {
                     self.add_token(TokenType::GREATER)
                 }
             }
-            Some('/') => {
+            '/' => {
                 if self.match_char('/') {
                     // A comment goes until the end of the line
                     while self.peek() != '\n' && !self.is_at_end() {
@@ -171,13 +171,13 @@ impl Scanner {
                     self.add_token(TokenType::SLASH);
                 }
             }
-            Some(' ') | Some('\r') | Some('\t') => {}
+            ' ' | '\r' | '\t' => {}
             // TO DO
             // Behaving weird it repl mode
-            Some('\n') => self.line += 1,
-            Some('"') => self.string(),
+            '\n' => self.line += 1,
+            '"' => self.string(),
             _ => {
-                if self.is_digit(char.unwrap()) {
+                if self.is_digit(char) {
                     self.number();
                 } else if self.is_alpha(char) {
                     self.identifier();
@@ -192,7 +192,6 @@ impl Scanner {
 
     fn identifier(&mut self) {
         // while self.peek().is_alphanumeric() {
-
         while self.is_alphanumeric(self.peek()) {
             self.advance();
         }
@@ -205,14 +204,14 @@ impl Scanner {
         self.add_token_with_literal(token_type.unwrap().clone(), Some(LiteralValue::r#String(identifier_literal)))
     }
 
-    fn is_alpha(&self, char: Option<char>) -> bool {
-        return (char.unwrap() >= 'a' && char.unwrap() <= 'z')
-            || (char.unwrap() >= 'A' && char.unwrap() <= 'Z')
-            || char.unwrap() == '_';
+    fn is_alpha(&self, char: char) -> bool {
+        return (char >= 'a' && char <= 'z')
+            || (char >= 'A' && char <= 'Z')
+            || char == '_';
     }
 
     fn is_alphanumeric(&self, char: char) -> bool {
-        self.is_alpha(Some(char)) || self.is_digit(char)
+        self.is_alpha(char) || self.is_digit(char)
     }
 
     fn is_at_end(&self) -> bool {
