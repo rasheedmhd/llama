@@ -47,7 +47,7 @@ impl Llama {
         let tokens     = scanner.scan_tokens();
         // let mut parser     = Parser::new(tokens);
         // let expression  = parser.parse().unwrap();
-        let mut interpreter = Interpreter::new();
+        // let mut interpreter = Interpreter::new();
         for token in &tokens {
             println!("{:?}", token);
         }

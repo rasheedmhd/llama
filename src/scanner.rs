@@ -5,9 +5,6 @@ use std::collections::HashMap;
 use crate::expr::ast::LiteralValue;
 
 // TO DO
-// Fix Error Impl
-
-// TO DO
 // Add support to Llamaʼs scanner for C-style /* ... */ block comments.
 // + handle newlines in them. + nesting.
 // Is adding support for nesting more work than you expected? Why?
@@ -16,18 +13,20 @@ use crate::expr::ast::LiteralValue;
 // Eng a Comp -> p70
 #[allow(dead_code)]
 pub struct Scanner {
+    // Text comes into the scanner from source and
+    // get transform into tokens in  stored
+    // in tokens
     source: String,
     // The start and current fields are offsets that index into the string.
     // points to the first character in the lexeme being scanned,
     start: usize,
     // points at the character currently being considered.
     current: usize,
-    // tracks what source line current is on
+    // Tracks which line in source we are on
     // So we can produce tokens that know their location
-    // TO DO
-    // refactor to use std::num::NonZeroUsize
-    // https://doc.rust-lang.org/std/num/type.NonZeroUsize.html
     line: usize,
+    // Serves as a source for the next step of the compilation
+    // pipeline: Tokens move from here into the Parser
     tokens: Vec<Token>,
 }
 
@@ -76,7 +75,7 @@ lazy_static! {
 impl Scanner {
     pub fn new() -> Self {
         Scanner {
-            source: String::new(),
+            source: String::new().chars().collect(),
             start: 0,
             current: 0,
             line: 1,
@@ -172,8 +171,6 @@ impl Scanner {
                 }
             }
             ' ' | '\r' | '\t' => {}
-            // TO DO
-            // Behaving weird it repl mode
             '\n' => self.line += 1,
             '"' => self.string(),
             _ => {
@@ -181,11 +178,12 @@ impl Scanner {
                     self.number();
                 } else if self.is_alpha(char) {
                     self.identifier();
+                } else {
+                    crate::repl::Llama::error(
+                        Token::new(TokenType::EOF, "".to_string(), self.line, None),
+                        "Unexpected Character",
+                    )
                 }
-                crate::repl::Llama::error(
-                    Token::new(TokenType::EOF, "".to_string(), self.line, None),
-                    "Unexpected Character",
-                )
             }
         }
     }
@@ -225,9 +223,11 @@ impl Scanner {
     fn advance(&mut self) -> Option<char> {
         // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.nth
         // nth() will return None if n is greater than or equal to the length of the iterator.
-        // Note that all preceding elements, as well as the returned element, will be consumed from the iterator. That means that the preceding elements will be discarded, and also that calling nth(0) multiple times on the same iterator will return different elements.
-        let next_char = self.source.chars().nth(self.current);
+        // Note that all preceding elements, as well as the returned element, will be consumed from the iterator.
+        // That means that the preceding elements will be discarded,
+        // and also that calling nth(0) multiple times on the same iterator will return different elements.
         self.current += 1;
+        let next_char = self.source.chars().nth(self.current);
         next_char
     }
 
