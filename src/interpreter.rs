@@ -6,21 +6,13 @@ use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
 
 pub struct Interpreter;
-type InterpretResult  = Result<Box<dyn Any>, RuntimeError>;
+type InterpretResult = Result<Box<dyn Any>, RuntimeError>;
+
 impl Interpreter {
 
-    fn stringify( expr: Box<dyn Any>) -> String {
-        if expr.is::<Option<()>>() { return "nil".to_string() };
-        if expr.is::<f64>() {
-            let mut text = expr.downcast_ref::<String>().unwrap().clone();
-            if text.ends_with(".0") {
-                text.truncate(text.len() -  2)
-            }
-        };
-        expr.downcast_ref::<String>().unwrap().clone()
-    }
+    pub fn new() -> Self { Interpreter }
 
-    fn interpret(&mut self, expr: &Box<Expr>) {
+    pub fn interpret(&mut self, expr: &Box<Expr>) {
         let eval_box = self.evaluate(expr);
         let value = Self::stringify(eval_box);
         println!("{}", value)
@@ -32,6 +24,18 @@ impl Interpreter {
         //         panic!("Lol, just kidding. No! Seriously we have a problem. {:?}", error);
         //     }
         // };
+    }
+
+
+    fn stringify( expr: Box<dyn Any>) -> String {
+        if expr.is::<Option<()>>() { return "nil".to_string() };
+        if expr.is::<f64>() {
+            let mut text = expr.downcast_ref::<String>().unwrap().clone();
+            if text.ends_with(".0") {
+                text.truncate(text.len() -  2)
+            }
+        };
+        expr.downcast_ref::<String>().unwrap().clone()
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> Box<dyn Any> {
@@ -51,7 +55,7 @@ impl Interpreter {
     fn is_equal(left: Box<dyn Any>, right: Box<dyn Any> ) -> bool {
         // To Do
         // Keep an Eye on this impl
-        if left.is::<Option<()>>() && right.is::<Option<()>>() { return true};
+        if left.is::<Option<()>>() && right.is::<Option<()>>() { return true };
         if left.is::<Option<()>>() { return false };
 
         if left.is::<f64>() ==  right.is::<f64>(){
@@ -63,13 +67,7 @@ impl Interpreter {
             return true;
         };
         return false;
-        // return Box::new(());
-        // let first = first_expr.is::<Option<()>>();
-        // let second = second_expr.is::<Option<()>>();
-        // if first_expr.is::<Option<()>>() && second_expr.is::<Option<()>>() { return true};
-        // if first_expr.is::<Option<()>>() { return false };
-        // first_expr == second_expr
-        // true
+
         // match (first, second) {
         //     (None, None) => true,
         //     (None, Some(_)) | (Some(_), None) => false,
@@ -139,8 +137,10 @@ impl Visitor<Box<dyn Any>> for Interpreter {
                 if left.is::<String>() &&  right.is::<String>(){
                     return Box::new(left_str.unwrap().clone() + right_str.unwrap());
                 };
-                panic!("OOOps, I was expecting two numbers or strings.");
-                // return Box::new(());
+                // panic!("OOOps, I was expecting two numbers or strings.");
+                return Box::new(
+                    RuntimeError { token: expr.operator.clone(), msg: "OOOps, I was expecting numbers.".to_string()}
+                );
             },
             TokenType::BangEQUAL  => { Box::new(!Self::is_equal(left, right)) },
             TokenType::EqualEQUAL => { Box::new(Self::is_equal(left,  right)) },

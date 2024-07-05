@@ -6,13 +6,17 @@ use std::io::{stdin, stdout, Write};
 use std::process;
 
 use crate::scanner::Scanner;
+use crate::parser::Parser;
+use crate::interpreter::Interpreter;
 use crate::token::Token;
+use crate::runtime_error::RuntimeError;
 use crate::token_type::TokenType;
 
 // TO DO
 // Use AtomicBool
 // https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html
 static mut HAD_ERROR: bool = false;
+static mut HAD_RUNTIME_ERROR: bool = false;
 
 pub struct Llama {
 }
@@ -41,18 +45,18 @@ impl Llama {
         // of the input language
         let mut scanner   = Scanner::from(source);
         let tokens     = scanner.scan_tokens();
-        // let mut parser     = Parser::new(tokens);
-        // let expression  = parser.parse();
-        for token in &tokens {
-            println!("{:?}", token);
-        }
-        // unsafe {
-        //     if HAD_ERROR { return };
+        let mut parser     = Parser::new(tokens);
+        let expression  = parser.parse().unwrap();
+        let mut interpreter = Interpreter::new();
+        // for token in &tokens {
+        //     println!("{:?}", token);
         // }
-        //
-        // let expression = AstPrinter::print(&mut AstPrinter, *expression);
-        //
-        // println!("{expression}");
+        unsafe {
+            if HAD_ERROR { return };
+        }
+                
+        interpreter.interpret(&expression);
+        
     }
 
 
@@ -60,8 +64,14 @@ impl Llama {
     // Our interpreter supports two ways of running code. If you start llama from the
     // command line and give it a path to a file, it reads the file and executes it
     fn run_file(path: String) {
+        // TO DO
+        // Handle file error properly
         let code = fs::read_to_string(path).expect("File doesn't exist");
         Llama::run(code);
+        unsafe {
+            if HAD_ERROR { process::exit(65)}
+            if HAD_RUNTIME_ERROR { process::exit(70)}
+        }
     }
 
     fn run_prompt() {
@@ -99,6 +109,13 @@ impl Llama {
         } else {
             Llama::report(token.line, format!("at '{}'", token.lexeme ),  message);
 
+        }
+    }
+
+    pub fn runtime_error(error: RuntimeError) {
+        println!("Error: {:?}  \n[ Line {:?} ]", error.token.line, error.msg);
+        unsafe {
+            HAD_RUNTIME_ERROR = true;
         }
     }
 
