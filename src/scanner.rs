@@ -2,7 +2,7 @@ use crate::token::Token;
 use crate::token_type::TokenType;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-use crate::expr::ast::LiteralValue;
+use crate::expr::ast::LitValue;
 
 // TO DO
 // Add support to Llamaʼs scanner for C-style /* ... */ block comments.
@@ -14,7 +14,7 @@ use crate::expr::ast::LiteralValue;
 #[allow(dead_code)]
 pub struct Scanner {
     // Text comes into the scanner from source and
-    // get transform into tokens in  stored
+    // get transformed into tokens in  stored
     // in tokens
     source: String,
     // The start and current fields are offsets that index into the string.
@@ -75,7 +75,7 @@ lazy_static! {
 impl Scanner {
     pub fn new() -> Self {
         Scanner {
-            source: String::new().chars().collect(),
+            source: String::new(),
             start: 0,
             current: 0,
             line: 1,
@@ -199,7 +199,7 @@ impl Scanner {
         if token_type.is_none() {
             token_type = Some(&TokenType::IDENTIFIER);
         }
-        self.add_token_with_literal(token_type.unwrap().clone(), Some(LiteralValue::r#String(identifier_literal)))
+        self.add_token_with_literal(token_type.unwrap().clone(), Some(LitValue::r#String(identifier_literal)))
     }
 
     fn is_alpha(&self, char: char) -> bool {
@@ -277,7 +277,7 @@ impl Scanner {
         self.advance();
         // Trim the surrounding quotes.
         let value: String = self.source[self.start + 1..self.current - 1].to_string();
-        self.add_token_with_literal(TokenType::STRING, Some(LiteralValue::r#String(value)))
+        self.add_token_with_literal(TokenType::STRING, Some(LitValue::r#String(value)))
     }
 
     fn is_digit(&self, char: char) -> bool {
@@ -299,7 +299,7 @@ impl Scanner {
         let number = self.source.to_string();
         // let number = self.source[self.start+1..self.current-1].parse::<f64>().unwrap();
         // self.add_token(TokenType::NUMBER);
-        self.add_token_with_literal(TokenType::NUMBER, Some(LiteralValue::r#String(number)))
+        self.add_token_with_literal(TokenType::NUMBER, Some(LitValue::r#String(number)))
     }
 
     fn peek_next(&self) -> char {
@@ -319,7 +319,7 @@ impl Scanner {
         self.add_token_with_literal(token_type, None)
     }
 
-    fn add_token_with_literal(&mut self, token_type: TokenType, literal: Option<LiteralValue>) {
+    fn add_token_with_literal(&mut self, token_type: TokenType, literal: Option<LitValue>) {
         let text = self.source[self.start..self.current].to_string();
         self.tokens
             .push(Token::new(token_type, text, self.line, literal));

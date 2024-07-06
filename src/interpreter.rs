@@ -14,8 +14,8 @@ impl Interpreter {
 
     pub fn interpret(&mut self, expr: &Box<Expr>) {
         let eval_box = self.evaluate(expr);
-        // let value = Self::stringify(eval_box);
-        println!("{:?}", eval_box)
+        let value = Self::stringify(eval_box);
+        println!("{:?}", value)
         // let eval_res = (&*eval_box).downcast_ref::<ParseResult>().unwrap();
         // match eval_res {
         //     Ok(value) => { value },
@@ -28,13 +28,13 @@ impl Interpreter {
 
 
     fn stringify( expr: Box<dyn Any>) -> String {
-        // if expr.is::<Option<()>>() { return "nil".to_string() };
-        // if expr.is::<f64>() {
-        //     let mut text = expr.downcast_ref::<String>().unwrap().clone();
-        //     if text.ends_with(".0") {
-        //         text.truncate(text.len() -  2)
-        //     }
-        // };
+        if expr.is::<Option<()>>() { return "nil".to_string() };
+        if expr.is::<f64>() {
+            let mut text = expr.downcast_ref::<String>().unwrap().clone();
+            if text.ends_with(".0") {
+                text.truncate(text.len() -  2)
+            }
+        };
         expr.downcast_ref::<String>().unwrap().clone()
     }
 
