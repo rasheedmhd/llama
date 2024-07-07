@@ -29,6 +29,7 @@ pub struct Parser {
     tokens: Vec<Token>,
     current: usize,
 }
+
 // THIS IS THE GRAMMAR
 // THE PARSER WORKS ON
 // expression      → equality ;
@@ -38,7 +39,6 @@ pub struct Parser {
 // factor          → unary ( ( "/" | "*" ) unary )* ;
 // unary           → ( "!" | "-" ) unary | primary ;
 // primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
-
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {

@@ -1,10 +1,10 @@
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
 use crate::visit::{Accept, Visitor};
-use std::any::Any;
 use crate::token::Token;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
-
+use std::any::Any;
+use std::any::type_name_of_val;
 pub struct Interpreter;
 type InterpretResult = Result<Box<dyn Any>, RuntimeError>;
 
@@ -14,8 +14,10 @@ impl Interpreter {
 
     pub fn interpret(&mut self, expr: &Box<Expr>) {
         let eval_box = self.evaluate(expr);
+       let x =   type_name_of_val(&eval_box);
         let value = Self::stringify(eval_box);
         println!("{:?}", value)
+        // println!("{:?}", eval_box.downcast_ref::<String>())  as
         // let eval_res = (&*eval_box).downcast_ref::<ParseResult>().unwrap();
         // match eval_res {
         //     Ok(value) => { value },
@@ -28,6 +30,8 @@ impl Interpreter {
 
 
     fn stringify( expr: Box<dyn Any>) -> String {
+        let expr =   type_name_of_val(&expr);
+
         if expr.is::<Option<()>>() { return "nil".to_string() };
         if expr.is::<f64>() {
             let mut text = expr.downcast_ref::<String>().unwrap().clone();
@@ -35,7 +39,17 @@ impl Interpreter {
                 text.truncate(text.len() -  2)
             }
         };
-        expr.downcast_ref::<String>().unwrap().clone()
+        // expr.downcast_ref::<String>().unwrap().clone()
+        match expr.downcast_ref::<String>() {
+            Some(as_string) => {
+                println!("String ({}): {}", as_string.len(), as_string);
+                return as_string.to_string();
+            }
+            None => {
+                println!(" None => {expr:#?}");
+                "Ahh, Errrrm! (scratch's head) I was expecting a string value but I got None  🧐".to_string()
+            }
+        }
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> Box<dyn Any> {
