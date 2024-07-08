@@ -54,7 +54,9 @@ impl Llama {
         unsafe {
             if HAD_ERROR { return };
         }
-                
+        // The Parser is good!
+        println!("{expression:#?}");
+
         interpreter.interpret(&expression);
         
     }

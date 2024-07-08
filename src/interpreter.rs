@@ -1,5 +1,5 @@
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
-use crate::visit::{Accept, Visitor};
+use crate::visit::Visitor;
 use crate::token::Token;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
@@ -14,10 +14,10 @@ impl Interpreter {
 
     pub fn interpret(&mut self, expr: &Box<Expr>) {
         let eval_box = self.evaluate(expr);
-       let x =   type_name_of_val(&eval_box);
-        let value = Self::stringify(eval_box);
-        println!("{:?}", value)
-        // println!("{:?}", eval_box.downcast_ref::<String>())  as
+        let x =   type_name_of_val(&eval_box);
+        // let value = Self::stringify(eval_box);
+        // println!("{:?}", value)
+        println!("{:#?}", eval_box.downcast_ref::<String>());
         // let eval_res = (&*eval_box).downcast_ref::<ParseResult>().unwrap();
         // match eval_res {
         //     Ok(value) => { value },
@@ -30,7 +30,7 @@ impl Interpreter {
 
 
     fn stringify( expr: Box<dyn Any>) -> String {
-        let expr =   type_name_of_val(&expr);
+        // let expr =   type_name_of_val(&expr);
 
         if expr.is::<Option<()>>() { return "nil".to_string() };
         if expr.is::<f64>() {
@@ -53,6 +53,7 @@ impl Interpreter {
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> Box<dyn Any> {
+        // let x = type_name_of_val(&expr.accept(self));
         expr.accept(self)
     }
 
@@ -104,6 +105,33 @@ impl Interpreter {
 }
 
 impl Visitor<Box<dyn Any>> for Interpreter {
+    fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> Box<dyn Any> {
+        Box::new(expr.value.clone())
+    }
+
+    fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> Box<dyn Any> {
+        let right = self.evaluate(&expr.right);
+
+        // borrow the value returned from evaluating the right side of the
+        // unary expression which is a Box<dyn Any> borrow it
+        // and deference to get the value inside of it. -> an Expr
+        // We downcast it into a Concrete type an Exprd
+        let operand = (&*right).downcast_ref::<f64>();
+        match expr.operator.token_type {
+            TokenType::BANG  => { Box::new(!Self::is_truthy(right)) },
+            TokenType::MINUS => {
+                Self::check_number_operand(&expr.operator, &right);
+                Box::new(-operand.unwrap())
+            },
+            // unreachable
+            _ => right
+        }
+    }
+
+    fn visit_grouping_expr(&mut self, expr: &GroupingExpr) -> Box<dyn Any> {
+        self.evaluate(&expr.expression)
+    }
+
     fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> Box<dyn Any> {
         let left = self.evaluate(&expr.left);
         let right= self.evaluate(&expr.right);
@@ -158,33 +186,6 @@ impl Visitor<Box<dyn Any>> for Interpreter {
             },
             TokenType::BangEQUAL  => { Box::new(!Self::is_equal(left, right)) },
             TokenType::EqualEQUAL => { Box::new(Self::is_equal(left,  right)) },
-            // unreachable
-            _ => right
-        }
-    }
-
-    fn visit_grouping_expr(&mut self, expr: &GroupingExpr) -> Box<dyn Any> {
-        self.evaluate(&expr.expression)
-    }
-
-    fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> Box<dyn Any> {
-        Box::new(expr.value.clone())
-    }
-
-    fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> Box<dyn Any> {
-        let right = self.evaluate(&expr.right);
-
-        // borrow the value returned from evaluating the right side of the
-        // unary expression which is a Box<dyn Any> borrow it
-        // and deference to get the value inside of it. -> an Expr
-        // We downcast it into a Concrete type an Expr
-        let operand = (&*right).downcast_ref::<f64>();
-        match expr.operator.token_type {
-            TokenType::BANG  => { Box::new(!Self::is_truthy(right)) },
-            TokenType::MINUS => {
-                Self::check_number_operand(&expr.operator, &right);
-                Box::new(-operand.unwrap())
-            },
             // unreachable
             _ => right
         }
