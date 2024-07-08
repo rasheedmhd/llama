@@ -1,4 +1,4 @@
-use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
+use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, LitValue, UnaryExpr};
 use crate::visit::Visitor;
 use crate::token::Token;
 use crate::token_type::TokenType;
@@ -19,13 +19,14 @@ impl Visitor<Box<dyn Any>> for Interpreter {
         // borrow the value returned from evaluating the right side of the
         // unary expression which is a Box<dyn Any> borrow it
         // and deference to get the value inside of it. -> an Expr
-        // We downcast it into a Concrete type an Exprd
-        let operand = (&*right).downcast_ref::<f64>();
+        // We downcast it into a Concrete type an Expr
+        let operand = (&*right).downcast_ref::<LitValue>().unwrap().clone();
         match expr.operator.token_type {
             TokenType::BANG  => { Box::new(!Self::is_truthy(right)) },
             TokenType::MINUS => {
                 Self::check_number_operand(&expr.operator, &right);
-                Box::new(-operand.unwrap())
+                Box::new(operand)
+                // right
             },
             // unreachable
             _ => right
@@ -41,47 +42,47 @@ impl Visitor<Box<dyn Any>> for Interpreter {
         let right= self.evaluate(&expr.right);
         // Using shadowing to convert the left and right parts of the
         // binary expr into concrete values
-        let left_fl  = (&*left).downcast_ref::<f64>();
-        let right_fl = (&*right).downcast_ref::<f64>();
+        let left_fl  = (&*left).downcast_ref::<f64>().unwrap().clone();
+        let right_fl = (&*right).downcast_ref::<f64>().unwrap().clone();
 
-        let left_str = (&*left).downcast_ref::<String>();
-        let right_str = (&*right).downcast_ref::<&str>();
+        let left_str = (&*left).downcast_ref::<String>().unwrap().clone();
+        let right_str = (&*right).downcast_ref::<&str>().unwrap().clone();
 
         match expr.operator.token_type {
             TokenType::GREATER      => {
                 Self::check_number_operand_bin(&expr.operator, &left, &right);
-                Box::new(left_fl.unwrap() > right_fl.unwrap())
+                Box::new(left_fl > right_fl)
             },
             TokenType::LessEQUAL    => {
                 Self::check_number_operand_bin(&expr.operator, &left, &right);
-                Box::new(left_fl.unwrap() <= right_fl.unwrap())
+                Box::new(left_fl <= right_fl)
             },
             TokenType::GreaterEQUAL => {
                 Self::check_number_operand_bin(&expr.operator, &left, &right);
-                Box::new(left_fl.unwrap() >= right_fl.unwrap())
+                Box::new(left_fl >= right_fl)
             },
             TokenType::LESS  => {
                 Self::check_number_operand_bin(&expr.operator, &left, &right);
-                Box::new(left_fl.unwrap() < right_fl.unwrap())
+                Box::new(left_fl < right_fl)
             },
             TokenType::MINUS => {
                 Self::check_number_operand_bin(&expr.operator, &left, &right);
-                Box::new(left_fl.unwrap() - right_fl.unwrap())
+                Box::new(left_fl - right_fl)
             },
             TokenType::SLASH => {
                 Self::check_number_operand_bin(&expr.operator, &left, &right);
-                Box::new(left_fl.unwrap() / right_fl.unwrap())
+                Box::new(left_fl / right_fl)
             },
             TokenType::STAR  => {
                 Self::check_number_operand_bin(&expr.operator, &left, &right);
-                Box::new(left_fl.unwrap() * right_fl.unwrap())
+                Box::new(left_fl * right_fl)
             },
             TokenType::PLUS  => {
                 if left.is::<f64>() &&  right.is::<f64>(){
-                    return Box::new(left_fl.unwrap() + right_fl.unwrap());
+                    return Box::new(left_fl + right_fl);
                 };
                 if left.is::<String>() &&  right.is::<String>(){
-                    return Box::new(left_str.unwrap().clone() + right_str.unwrap());
+                    return Box::new(left_str.clone() + right_str);
                 };
                 // panic!("OOOps, I was expecting two numbers or strings.");
                 return Box::new(
@@ -101,11 +102,13 @@ impl Interpreter {
     pub fn new() -> Self { Interpreter }
 
     pub fn interpret(&mut self, expr: &Box<Expr>) {
-        let eval_box = self.evaluate(expr);
-        let x =   type_name_of_val(&eval_box);
+        let value = self.evaluate(expr);
+        // let value =   type_name_of_val(&eval_box);
         // let value = Self::stringify(eval_box);
-        // println!("{:?}", value)
-        println!("{:#?}", eval_box.downcast_ref::<String>());
+        if value.is::<UnaryExpr>() || value.is::<LitValue>() || value.is::<BinaryExpr>() || value.is::<GroupingExpr>() {
+            println!("{:?}", value);
+        }
+        // println!("{:#?}", value.downcast_ref::<UnaryExpr>().unwrap());
         // let eval_res = (&*eval_box).downcast_ref::<ParseResult>().unwrap();
         // match eval_res {
         //     Ok(value) => { value },
@@ -142,6 +145,9 @@ impl Interpreter {
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> Box<dyn Any> {
         // let x = type_name_of_val(&expr.accept(self));
+        // println!(" interpreter {expr:#?}");
+        // Safe to say Evaluate is returning and Expr to
+        // whoever the fuck is calling it
         expr.accept(self)
     }
 
