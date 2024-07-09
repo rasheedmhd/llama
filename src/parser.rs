@@ -1,6 +1,6 @@
 use std::fmt;
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
-use crate::expr::ast::LitValue;
+use crate::expr::ast::Literal;
 use crate::repl::Llama;
 use crate::token::Token;
 use crate::token_type::TokenType;
@@ -164,7 +164,7 @@ impl Parser {
         if self.match_token(&[TokenType::FALSE]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: LitValue::Bool(false)
+                    value: Literal::Bool(false)
                 }
             ));
             return Ok(expr);
@@ -173,7 +173,7 @@ impl Parser {
         if self.match_token(&[TokenType::TRUE]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: LitValue::Bool(true)
+                    value: Literal::Bool(true)
                 }
             ));
             return Ok(expr);
@@ -182,7 +182,7 @@ impl Parser {
         if self.match_token(&[TokenType::NIL]) {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
-                    value: LitValue::Nil
+                    value: Literal::Nil
                 }
             ));
             return Ok(expr);

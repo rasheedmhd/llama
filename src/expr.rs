@@ -24,8 +24,8 @@ pub mod ast {
     }
 
     #[derive(Clone, Debug, PartialEq)]
-    pub enum LitValue {
-        r#String(String),
+    pub enum Literal {
+        String(String),
         Number(f64),
         Bool(bool),
         Nil
@@ -33,7 +33,7 @@ pub mod ast {
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct LiteralExpr {
-        pub value : LitValue,
+        pub value : Literal,
     }
 
     #[derive(Clone, Debug, PartialEq)]
@@ -65,7 +65,7 @@ pub mod ast {
     }
 
     impl LiteralExpr {
-        pub fn new(value : LitValue) -> Self {
+        pub fn new(value : Literal) -> Self {
             Self {
                 value,
             }

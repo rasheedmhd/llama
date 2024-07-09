@@ -1,4 +1,4 @@
-use crate::expr::ast::LitValue;
+use crate::expr::ast::Literal;
 use crate::token_type::TokenType;
 #[allow(dead_code)]
 
@@ -7,7 +7,7 @@ pub struct Token {
     pub token_type: TokenType,
     pub lexeme: String,
     pub line: usize,
-    pub literal: LitValue,
+    pub literal: Literal,
 }
 
 impl std::fmt::Display for Token {
@@ -24,8 +24,8 @@ impl std::fmt::Display for Token {
 
 impl Token {
     #[allow(dead_code)]
-    pub fn new(token_type: TokenType, lexeme: String, line: usize, literal: Option<LitValue>) -> Self {
-        let literal = literal.unwrap_or_else(|| LitValue::Nil);
+    pub fn new(token_type: TokenType, lexeme: String, line: usize, literal: Option<Literal>) -> Self {
+        let literal = literal.unwrap_or_else(|| Literal::Nil);
         Token {
             token_type,
             lexeme,
@@ -34,7 +34,7 @@ impl Token {
         }
     }
 
-    pub fn to_string(&self, token_type: TokenType, lexeme: String, literal: LitValue) -> String {
+    pub fn to_string(&self, token_type: TokenType, lexeme: String, literal: Literal) -> String {
         let token_string: String = format!("{:?} {} {:?}", token_type, lexeme, literal);
         token_string
     }

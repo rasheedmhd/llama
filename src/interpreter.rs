@@ -1,4 +1,4 @@
-use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, LitValue, UnaryExpr};
+use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr};
 use crate::visit::Visitor;
 use crate::token::Token;
 use crate::token_type::TokenType;
@@ -20,7 +20,7 @@ impl Visitor<Box<dyn Any>> for Interpreter {
         // unary expression which is a Box<dyn Any> borrow it
         // and deference to get the value inside of it. -> an Expr
         // We downcast it into a Concrete type an Expr
-        let operand = (&*right).downcast_ref::<LitValue>().unwrap().clone();
+        let operand = (&*right).downcast_ref::<Literal>().unwrap().clone();
         match expr.operator.token_type {
             TokenType::BANG  => { Box::new(!Self::is_truthy(right)) },
             TokenType::MINUS => {
@@ -42,8 +42,10 @@ impl Visitor<Box<dyn Any>> for Interpreter {
         let right= self.evaluate(&expr.right);
         // Using shadowing to convert the left and right parts of the
         // binary expr into concrete values
+        println!("{:?}", right.type_id());
         let left_fl  = (&*left).downcast_ref::<f64>().unwrap().clone();
         let right_fl = (&*right).downcast_ref::<f64>().unwrap().clone();
+        println!("{:?}", right_fl.type_id());
 
         let left_str = (&*left).downcast_ref::<String>().unwrap().clone();
         let right_str = (&*right).downcast_ref::<&str>().unwrap().clone();
@@ -105,7 +107,7 @@ impl Interpreter {
         let value = self.evaluate(expr);
         // let value =   type_name_of_val(&eval_box);
         // let value = Self::stringify(eval_box);
-        if value.is::<UnaryExpr>() || value.is::<LitValue>() || value.is::<BinaryExpr>() || value.is::<GroupingExpr>() {
+        if value.is::<UnaryExpr>() || value.is::<Literal>() || value.is::<BinaryExpr>() || value.is::<GroupingExpr>() {
             println!("{:?}", value);
         }
         // println!("{:#?}", value.downcast_ref::<UnaryExpr>().unwrap());
