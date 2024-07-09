@@ -31,21 +31,40 @@ pub mod ast {
         Nil
     }
 
+    impl Literal {
+        pub fn is_num(&self) -> bool {
+            match self {
+                Self::Number(_) => true,
+                _ => false
+            }
+        }
+        pub fn is_string(&self) -> bool {
+           match self {
+                Self::String(_) => true,
+                _ => false
+            }
+        }
+        pub fn unwrap_num(&self) -> f64 {
+            match self {
+                Self::Number(num) => *num,
+                // hopefully unreachable
+                // To Do
+                // proper handling later
+                _ => panic!()
+            }
+        }
+        pub fn wrap_num(value: f64) -> Self {
+            Self::Number(value)
+        }
+    }
+
     impl std::fmt::Display for Literal {
         fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
             let literal = match self {
-                Literal::String(string) => {
-                    write!(f, "{}", string)
-                },
-                Literal::Number(num) => {
-                    write!(f, "{}", num)
-                },
-                Literal::Bool(bool) => {
-                    write!(f, "{}", bool)
-                },
-                Literal::Nil => {
-                    write!(f, "nil")
-                },
+                Literal::String(string) => { write!(f, "{}", string) },
+                Literal::Number(num) => { write!(f, "{:?}", num) },
+                Literal::Bool(bool) => { write!(f, "{}", bool) },
+                Literal::Nil => { write!(f, "nil") },
             };
             literal
         }

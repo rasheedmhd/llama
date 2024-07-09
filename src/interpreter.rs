@@ -3,6 +3,8 @@ use crate::visit::Visitor;
 use crate::token::Token;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
+
+#[allow(unused_variables)]
 pub struct Interpreter;
 type LiteralResult = Result<Literal, RuntimeError>;
 
@@ -12,24 +14,32 @@ impl Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> LiteralResult {
-        todo!()
-        // let right = self.evaluate(&expr.right);
-        //
-        // // borrow the value returned from evaluating the right side of the
-        // // unary expression which is a LiteralResult borrow it
-        // // and deference to get the value inside of it. -> an Expr
-        // // We downcast it into a Concrete type an Expr
-        // let operand = (&*right).downcast_ref::<Literal>().unwrap().clone();
+        let right = self.evaluate(&expr.right)?;
+
         // match expr.operator.token_type {
-        //     TokenType::BANG  => { Box::new(!Self::is_truthy(right)) },
         //     TokenType::MINUS => {
-        //         Self::check_number_operand(&expr.operator, &right);
-        //         Box::new(operand)
-        //         // right
+        //         match right {
+        //             Literal::Number(right) => return Ok(Literal::Number(-right)),
+        //             _ => Ok(Literal::Nil),
+        //         // return Ok(Literal::wrap_num(-right.unwrap_num()));
+        //
+        //         }
         //     },
-        //     // unreachable
-        //     _ => right
+        //     _ => Ok(Literal::Nil),
         // }
+        match expr.operator.token_type {
+            TokenType::MINUS => {
+                if right.is_string() {
+                    // construct_number_error(&expr.operator)
+                    println!("Expecting Num but found String");
+                    Ok(right)
+                } else {
+                    return Ok(Literal::wrap_num(-right.unwrap_num()));
+                }
+            }
+            TokenType::BANG => Ok(right),
+            _ => panic!(), //TODO:
+        }
     }
 
     fn visit_grouping_expr(&mut self, expr: &GroupingExpr) -> LiteralResult {
@@ -106,18 +116,15 @@ impl Interpreter {
     pub fn interpret(&mut self, expr: &Box<Expr>) {
         let lit = self.evaluate(expr)
             .expect("Failed to interpret expression");
-        println!("{lit}");
+        println!("{:?}", lit);
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {
-        // let x = type_name_of_val(&expr.accept(self));
-        // println!(" interpreter {expr:#?}");
-        // Safe to say Evaluate is returning and Expr to
-        // whoever the fuck is calling it
         expr.accept(self)
     }
 
-    // fn is_truthy(unary_expr: LiteralResult) -> bool {
+    fn is_truthy(unary_expr: LiteralResult) -> bool {
+        todo!()
     //     if unary_expr.is::<Option<()>>() {
     //         return false;
     //     }
@@ -125,9 +132,10 @@ impl Interpreter {
     //         return *boolean;
     //     }
     //     true
-    // }
+    }
 
-    // fn is_equal(left: LiteralResult, right: LiteralResult ) -> bool {
+    fn is_equal(left: LiteralResult, right: LiteralResult ) -> bool {
+        todo!()
     //     // To Do
     //     // Keep an Eye on this impl
     //     if left.is::<Option<()>>() && right.is::<Option<()>>() { return true };
@@ -149,17 +157,18 @@ impl Interpreter {
     //     //     (Some(first), Some(second)) => first== second,
     //     //     _ => true
     //     // }
-    // }
+    }
 
-    // fn check_number_operand(operator: &Token, operand: &LiteralResult) -> Result<(), RuntimeError> {
-    //     if operand.is::<f64>() { return Ok(()); };
+    fn check_number_operand(operator: &Token, operand: &LiteralResult) -> Result<(), RuntimeError> {
+    todo!()//     if operand.is::<f64>() { return Ok(()); };
     //     // TO DO
     //     // Copy Rust Error Ergonomics, Providing error codes to run that explains the Error
     //     Err(RuntimeError { token: operator.clone(), msg: "OOOps, I was expecting numbers.".to_string()})
-    // }
+    }
     //
-    // fn check_number_operand_bin(operator: &Token, left: &LiteralResult, right: &LiteralResult) -> Result<(), RuntimeError> {
-    //     if left.is::<f64>() && right.is::<f64>() { return Ok(()); };
+    fn check_number_operand_bin(operator: &Token, left: &LiteralResult, right: &LiteralResult) -> Result<(), RuntimeError> {
+    todo!()
+        //     if left.is::<f64>() && right.is::<f64>() { return Ok(()); };
     //     Err(RuntimeError { token: operator.clone(), msg: "OOOps, I was expecting numbers.".to_string()})
-    // }
+    }
 }
