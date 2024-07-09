@@ -55,7 +55,7 @@ impl Llama {
             if HAD_ERROR { return };
         }
         // The Parser is good!
-        println!("{expression:#?}");
+        // println!("{expression:#?}");
 
         interpreter.interpret(&expression);
         

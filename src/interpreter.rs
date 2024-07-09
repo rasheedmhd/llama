@@ -104,32 +104,10 @@ impl Interpreter {
     pub fn new() -> Self { Interpreter }
 
     pub fn interpret(&mut self, expr: &Box<Expr>) {
-        self.evaluate(expr).expect("failed");
+        let lit = self.evaluate(expr)
+            .expect("Failed to interpret expression");
+        println!("{lit}");
     }
-
-
-    // fn stringify( expr: LiteralResult) -> String {
-    //     // let expr =   type_name_of_val(&expr);
-    //
-    //     if expr.is::<Option<()>>() { return "nil".to_string() };
-    //     if expr.is::<f64>() {
-    //         let mut text = expr.downcast_ref::<String>().unwrap().clone();
-    //         if text.ends_with(".0") {
-    //             text.truncate(text.len() -  2)
-    //         }
-    //     };
-    //     // expr.downcast_ref::<String>().unwrap().clone()
-    //     match expr.downcast_ref::<String>() {
-    //         Some(as_string) => {
-    //             println!("String ({}): {}", as_string.len(), as_string);
-    //             return as_string.to_string();
-    //         }
-    //         None => {
-    //             println!(" None => {expr:#?}");
-    //             "Ahh, Errrrm! (scratch's head) I was expecting a string value but I got None  🧐".to_string()
-    //         }
-    //     }
-    // }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {
         // let x = type_name_of_val(&expr.accept(self));

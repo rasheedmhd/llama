@@ -31,6 +31,26 @@ pub mod ast {
         Nil
     }
 
+    impl std::fmt::Display for Literal {
+        fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            let literal = match self {
+                Literal::String(string) => {
+                    write!(f, "{}", string)
+                },
+                Literal::Number(num) => {
+                    write!(f, "{}", num)
+                },
+                Literal::Bool(bool) => {
+                    write!(f, "{}", bool)
+                },
+                Literal::Nil => {
+                    write!(f, "nil")
+                },
+            };
+            literal
+        }
+    }
+
     #[derive(Clone, Debug, PartialEq)]
     pub struct LiteralExpr {
         pub value : Literal,
