@@ -109,9 +109,12 @@ impl Interpreter {
     pub fn new() -> Self { Interpreter }
 
     pub fn interpret(&mut self, expr: &Box<Expr>) {
-        let lit = self.evaluate(expr)
-            .expect("Failed to interpret expression");
-        println!("{}", lit);
+        match self.evaluate(expr) {
+            Ok(lit) => println!("{}", lit),
+            Err(e) => {
+                println!("{}", e);
+            }
+        }
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {

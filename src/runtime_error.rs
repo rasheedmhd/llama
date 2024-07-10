@@ -14,6 +14,6 @@ impl RuntimeError {
 
 impl std::fmt::Display for RuntimeError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Invalid Syntax: Token: {} msg: {}", self.token.lexeme, self.msg)
+        write!(f, "{} \nInvalid Syntax: [Token {}]", self.msg, self.token.lexeme)
     }
 }

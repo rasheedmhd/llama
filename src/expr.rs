@@ -95,7 +95,13 @@ pub mod ast {
         fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
             let literal = match self {
                 Literal::String(string) => { write!(f, "{}", string) },
-                Literal::Number(num) => { write!(f, "{:?}", num) },
+                Literal::Number(num) => {
+                    return if num.fract() == 0.0 {
+                        write!(f, "{:?}", *num as i64)
+                    } else {
+                        write!(f, "{:?}", num)
+                    };
+                },
                 Literal::Bool(bool) => { write!(f, "{}", bool) },
                 Literal::Nil => { write!(f, "nil") },
             };
