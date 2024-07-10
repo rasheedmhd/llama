@@ -1,10 +1,12 @@
+#[allow(unused_variables)]
+
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr};
 use crate::visit::Visitor;
 use crate::token::Token;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
 
-#[allow(unused_variables)]
+
 pub struct Interpreter;
 type LiteralResult = Result<Literal, RuntimeError>;
 
@@ -12,14 +14,14 @@ impl Visitor<LiteralResult> for Interpreter {
     fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> LiteralResult {
          Ok(expr.value.clone())
     }
-
+    #[allow(unused_variables)]
     fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> LiteralResult {
         let right = self.evaluate(&expr.right)?;
-
+        //
         // match expr.operator.token_type {
         //     TokenType::MINUS => {
         //         match right {
-        //             Literal::Number(right) => return Ok(Literal::Number(-right)),
+        //             Literal::Number(right) => return Ok(Literal::Number(-right+11f64)),
         //             _ => Ok(Literal::Nil),
         //         // return Ok(Literal::wrap_num(-right.unwrap_num()));
         //
@@ -29,9 +31,9 @@ impl Visitor<LiteralResult> for Interpreter {
         // }
         match expr.operator.token_type {
             TokenType::MINUS => {
-                if right.is_string() {
-                    // construct_number_error(&expr.operator)
-                    println!("Expecting Num but found String");
+                if !right.is_num() {
+                    // number_error(&expr.operator)
+                    println!("Expecting number but found something else");
                     Ok(right)
                 } else {
                     return Ok(Literal::wrap_num(-right.unwrap_num()));
@@ -45,7 +47,7 @@ impl Visitor<LiteralResult> for Interpreter {
     fn visit_grouping_expr(&mut self, expr: &GroupingExpr) -> LiteralResult {
         self.evaluate(&expr.expression)
     }
-
+    #[allow(unused_variables)]
     fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> LiteralResult {
         let left = self.evaluate(&expr.left);
         let right= self.evaluate(&expr.right);
@@ -116,13 +118,13 @@ impl Interpreter {
     pub fn interpret(&mut self, expr: &Box<Expr>) {
         let lit = self.evaluate(expr)
             .expect("Failed to interpret expression");
-        println!("{:?}", lit);
+        println!("{}", lit);
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {
         expr.accept(self)
     }
-
+    #[allow(unused_variables)]
     fn is_truthy(unary_expr: LiteralResult) -> bool {
         todo!()
     //     if unary_expr.is::<Option<()>>() {
@@ -133,7 +135,7 @@ impl Interpreter {
     //     }
     //     true
     }
-
+    #[allow(unused_variables)]
     fn is_equal(left: LiteralResult, right: LiteralResult ) -> bool {
         todo!()
     //     // To Do
@@ -158,7 +160,7 @@ impl Interpreter {
     //     //     _ => true
     //     // }
     }
-
+    #[allow(unused_variables)]
     fn check_number_operand(operator: &Token, operand: &LiteralResult) -> Result<(), RuntimeError> {
     todo!()//     if operand.is::<f64>() { return Ok(()); };
     //     // TO DO
@@ -166,6 +168,7 @@ impl Interpreter {
     //     Err(RuntimeError { token: operator.clone(), msg: "OOOps, I was expecting numbers.".to_string()})
     }
     //
+    #[allow(unused_variables)]
     fn check_number_operand_bin(operator: &Token, left: &LiteralResult, right: &LiteralResult) -> Result<(), RuntimeError> {
     todo!()
         //     if left.is::<f64>() && right.is::<f64>() { return Ok(()); };

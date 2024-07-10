@@ -296,10 +296,8 @@ impl Scanner {
                 self.advance();
             }
         }
-        let number = self.source.to_string();
-        // let number = self.source[self.start+1..self.current-1].parse::<f64>().unwrap();
-        // self.add_token(TokenType::NUMBER);
-        self.add_token_with_literal(TokenType::NUMBER, Some(Literal::String(number)))
+        let num = self.source[self.start..self.current].parse::<f64>().unwrap();
+        self.add_token_with_literal(TokenType::NUMBER, Some(Literal::Number(num)))
     }
 
     fn peek_next(&self) -> char {
