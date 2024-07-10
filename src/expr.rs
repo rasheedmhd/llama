@@ -31,7 +31,6 @@ pub mod ast {
         Bool(bool),
         Nil
     }
-
     impl Literal {
         pub fn is_num(&self) -> bool {
             match self {
@@ -51,8 +50,18 @@ pub mod ast {
                 _ => panic!()
             }
         }
+
         pub fn wrap_num(value: f64) -> Self {
             Self::Number(value)
+        }
+
+        pub fn is_truthy(&self) -> bool {
+            // if self == Literal::Nil { }
+            match self {
+                Literal::Nil => false,
+                Literal::Bool(bool_value) => *bool_value,
+                _ => true
+            }
         }
     }
 

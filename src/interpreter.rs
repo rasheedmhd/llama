@@ -29,6 +29,7 @@ impl Visitor<LiteralResult> for Interpreter {
         //     _ => panic!(),
         // }
         match expr.operator.token_type {
+            TokenType::BANG => Ok(Literal::Bool(!right.is_truthy())),
             TokenType::MINUS => {
                 if !right.is_num() {
                     // number_error(&expr.operator)
@@ -38,7 +39,6 @@ impl Visitor<LiteralResult> for Interpreter {
                     return Ok(Literal::wrap_num(-right.unwrap_num()));
                 }
             }
-            TokenType::BANG => Ok(right),
             _ => panic!(), //To Do:
         }
     }
@@ -123,17 +123,13 @@ impl Interpreter {
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {
         expr.accept(self)
     }
-    #[allow(unused_variables)]
-    fn is_truthy(unary_expr: LiteralResult) -> bool {
-        todo!()
-    //     if unary_expr.is::<Option<()>>() {
-    //         return false;
-    //     }
-    //     if let Some(boolean) = unary_expr.downcast_ref::<bool>() {
-    //         return *boolean;
-    //     }
-    //     true
-    }
+    // second Impl
+    // fn is_truthy(lit: &Literal) -> bool {
+    //     // https://doc.rust-lang.org/std/macro.matches.html
+    //     // Anything that is not Nil or False is true
+    //     !matches!(lit, Literal::Nil | Literal::Bool(false))
+    // }
+
     #[allow(unused_variables)]
     fn is_equal(left: LiteralResult, right: LiteralResult ) -> bool {
         todo!()
