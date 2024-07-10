@@ -1,5 +1,4 @@
 pub mod ast {
-    use std::ops::{Add, Sub, Neg, Div};
     use crate::token::Token;
 
     type BoxedExpr = Box<Expr>;
@@ -32,6 +31,30 @@ pub mod ast {
         Nil
     }
     impl Literal {
+        pub fn is_equal(&self, other: &Self) -> bool {
+            if let Self::Nil = self {
+                if let Self::Nil = other {
+                    return true;
+                }
+            }
+            if let Self::Number(left) = self {
+                if let Self::Number(right) = other {
+                    return left == right;
+                }
+            }
+            if let Self::Bool(left ) = self {
+                if let Self::Bool(right) = other {
+                    return left == right;
+                }
+            }
+            if let Self::String(left) = self {
+                if let Self::String(right) = other {
+                    return left == right;
+                }
+            }
+            return false;
+        }
+
         pub fn is_num(&self) -> bool {
             match self {
                 Self::Number(_) => true,
@@ -44,6 +67,14 @@ pub mod ast {
                 _ => false
             }
         }
+
+        pub fn unwrap_string(&self) -> &str {
+            match self {
+                Self::String(str) => &str,
+                _ => panic!()
+            }
+        }
+
         pub fn unwrap_num(&self) -> f64 {
             match self {
                 Self::Number(num) => *num,
@@ -51,53 +82,11 @@ pub mod ast {
             }
         }
 
-        pub fn wrap_num(value: f64) -> Self {
-            Self::Number(value)
-        }
-
         pub fn is_truthy(&self) -> bool {
-            // if self == Literal::Nil { }
             match self {
                 Literal::Nil => false,
                 Literal::Bool(bool_value) => *bool_value,
                 _ => true
-            }
-        }
-    }
-
-    // Impl Std Ops for second impl of interpreter visit impl
-    impl Add for Literal {
-        type Output = Literal;
-
-        fn add(self, other: Self) -> Literal {
-            match (self, other) {
-                (Literal::Number(left), Literal::Number(right)) => Literal::Number(left + right),
-                (Literal::String(String), Literal::String(str)) => Literal::String(String + &str),
-                // To Do
-                _ => panic!()
-            }
-        }
-    }
-
-    impl Sub for Literal {
-        type Output = Literal;
-
-        fn sub(self, other: Self) -> Literal {
-            match (self, other) {
-                (Literal::Number(left), Literal::Number(right)) => Literal::Number(left - right),
-                // To Do
-                _ => panic!()
-            }
-        }
-    }
-
-    impl Neg for Literal {
-        type Output = Literal;
-
-        fn neg(self) -> Self::Output {
-            match self {
-                Literal::Number(num) => Literal::Number(-num),
-                _ => panic!()
             }
         }
     }

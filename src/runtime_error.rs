@@ -1,3 +1,4 @@
+use crate::expr::ast::Literal;
 use crate::token::Token;
 #[derive(Debug)]
 pub struct RuntimeError {
@@ -8,5 +9,11 @@ pub struct RuntimeError {
 impl RuntimeError {
     fn new(token: Token, msg: String ) -> Self {
         Self { token, msg }
+    }
+}
+
+impl std::fmt::Display for RuntimeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Invalid Syntax: Token: {} msg: {}", self.token.lexeme, self.msg)
     }
 }
