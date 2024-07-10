@@ -17,17 +17,16 @@ impl Visitor<LiteralResult> for Interpreter {
     #[allow(unused_variables)]
     fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> LiteralResult {
         let right = self.evaluate(&expr.right)?;
-        //
         // match expr.operator.token_type {
         //     TokenType::MINUS => {
         //         match right {
-        //             Literal::Number(right) => return Ok(Literal::Number(-right+11f64)),
+        //             Literal::Number(right) => return Ok(Literal::Number(-right)),
         //             _ => Ok(Literal::Nil),
-        //         // return Ok(Literal::wrap_num(-right.unwrap_num()));
+        //            // return Ok(Literal::wrap_num(-right.unwrap_num()));
         //
         //         }
         //     },
-        //     _ => Ok(Literal::Nil),
+        //     _ => panic!(),
         // }
         match expr.operator.token_type {
             TokenType::MINUS => {
@@ -40,7 +39,7 @@ impl Visitor<LiteralResult> for Interpreter {
                 }
             }
             TokenType::BANG => Ok(right),
-            _ => panic!(), //TODO:
+            _ => panic!(), //To Do:
         }
     }
 

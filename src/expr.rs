@@ -1,4 +1,5 @@
 pub mod ast {
+    use std::ops::{Add, Sub, Neg, Div};
     use crate::token::Token;
 
     type BoxedExpr = Box<Expr>;
@@ -47,14 +48,48 @@ pub mod ast {
         pub fn unwrap_num(&self) -> f64 {
             match self {
                 Self::Number(num) => *num,
-                // hopefully unreachable
-                // To Do
-                // proper handling later
                 _ => panic!()
             }
         }
         pub fn wrap_num(value: f64) -> Self {
             Self::Number(value)
+        }
+    }
+
+    // Impl Std Ops for second impl of interpreter visit impl
+    impl Add for Literal {
+        type Output = Literal;
+
+        fn add(self, other: Self) -> Literal {
+            match (self, other) {
+                (Literal::Number(left), Literal::Number(right)) => Literal::Number(left + right),
+                (Literal::String(String), Literal::String(str)) => Literal::String(String + &str),
+                // To Do
+                _ => panic!()
+            }
+        }
+    }
+
+    impl Sub for Literal {
+        type Output = Literal;
+
+        fn sub(self, other: Self) -> Literal {
+            match (self, other) {
+                (Literal::Number(left), Literal::Number(right)) => Literal::Number(left - right),
+                // To Do
+                _ => panic!()
+            }
+        }
+    }
+
+    impl Neg for Literal {
+        type Output = Literal;
+
+        fn neg(self) -> Self::Output {
+            match self {
+                Literal::Number(num) => Literal::Number(-num),
+                _ => panic!()
+            }
         }
     }
 
