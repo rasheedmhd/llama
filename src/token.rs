@@ -1,4 +1,4 @@
-use crate::expr::ast::Literal;
+use crate::expr::Literal;
 use crate::token_type::TokenType;
 #[allow(dead_code)]
 

@@ -1,4 +1,3 @@
-use crate::expr::ast::Literal;
 use crate::token::Token;
 #[derive(Debug)]
 pub struct RuntimeError {

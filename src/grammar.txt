@@ -39,6 +39,13 @@ protein         → "really"+ "crispy" "bacon"
 
 bread           → "toast" | "biscuits" | "English muffin" ;
 
+STATEMENTS AND STATE
+program      → statement* EOF ;
+statement    → exprStmt
+             | printStmt ;
+exprStmt     → expression ";" ;
+printStmt    → "print" expression ";" ;
+
 EVALUATING EXPRESSIONS
 expression → literal
             | unary

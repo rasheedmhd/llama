@@ -1,13 +1,29 @@
-use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr};
+use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr};
 use crate::repl::Llama;
-use crate::visit::Visitor;
+use crate::expr;
+use crate::stmt;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
+use crate::stmt::{ExpressionStmt, PrintStmt, Stmt};
 
 pub struct Interpreter;
 type LiteralResult = Result<Literal, RuntimeError>;
+type StmtResult = Result<(), RuntimeError>;
 
-impl Visitor<LiteralResult> for Interpreter {
+impl stmt::Visitor<StmtResult> for Interpreter {
+    fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
+        self.evaluate(&stmt.expression)?;
+        Ok(())
+    }
+
+    fn visit_print_stmt(&mut self, stmt: &PrintStmt) -> StmtResult {
+        let value = self.evaluate(&stmt.expression)?;
+        println!("{value}");
+        Ok(())
+    }
+}
+
+impl expr::Visitor<LiteralResult> for Interpreter {
     fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> LiteralResult {
          Ok(expr.value.clone())
     }
@@ -109,13 +125,29 @@ impl Interpreter {
 
     pub fn new() -> Self { Interpreter }
 
-    pub fn interpret(&mut self, expr: &Box<Expr>) {
-        match self.evaluate(expr) {
-            Ok(lit) => println!("{}", lit),
-            Err(e) => {
-                Llama::runtime_error(e);
-            }
+    // void interpret(List<Stmt> statements) {
+    // try {
+    // for (Stmt statement : statements) {
+    // execute(statement);
+    // }
+    // } catch (RuntimeError error) {
+    // Lox.runtimeError(error);
+    // }
+    // }
+
+    pub fn interpret(&mut self, statements: Vec<Stmt>) {
+        for statement in statements {
+            self.execute(statement)
+            //     Ok(()),
+            //     Err(e) => {
+            //         Llama::runtime_error(e);
+            //     }
+            // }
         }
+    }
+
+    fn execute(&mut self, stmt: Stmt) {
+        stmt.accept(self);
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {

@@ -1,9 +1,10 @@
-use std::fmt;
-use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
-use crate::expr::ast::Literal;
+use crate::stmt::{ExpressionStmt, PrintStmt, Stmt};
+use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
+use crate::expr::Literal;
 use crate::repl::Llama;
 use crate::token::Token;
 use crate::token_type::TokenType;
+use std::fmt;
 
 type  BoxedExpr = Box<Expr>;
 pub struct ParseError;
@@ -46,6 +47,39 @@ impl Parser {
             current: 0,
             tokens,
         }
+    }
+
+    pub fn parse(&mut self) -> Result<Vec<Stmt>, ParseError> {
+        let mut statements: Vec<Stmt> = Vec::new();
+        while !self.is_at_end() {
+            statements.push(self.statement());
+        }
+        Ok(statements)
+        // match self.expression() {
+        //     Ok(expr) => Ok(expr),
+        //     Err(_) => Err(ParseError),
+        // }
+    }
+
+    fn statement(&mut self) -> Stmt {
+        if self.match_token(&[TokenType::PRINT]) {
+            return self.print_statement();
+        };
+        return self.expression_statement();
+    }
+    fn print_statement(&mut self) -> Stmt {
+        let value = self.expression().unwrap();
+        self.consume(&TokenType::SEMICOLON, "Expect ';' after value.").unwrap();
+        // shadowing value to pass to Stmt::Print,
+        // I believe it helps in reading
+        let value = PrintStmt { expression: value };
+        Stmt::Print(value)
+    }
+    fn expression_statement(&mut self) -> Stmt {
+        let expr = self.expression().unwrap();
+        self.consume(&TokenType::SEMICOLON, "Expect ';' after value.").unwrap();
+        let expr = ExpressionStmt { expression: expr };
+        Stmt::Expression(expr)
     }
 
     // expression      → equality
@@ -277,16 +311,6 @@ impl Parser {
                 _ => {}
             }
             self.advance();
-        }
-    }
-
-    pub fn parse(&mut self) -> ExprResult {
-        // Returns a ParseResult
-        // Needs handling
-        // self.expression()
-        match self.expression() {
-            Ok(expr) => Ok(expr),
-            Err(_) => Err(ParseError),
         }
     }
 

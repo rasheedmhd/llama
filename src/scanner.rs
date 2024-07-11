@@ -2,7 +2,7 @@ use crate::token::Token;
 use crate::token_type::TokenType;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-use crate::expr::ast::Literal;
+use crate::expr::Literal;
 
 // TO DO
 // Add support to Llamaʼs scanner for C-style /* ... */ block comments.

@@ -6,7 +6,7 @@ use std::io::{stdin, stdout, Write};
 use std::process;
 
 use crate::scanner::Scanner;
-use crate::parser::{ParseError, Parser};
+use crate::parser::Parser;
 use crate::interpreter::Interpreter;
 use crate::token::Token;
 use crate::runtime_error::RuntimeError;
@@ -46,11 +46,11 @@ impl Llama {
         let mut scanner   = Scanner::from(source);
         let tokens     = scanner.scan_tokens();
         let mut parser     = Parser::new(tokens);
-        let expression  = match parser.parse() {
-            Ok(expr) => expr,
+        let statements  = match parser.parse() {
+            Ok(statement) => statement,
             Err(e) => {
                 eprintln!("Failed to parse expression: {}", e);
-                return;
+                return
             },
         };
         let mut interpreter = Interpreter::new();
@@ -59,7 +59,7 @@ impl Llama {
             if HAD_ERROR { return };
         }
 
-        interpreter.interpret(&expression);
+        interpreter.interpret(statements);
         
     }
 
