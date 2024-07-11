@@ -14,6 +14,7 @@ impl Expr {
             Expr::Unary(expr) => visitor.visit_unary_expr(expr),
             Expr::Grouping(expr) => visitor.visit_grouping_expr(expr),
             Expr::Binary(expr) => visitor.visit_binary_expr(expr),
+
         }
     }
 }

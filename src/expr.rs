@@ -115,7 +115,7 @@ pub mod ast {
     }
 
     #[derive(Clone, Debug, PartialEq)]
-    pub struct UnaryExpr {
+    pub struct  UnaryExpr {
         pub operator : Token,
         pub right : BoxedExpr,
     }
