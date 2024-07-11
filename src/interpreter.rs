@@ -1,4 +1,5 @@
 use crate::expr::ast::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr};
+use crate::repl::Llama;
 use crate::visit::Visitor;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
@@ -112,7 +113,7 @@ impl Interpreter {
         match self.evaluate(expr) {
             Ok(lit) => println!("{}", lit),
             Err(e) => {
-                println!("{}", e);
+                Llama::runtime_error(e);
             }
         }
     }

@@ -82,7 +82,7 @@ impl Parser {
     // comparison  → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
     fn comparison(&mut self) -> ExprResult {
 
-        let mut expr = self.term().unwrap();
+        let mut expr = self.term()?;
 
         while self.match_token(&[TokenType::GREATER, TokenType::GreaterEQUAL, TokenType::LESS, TokenType::LessEQUAL]) {
             let operator = self.previous();
@@ -123,7 +123,7 @@ impl Parser {
     // factor  → unary ( ( "/" | "*" ) unary )* ;
     fn factor(&mut self) -> ExprResult {
 
-        let mut expr = BoxedExpr::from(self.unary().unwrap());
+        let mut expr = BoxedExpr::from(self.unary()?);
 
         while self.match_token(&[TokenType::SLASH, TokenType::STAR]) {
             let operator = self.previous();

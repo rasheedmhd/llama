@@ -54,8 +54,6 @@ impl Llama {
         unsafe {
             if HAD_ERROR { return };
         }
-        // The Parser is good!
-        // println!("{expression:#?}");
 
         interpreter.interpret(&expression);
         
@@ -110,12 +108,12 @@ impl Llama {
             Llama::report(token.line, "at end".to_string(),  message);
         } else {
             Llama::report(token.line, format!("at '{}'", token.lexeme ),  message);
-
         }
     }
 
     pub fn runtime_error(error: RuntimeError) {
-        println!("Error: {:?}  \n[ Line {:?} ]", error.token.line, error.msg);
+        // println!("Error: {:?}  \n[ Line {:?} ]", error.token.line, error.msg);
+        println!("{}", error);
         unsafe {
             HAD_RUNTIME_ERROR = true;
         }
