@@ -38,6 +38,22 @@ protein         → "really"+ "crispy" "bacon"
                 | ( "scrambled" | "poached" | "fried" ) "eggs";
 
 bread           → "toast" | "biscuits" | "English muffin" ;
+STATEMENT PRECEDENCE
+program      → declaration* EOF ;
+declaration  → varDecl
+             | statement ;
+
+statement    → exprStmt
+             | printStmt ;
+
+VARIABLE DECLARATION RULE
+varDecl → "var" IDENTIFIER ( "=" expression )? ";" ;
+
+NEW PRIMARY RULE FOR ACCESSING VARIABLES
+primary → "true" | "false" | "nil"
+        | NUMBER | STRING
+        | "(" expression ")"
+        | IDENTIFIER ;
 
 STATEMENTS AND STATE
 program      → statement* EOF ;
@@ -78,13 +94,22 @@ unary → ( "!" | "-" ) unary | primary;
 
 factor → unary ( ( "/" | "*" ) unary )* ;
 
+COMPLETE GRAMMAR FOR LLAMA
+program         → statement* EOF ;
+statement       → exprStmt
+                | printStmt ;
+declaration     → varDecl
+                | statement ;
+varDecl         → "var" IDENTIFIER ( "=" expression )? ";"
+exprStmt        → expression ";" ;
+printStmt       → "print" expression ";" ;
 expression      → equality ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
 factor          → unary ( ( "/" | "*" ) unary )* ;
 unary           → ( "!" | "-" ) unary | primary ;
-primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;
 
 
 (1) pick a non-terminal symbol, α, in the prototype string;

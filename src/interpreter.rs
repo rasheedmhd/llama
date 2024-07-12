@@ -1,10 +1,10 @@
-use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr};
+use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr, VariableExpr};
 use crate::repl::Llama;
 use crate::expr;
 use crate::stmt;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
-use crate::stmt::{ExpressionStmt, PrintStmt, Stmt};
+use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
 
 pub struct Interpreter;
 type LiteralResult = Result<Literal, RuntimeError>;
@@ -20,6 +20,10 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         let value = self.evaluate(&stmt.expression)?;
         println!("{value}");
         Ok(())
+    }
+
+    fn visit_var_stmt(&mut self, stmt: &VarStmt) -> StmtResult {
+        todo!()
     }
 }
 
@@ -118,6 +122,10 @@ impl expr::Visitor<LiteralResult> for Interpreter {
             // unreachable
             _ => panic!()
         }
+    }
+
+    fn visit_variable_expr(&mut self, expr: &VariableExpr) -> LiteralResult {
+        todo!()
     }
 }
 
