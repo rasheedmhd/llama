@@ -1,4 +1,4 @@
-use crate::stmt::{ExpressionStmt, PrintStmt, Stmt};
+use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
 use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
 use crate::expr::Literal;
 use crate::repl::Llama;
@@ -52,13 +52,61 @@ impl Parser {
     pub fn parse(&mut self) -> Result<Vec<Stmt>, ParseError> {
         let mut statements: Vec<Stmt> = Vec::new();
         while !self.is_at_end() {
-            statements.push(self.statement());
+            statements.push(self.declaration());
         }
         Ok(statements)
         // match self.expression() {
         //     Ok(expr) => Ok(expr),
         //     Err(_) => Err(ParseError),
         // }
+    }
+
+    fn declaration(&mut self) -> Stmt {
+        if self.match_token(&[TokenType::VAR]) {
+            return self.var_declaration().unwrap_or_else(
+                |e| {
+                    self.synchronize();
+                    return
+                    // return ParseError {}
+                }
+            );
+        };
+        return self.statement();
+    }
+
+    // private Stmt varDeclaration() {
+    //     Token name = consume(IDENTIFIER, "Expect variable name.");
+    //     Expr initializer = null;
+    //     if (match(EQUAL)) { initializer = expression(); }
+    //     consume(SEMICOLON, "Expect ';' after variable declaration.");
+    //     return new Stmt.Var(name, initializer);
+    // }
+
+    // fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
+    //     let name = self.consume(&TokenType::IDENTIFIER, "Expect variable name")?;
+    //     let initializer: Option<Box<Expr>>;
+    //
+    //     if self.match_token(&[TokenType::EQUAL]) {
+    //         initializer = Some(Box::new(self.expression()?));
+    //     } else {
+    //         initializer = None;
+    //     }
+    //
+    //     self.consume(&TokenType::SEMICOLON, "Expect ';' after variable declaration.")?;
+    //
+    //     let var_statement = VarStmt { name, initializer };
+    //     Ok(Stmt::Var(var_statement))
+    // }
+
+    fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
+        let name = self.consume(&TokenType::IDENTIFIER, "Expect variable name").unwrap();
+        let initializer: Option<BoxedExpr> ;
+        if  self.match_token(&[TokenType::EQUAL]) {
+           initializer = Some(self.expression()?);
+        } else  { initializer = None };
+        self.consume(&TokenType::SEMICOLON, "Expect ';' after variable declaration.").unwrap();
+        let var_statement = VarStmt { name, initializer.name };
+        Ok(Stmt::Var(var_statement))
     }
 
     fn statement(&mut self) -> Stmt {
