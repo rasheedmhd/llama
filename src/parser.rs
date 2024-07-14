@@ -7,6 +7,7 @@ use crate::token_type::TokenType;
 use std::fmt;
 
 type  BoxedExpr = Box<Expr>;
+type StmtResult = Result<Stmt, ParseError>;
 pub struct ParseError;
 
 impl ParseError {
@@ -52,7 +53,7 @@ impl Parser {
     pub fn parse(&mut self) -> Result<Vec<Stmt>, ParseError> {
         let mut statements: Vec<Stmt> = Vec::new();
         while !self.is_at_end() {
-            statements.push(self.declaration());
+            statements.push(self.declaration()?);
         }
         Ok(statements)
         // match self.expression() {
@@ -61,59 +62,53 @@ impl Parser {
         // }
     }
 
-    fn declaration(&mut self) -> Stmt {
+    fn declaration(&mut self) -> StmtResult {
+        // If we hit a var token, then we are dealing with a variable expr
+        // So we pass control to var_declaration() to parse it
+        // Else executing falls through to statement() to parse
         if self.match_token(&[TokenType::VAR]) {
-            return self.var_declaration().unwrap_or_else(
-                |e| {
-                    self.synchronize();
-                    return
-                    // return ParseError {}
-                }
-            );
-        };
-        return self.statement();
+            return self.var_declaration()
+        }
+
+        // What did statement() return ?
+        // An error ? Then synchronize and return a None/Nil Statement
+        // Else return the whole statement result to the function
+        // calling declaration() to handle
+        /// Essentially here is where we handle Errors
+        let stmt_result = self.statement();
+        match stmt_result {
+            Err(_) => {
+                self.synchronize();
+                // construct expr
+                let expr = Box::new(Expr::Literal ( LiteralExpr { value: Literal::Nil }));
+                // wrap constructed expr above into a statement expression
+                let stmt_expr = Stmt::Expression( ExpressionStmt { expression: expr });
+                // return the statement expression after synchronizing above
+                // To Do
+                // I think this is easier to read but might have perf hit,
+                // throw this into godbolt.org and investigate
+                return Ok( stmt_expr );
+            }
+            _ => stmt_result
+        }
     }
 
-    // private Stmt varDeclaration() {
-    //     Token name = consume(IDENTIFIER, "Expect variable name.");
-    //     Expr initializer = null;
-    //     if (match(EQUAL)) { initializer = expression(); }
-    //     consume(SEMICOLON, "Expect ';' after variable declaration.");
-    //     return new Stmt.Var(name, initializer);
-    // }
-
-    // fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
-    //     let name = self.consume(&TokenType::IDENTIFIER, "Expect variable name")?;
-    //     let initializer: Option<Box<Expr>>;
-    //
-    //     if self.match_token(&[TokenType::EQUAL]) {
-    //         initializer = Some(Box::new(self.expression()?));
-    //     } else {
-    //         initializer = None;
-    //     }
-    //
-    //     self.consume(&TokenType::SEMICOLON, "Expect ';' after variable declaration.")?;
-    //
-    //     let var_statement = VarStmt { name, initializer };
-    //     Ok(Stmt::Var(var_statement))
-    // }
-
-    fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
+    fn var_declaration(&mut self) -> StmtResult {
         let name = self.consume(&TokenType::IDENTIFIER, "Expect variable name").unwrap();
-        let initializer: Option<BoxedExpr> ;
-        if  self.match_token(&[TokenType::EQUAL]) {
-           initializer = Some(self.expression()?);
-        } else  { initializer = None };
+        let mut initializer = Box::new(Expr::Literal ( LiteralExpr { value: Literal::Nil }));
+        if self.match_token(&[TokenType::EQUAL]) {
+           initializer = self.expression()?;
+        };
         self.consume(&TokenType::SEMICOLON, "Expect ';' after variable declaration.").unwrap();
-        let var_statement = VarStmt { name, initializer.name };
+        let var_statement = VarStmt { name, initializer };
         Ok(Stmt::Var(var_statement))
     }
 
-    fn statement(&mut self) -> Stmt {
+    fn statement(&mut self) -> StmtResult {
         if self.match_token(&[TokenType::PRINT]) {
-            return self.print_statement();
+            return Ok(self.print_statement());
         };
-        return self.expression_statement();
+        return Ok(self.expression_statement());
     }
     fn print_statement(&mut self) -> Stmt {
         let value = self.expression().unwrap();
