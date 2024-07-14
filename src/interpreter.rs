@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr, VariableExpr};
 use crate::repl::Llama;
 use crate::expr;

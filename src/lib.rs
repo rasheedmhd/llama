@@ -8,3 +8,4 @@ pub mod parser;
 mod interpreter;
 mod runtime_error;
 mod stmt;
+mod environment;
