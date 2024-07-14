@@ -1,5 +1,5 @@
 use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
-use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr};
+use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr};
 use crate::expr::Literal;
 use crate::repl::Llama;
 use crate::token::Token;
@@ -269,6 +269,15 @@ impl Parser {
             let expr = Box::new(Expr::Literal(
                 LiteralExpr {
                     value: self.previous().literal
+                }
+            ));
+            return Ok(expr);
+        }
+
+        if self.match_token(&[TokenType::IDENTIFIER]) {
+            let expr = Box::new(Expr::Variable(
+                VariableExpr {
+                    name: self.previous(),
                 }
             ));
             return Ok(expr);
