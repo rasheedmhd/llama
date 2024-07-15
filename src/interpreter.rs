@@ -1,17 +1,21 @@
-use std::collections::HashMap;
+use std::cell::RefCell;
+use std::rc::Rc;
+use crate::environment::Environment;
 use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr, VariableExpr};
-use crate::repl::Llama;
 use crate::expr;
 use crate::stmt;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
 use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
 
-pub struct Interpreter;
+pub struct Interpreter {
+    environment: Rc<RefCell<Environment>>
+}
 type LiteralResult = Result<Literal, RuntimeError>;
 type StmtResult = Result<(), RuntimeError>;
 
 impl stmt::Visitor<StmtResult> for Interpreter {
+
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
         self.evaluate(&stmt.expression)?;
         Ok(())
@@ -24,7 +28,24 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_var_stmt(&mut self, stmt: &VarStmt) -> StmtResult {
-        todo!()
+
+        // let mut value = Box::new(Expr::Literal
+        //     (LiteralExpr { value: Literal::Nil })
+        // );
+
+        // let mut value = Box::new(Expr::Literal
+        //     (LiteralExpr { value: Literal::Nil })
+        // );
+        // if stmt.initializer != value {
+        //     value = Box::new(Expr::Literal (
+        //         LiteralExpr { value: self.evaluate(&stmt.initializer)? })
+        //     );
+        // }
+
+        let literal = self.evaluate(&stmt.initializer)?;
+        (*self.environment).borrow_mut().define(stmt.name.lexeme.clone(), literal);
+        // self.environment.as_ref().borrow_mut().define(stmt.name.lexeme.clone(), literal);
+       Ok(())
     }
 }
 
@@ -126,32 +147,19 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> LiteralResult {
-        todo!()
+        self.environment.as_ref().borrow_mut().get(expr.name.clone())
     }
 }
 
 impl Interpreter {
 
-    pub fn new() -> Self { Interpreter }
-
-    // void interpret(List<Stmt> statements) {
-    // try {
-    // for (Stmt statement : statements) {
-    // execute(statement);
-    // }
-    // } catch (RuntimeError error) {
-    // Lox.runtimeError(error);
-    // }
-    // }
+    pub fn new() -> Self {
+        Interpreter { environment: Rc::new(RefCell::new(Environment::new())) }
+    }
 
     pub fn interpret(&mut self, statements: Vec<Stmt>) {
         for statement in statements {
             self.execute(statement)
-            //     Ok(()),
-            //     Err(e) => {
-            //         Llama::runtime_error(e);
-            //     }
-            // }
         }
     }
 
