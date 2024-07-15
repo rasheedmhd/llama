@@ -9,6 +9,7 @@ pub enum Expr {
     Literal(LiteralExpr),
     Unary(UnaryExpr),
     Variable(VariableExpr),
+    Assign(AssignExpr),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -172,12 +173,30 @@ impl VariableExpr {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct AssignExpr {
+    pub name: Token,
+    pub value : BoxedExpr,
+}
+
+impl AssignExpr {
+    pub fn new(name: Token, value : BoxedExpr) -> Self {
+        Self {
+            name,
+            value,
+        }
+    }
+
+}
+
+
 pub trait Visitor<T> {
     fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> T;
     fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> T;
     fn visit_grouping_expr(&mut self, expr: &GroupingExpr) -> T;
     fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> T;
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> T;
+    fn visit_assign_expr(&mut self, expr: &AssignExpr) -> T;
 }
 
 impl Expr {
@@ -188,6 +207,7 @@ impl Expr {
             Expr::Grouping(expr) => visitor.visit_grouping_expr(expr),
             Expr::Binary(expr) => visitor.visit_binary_expr(expr),
             Expr::Variable(expr) => visitor.visit_variable_expr(expr),
+            Expr::Assign(expr) => visitor.visit_assign_expr(expr),
         }
     }
 }

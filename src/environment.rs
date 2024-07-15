@@ -26,4 +26,30 @@ impl Environment {
             msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
         });
     }
+
+    pub fn assign(&mut self, name: Token, value: Literal ) -> Result<(), RuntimeError> {
+        if self.values.contains_key(&name.lexeme) {
+            self.values.insert(name.lexeme, value);
+            return Ok(());
+        };
+        return Err(RuntimeError {
+            token: name.clone(),
+            msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
+        });
+
+    }
 }
+
+// private Expr assignment() {
+// Expr expr = equality();
+// if (match(EQUAL)) {
+//     Token equals = previous();
+//     Expr value = assignment();
+//     if (expr instanceof Expr.Variable) {
+//     T   oken name = ((Expr.Variable)expr).name;
+//     r   eturn new Expr.Assign(name, value);
+//     }
+//     error(equals, "Invalid assignment target.");
+// }
+// return expr;
+// }

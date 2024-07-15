@@ -1,5 +1,5 @@
 use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
-use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr};
+use crate::expr::{AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr};
 use crate::expr::Literal;
 use crate::repl::Llama;
 use crate::token::Token;
@@ -94,12 +94,12 @@ impl Parser {
     }
 
     fn var_declaration(&mut self) -> StmtResult {
-        let name = self.consume(&TokenType::IDENTIFIER, "Expect variable name").unwrap();
+        let name = self.consume(&TokenType::IDENTIFIER, "Expect variable name")?;
         let mut initializer = Box::new(Expr::Literal ( LiteralExpr { value: Literal::Nil }));
         if self.match_token(&[TokenType::EQUAL]) {
            initializer = self.expression()?;
         };
-        self.consume(&TokenType::SEMICOLON, "Expect ';' after variable declaration.").unwrap();
+        self.consume(&TokenType::SEMICOLON, "Expect ';' after variable declaration.")?;
         let var_statement = VarStmt { name, initializer };
         Ok(Stmt::Var(var_statement))
     }
@@ -125,6 +125,43 @@ impl Parser {
         Stmt::Expression(expr)
     }
 
+    fn assignment(&mut self) -> Result<Expr, ParseError> {
+        // let mut expr = self.equality()?;
+        //
+        // if self.match_token(&[TokenType::EQUAL]) {
+        //     let equals = self.previous();
+        //     let value = self.assignment()?;
+        //
+        //     if let Expr::Variable(name) = expr {
+        //         return Ok(Expr::Assign( AssignExpr { name, Box::new(value)} ));
+        //     }
+        //
+        //     // self.error(equals, "Invalid assignment target.");
+        //     Llama::error(equals, "Invalid argument target");
+        // }
+        //
+        // Ok(expr)]
+        todo!()
+    }
+
+
+    // fn assignment(&mut self) -> ExprResult {
+    //
+    //     let mut expr = self.comparison()?;
+    //     if self.match_token(&[TokenType::EQUAL]) {
+    //         let equals = self.previous();
+    //         let value = self.assignment()?;
+    //         match var {
+    //             VariableExpr => {
+    //
+    //             }
+    //             let name =
+    //             return Expr::Assign(AssignExpr { name, value });
+    //         }
+    //     Llama::error(equals, "Invalid argument target");
+    //     }
+    //     Ok(expr)
+    // }
     // expression      → equality
     fn expression(&mut self) -> ExprResult {
         self.equality()

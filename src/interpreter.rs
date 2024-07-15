@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use crate::environment::Environment;
-use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr, VariableExpr};
+use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr, VariableExpr, AssignExpr};
 use crate::expr;
 use crate::stmt;
 use crate::token_type::TokenType;
@@ -147,7 +147,14 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> LiteralResult {
-        self.environment.as_ref().borrow_mut().get(expr.name.clone())
+        (*self.environment).borrow_mut().get(expr.name.clone())
+        // self.environment.as_ref().borrow_mut().get(expr.name.clone())
+    }
+
+    fn visit_assign_expr(&mut self, expr: &AssignExpr) -> LiteralResult {
+        let value = self.evaluate(&expr.value)?;
+        (*self.environment).borrow_mut().assign(expr.name.clone(), value.clone());
+        Ok(value)
     }
 }
 

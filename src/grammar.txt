@@ -62,6 +62,10 @@ statement    → exprStmt
 exprStmt     → expression ";" ;
 printStmt    → "print" expression ";" ;
 
+expression   → assignment ;
+assignment   → IDENTIFIER "=" assignment
+             | equality ;
+
 EVALUATING EXPRESSIONS
 expression → literal
             | unary
