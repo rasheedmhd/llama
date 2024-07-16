@@ -17,27 +17,47 @@ impl Environment {
     }
 
     pub fn get(&mut self, name: Token) -> EnvResult {
-        if self.values.contains_key(&name.lexeme) {
-            return Ok(self.values.get(&name.lexeme).unwrap().clone());
-        };
-
-        return Err(RuntimeError {
+        self.values.get(&name.lexeme).cloned().ok_or_else(|| RuntimeError {
             token: name.clone(),
             msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
-        });
+        })
     }
 
-    pub fn assign(&mut self, name: Token, value: Literal ) -> Result<(), RuntimeError> {
-        if self.values.contains_key(&name.lexeme) {
-            self.values.insert(name.lexeme, value);
-            return Ok(());
-        };
-        return Err(RuntimeError {
-            token: name.clone(),
-            msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
-        });
 
+    // pub fn get(&mut self, name: Token) -> EnvResult {
+    //     if self.values.contains_key(&name.lexeme) {
+    //         return Ok(self.values.get(&name.lexeme).unwrap().clone());
+    //     };
+    //
+    //     return Err(RuntimeError {
+    //         token: name.clone(),
+    //         msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
+    //     });
+    // }
+    pub fn assign(&mut self, name: Token, value: Literal) -> Result<(), RuntimeError> {
+        if let Some(entry) = self.values.get_mut(&name.lexeme) {
+            *entry = value;
+            Ok(())
+        } else {
+            Err(RuntimeError {
+                token: name.clone(),
+                msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
+            })
+        }
     }
+
+
+    // pub fn assign(&mut self, name: Token, value: Literal ) -> Result<(), RuntimeError> {
+    //     if self.values.contains_key(&name.lexeme) {
+    //         self.values.insert(name.lexeme, value);
+    //         return Ok(());
+    //     };
+    //     return Err(RuntimeError {
+    //         token: name.clone(),
+    //         msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
+    //     });
+    //
+    // }
 }
 
 // private Expr assignment() {

@@ -153,7 +153,8 @@ impl expr::Visitor<LiteralResult> for Interpreter {
 
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> LiteralResult {
         let value = self.evaluate(&expr.value)?;
-        (*self.environment).borrow_mut().assign(expr.name.clone(), value.clone());
+        (*self.environment).borrow_mut().assign(expr.name.clone(), value.clone())?;
+        println!("{:?}", value);
         Ok(value)
     }
 }
