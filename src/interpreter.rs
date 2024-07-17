@@ -29,23 +29,10 @@ impl stmt::Visitor<StmtResult> for Interpreter {
 
     fn visit_var_stmt(&mut self, stmt: &VarStmt) -> StmtResult {
 
-        // let mut value = Box::new(Expr::Literal
-        //     (LiteralExpr { value: Literal::Nil })
-        // );
-
-        // let mut value = Box::new(Expr::Literal
-        //     (LiteralExpr { value: Literal::Nil })
-        // );
-        // if stmt.initializer != value {
-        //     value = Box::new(Expr::Literal (
-        //         LiteralExpr { value: self.evaluate(&stmt.initializer)? })
-        //     );
-        // }
-
         let literal = self.evaluate(&stmt.initializer)?;
         (*self.environment).borrow_mut().define(stmt.name.lexeme.clone(), literal);
-        // self.environment.as_ref().borrow_mut().define(stmt.name.lexeme.clone(), literal);
-       Ok(())
+        Ok(())
+
     }
 }
 
@@ -148,13 +135,11 @@ impl expr::Visitor<LiteralResult> for Interpreter {
 
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> LiteralResult {
         (*self.environment).borrow_mut().get(expr.name.clone())
-        // self.environment.as_ref().borrow_mut().get(expr.name.clone())
     }
 
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> LiteralResult {
         let value = self.evaluate(&expr.value)?;
         (*self.environment).borrow_mut().assign(expr.name.clone(), value.clone())?;
-        println!("{:?}", value);
         Ok(value)
     }
 }

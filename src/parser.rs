@@ -106,26 +106,28 @@ impl Parser {
 
     fn statement(&mut self) -> StmtResult {
         if self.match_token(&[TokenType::PRINT]) {
-            return Ok(self.print_statement());
+            return Ok(self.print_statement()?);
         };
-        return Ok(self.expression_statement());
-    }
-    fn print_statement(&mut self) -> Stmt {
-        let value = self.expression().unwrap();
-        self.consume(&TokenType::SEMICOLON, "Expect ';' after value.").unwrap();
-        // shadowing value to pass to Stmt::Print,
-        // I believe it helps in reading
-        let value = PrintStmt { expression: value };
-        Stmt::Print(value)
-    }
-    fn expression_statement(&mut self) -> Stmt {
-        let expr = self.expression().unwrap();
-        self.consume(&TokenType::SEMICOLON, "Expect ';' after value.").unwrap();
-        let expr = ExpressionStmt { expression: expr };
-        Stmt::Expression(expr)
+        return Ok(self.expression_statement()?);
     }
 
-    fn assignment(&mut self) -> Result<Expr, ParseError> {
+    fn print_statement(&mut self) -> StmtResult {
+        let value = self.expression()?;
+        self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
+        // shadowing value to pass to Stmt::Print,
+        // I believe it helps with readability
+        let value = PrintStmt { expression: value };
+        Ok(Stmt::Print(value))
+    }
+
+    fn expression_statement(&mut self) -> StmtResult {
+        let expr = self.expression()?;
+        self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
+        let expr = ExpressionStmt { expression: expr };
+        Ok(Stmt::Expression(expr))
+    }
+
+    fn assignment(&mut self) -> ExprResult {
         let mut expr = self.equality()?;
 
         if self.match_token(&[TokenType::EQUAL]) {
@@ -133,14 +135,14 @@ impl Parser {
             let value = self.assignment()?;
 
             if let Expr::Variable(var_expr) = *expr {
-                return Ok(Expr::Assign( AssignExpr { name: var_expr.name, value: Box::new(value) } ));
+                return Ok(Box::new(Expr::Assign( AssignExpr { name: var_expr.name, value } )));
             }
 
             // self.error(equals, "Invalid assignment target.");
             Llama::error(equals, "Invalid argument target");
         }
 
-        Ok(*expr)
+        Ok(expr)
     }
 
     // expression      → equality
