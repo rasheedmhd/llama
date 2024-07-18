@@ -134,12 +134,12 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> LiteralResult {
-        (*self.environment).borrow_mut().get(expr.name.clone())
+        (*self.environment).borrow().get(&expr.name)
     }
 
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> LiteralResult {
         let value = self.evaluate(&expr.value)?;
-        (*self.environment).borrow_mut().assign(expr.name.clone(), value.clone())?;
+        self.environment.borrow_mut().assign(&expr.name, value.clone()).unwrap();
         Ok(value)
     }
 }
@@ -150,14 +150,17 @@ impl Interpreter {
         Interpreter { environment: Rc::new(RefCell::new(Environment::new())) }
     }
 
-    pub fn interpret(&mut self, statements: Vec<Stmt>) {
+    pub fn interpret(&mut self, statements: Vec<Stmt>) -> () {
         for statement in statements {
-            self.execute(statement)
+            if let Err(e) = self.execute(statement) {
+                eprintln!("{}", e);
+            }
         }
+        ()
     }
 
-    fn execute(&mut self, stmt: Stmt) {
-        stmt.accept(self);
+    fn execute(&mut self, stmt: Stmt) -> StmtResult {
+        stmt.accept(self)
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {

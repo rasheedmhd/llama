@@ -16,7 +16,7 @@ impl Environment {
         self.values.insert(name, value);
     }
 
-    pub fn get(&mut self, name: Token) -> EnvResult {
+    pub fn get(&self, name: &Token) -> EnvResult {
         self.values.get(&name.lexeme)
             .cloned()
             .ok_or_else(|| RuntimeError {
@@ -26,7 +26,7 @@ impl Environment {
     }
 
 
-    pub fn assign(&mut self, name: Token, value: Literal) -> Result<(), RuntimeError> {
+    pub fn assign(&mut self, name: &Token, value: Literal) -> Result<(), RuntimeError> {
         if let Some(entry) = self.values.get_mut(&name.lexeme) {
             *entry = value;
             Ok(())
