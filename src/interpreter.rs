@@ -3,6 +3,7 @@ use std::rc::Rc;
 use crate::environment::Environment;
 use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr, VariableExpr, AssignExpr};
 use crate::expr;
+use crate::repl::Llama;
 use crate::stmt;
 use crate::token_type::TokenType;
 use crate::runtime_error::RuntimeError;
@@ -153,7 +154,7 @@ impl Interpreter {
     pub fn interpret(&mut self, statements: Vec<Stmt>) -> () {
         for statement in statements {
             if let Err(e) = self.execute(statement) {
-                eprintln!("{}", e);
+                Llama::runtime_error(e);
             }
         }
         ()

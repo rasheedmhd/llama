@@ -116,7 +116,6 @@ impl Llama {
     }
 
     pub fn runtime_error(error: RuntimeError) {
-        // println!("Error: {:?}  \n[ Line {:?} ]", error.token.line, error.msg);
         println!("{}", error);
         unsafe {
             HAD_RUNTIME_ERROR = true;

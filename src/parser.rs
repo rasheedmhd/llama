@@ -56,10 +56,6 @@ impl Parser {
             statements.push(self.declaration()?);
         }
         Ok(statements)
-        // match self.expression() {
-        //     Ok(expr) => Ok(expr),
-        //     Err(_) => Err(ParseError),
-        // }
     }
 
     fn declaration(&mut self) -> StmtResult {
@@ -71,7 +67,8 @@ impl Parser {
         }
 
         // What did statement() return ?
-        // An error ? Then synchronize and return a None/Nil Statement
+        // An error ? Then synchronize and return a None/Nil Literal
+        // wrapped in an Expression
         // Else return the whole statement result to the function
         // calling declaration() to handle
         /// Essentially here is where we handle Errors
@@ -114,7 +111,7 @@ impl Parser {
     fn print_statement(&mut self) -> StmtResult {
         let value = self.expression()?;
         self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
-        // shadowing value to pass to Stmt::Print,
+        // Shadowing value to pass to Stmt::Print,
         // I believe it helps with readability
         let value = PrintStmt { expression: value };
         Ok(Stmt::Print(value))

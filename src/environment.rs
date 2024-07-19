@@ -21,7 +21,7 @@ impl Environment {
             .cloned()
             .ok_or_else(|| RuntimeError {
                 token: name.clone(),
-                msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
+                msg: format!("OOpsie, looks like you forgot to define '{}' as a variable, (scratches head)", name.lexeme),
            })
     }
 
@@ -33,7 +33,7 @@ impl Environment {
         } else {
             Err(RuntimeError {
                 token: name.clone(),
-                msg: format!("OOpsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
+                msg: format!("OOpsie, looks like you forgot to define '{}' as a variable, (scratches head)", name.lexeme),
             })
         }
     }
