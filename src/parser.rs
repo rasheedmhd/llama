@@ -105,7 +105,7 @@ impl Parser {
     fn var_declaration(&mut self) -> StmtResult {
         let name = self.consume(&TokenType::IDENTIFIER, "Expect variable name")?;
         let mut initializer = Box::new(Expr::Literal(LiteralExpr {
-            value: Literal::Bool(true),
+            value: Literal::Nil,
         }));
         if self.match_token(&[TokenType::EQUAL]) {
             initializer = self.expression().unwrap();
