@@ -36,15 +36,21 @@ pub struct Parser {
     current: usize,
 }
 
-// THIS IS THE GRAMMAR
-// THE PARSER WORKS ON
-// expression      → equality ;
+// THIS IS THE GRAMMAR THE PARSER DESCENDS ON
+// program         → declaration* EOF ;
+// declaration 	   → varDecl | statement ;
+// varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
+// statement 	   → exprStmt | printStmt ;
+// exprStmt        → expression ";" ;
+// printStmt       → "print" expression ";" ;
+// expression      → assigment ;
+// assignment 	   → IDENTIFIER "=" assignment | equality ;
 // equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 // comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 // term            → factor ( ( "-" | "+" ) factor )* ;
 // factor          → unary ( ( "/" | "*" ) unary )* ;
 // unary           → ( "!" | "-" ) unary | primary ;
-// primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+// primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
