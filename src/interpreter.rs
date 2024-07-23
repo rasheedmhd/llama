@@ -29,11 +29,14 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_var_stmt(&mut self, stmt: &VarStmt) -> StmtResult {
-
+        // To Do
+        // CHECKPOINT
+        // define works but doesn't persist the changes to environment
         let literal = self.evaluate(&stmt.initializer)?;
+        println!("{:?}", self.environment);
         (*self.environment).borrow_mut().define(stmt.name.lexeme.clone(), literal);
+        println!("{:?}", self.environment);
         Ok(())
-
     }
 }
 
@@ -135,6 +138,8 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> LiteralResult {
+        // returns a literal of the variable or
+        // a runtime error, if variable wasn't declared [properly]
         (*self.environment).borrow().get(&expr.name)
     }
 

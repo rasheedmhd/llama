@@ -3,6 +3,7 @@ use crate::expr::Literal;
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
 
+#[derive(Debug)]
 pub struct Environment {
     pub values: HashMap<String, Literal>
 }

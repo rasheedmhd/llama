@@ -53,6 +53,9 @@ impl Parser {
     pub fn parse(&mut self) -> Result<Vec<Stmt>, ParseError> {
         let mut statements: Vec<Stmt> = Vec::new();
         while !self.is_at_end() {
+            // Get a variable declaration statements and add to
+            // statements above, continue doing that till the end
+            // of the code / source code file
             statements.push(self.declaration()?);
         }
         Ok(statements)
@@ -63,7 +66,7 @@ impl Parser {
         // So we pass control to var_declaration() to parse it
         // Else executing falls through to statement() to parse
         if self.match_token(&[TokenType::VAR]) {
-            return self.var_declaration()
+            return self.var_declaration();
         }
 
         // What did statement() return ?
@@ -71,7 +74,7 @@ impl Parser {
         // wrapped in an Expression
         // Else return the whole statement result to the function
         // calling declaration() to handle
-        /// Essentially here is where we handle Errors
+        // Essentially here is where we handle Errors
         let stmt_result = self.statement();
         match stmt_result {
             Err(_) => {

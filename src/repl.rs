@@ -47,7 +47,7 @@ impl Llama {
         let tokens     = scanner.scan_tokens();
         let mut parser     = Parser::new(tokens);
         let statements  = match parser.parse() {
-            Ok(statement) => statement,
+            Ok(statements) => statements,
             Err(e) => {
                 eprintln!("Failed to parse expression: {}", e);
                 return
