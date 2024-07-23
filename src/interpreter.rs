@@ -1,22 +1,23 @@
+use crate::environment::Environment;
+use crate::expr;
+use crate::expr::{
+    AssignExpr, BinaryExpr, Expr, GroupingExpr, Literal, LiteralExpr, UnaryExpr, VariableExpr,
+};
+use crate::repl::Llama;
+use crate::runtime_error::RuntimeError;
+use crate::stmt;
+use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
+use crate::token_type::TokenType;
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::environment::Environment;
-use crate::expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, Literal, UnaryExpr, VariableExpr, AssignExpr};
-use crate::expr;
-use crate::repl::Llama;
-use crate::stmt;
-use crate::token_type::TokenType;
-use crate::runtime_error::RuntimeError;
-use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
 
 pub struct Interpreter {
-    environment: Rc<RefCell<Environment>>
+    environment: Rc<RefCell<Environment>>,
 }
 type LiteralResult = Result<Literal, RuntimeError>;
 type StmtResult = Result<(), RuntimeError>;
 
 impl stmt::Visitor<StmtResult> for Interpreter {
-
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
         self.evaluate(&stmt.expression)?;
         Ok(())
@@ -34,15 +35,18 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         // define works but doesn't persist the changes to environment
         let literal = self.evaluate(&stmt.initializer)?;
         println!("{:?}", self.environment);
-        (*self.environment).borrow_mut().define(stmt.name.lexeme.clone(), literal);
-        println!("{:?}", self.environment);
+        (*self.environment)
+            .borrow_mut()
+            .define(stmt.name.lexeme.clone(), literal);
+        println!("{:?}", self.environment.borrow().values.keys());
+        println!("{:?}", self.environment.borrow().values.values());
         Ok(())
     }
 }
 
 impl expr::Visitor<LiteralResult> for Interpreter {
     fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> LiteralResult {
-         Ok(expr.value.clone())
+        Ok(expr.value.clone())
     }
 
     fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> LiteralResult {
@@ -54,7 +58,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
                 return if !right.is_num() {
                     Err(RuntimeError {
                         token: expr.operator.clone(),
-                        msg: "OOpsie, I was expecting a num but found something else ".to_string()
+                        msg: "OOpsie, I was expecting a num but found something else ".to_string(),
                     })
                 } else {
                     Ok(Literal::Number(-right.unwrap_num()))
@@ -70,7 +74,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
 
     fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> LiteralResult {
         let left = self.evaluate(&expr.left)?;
-        let right= self.evaluate(&expr.right)?;
+        let right = self.evaluate(&expr.right)?;
 
         match expr.operator.token_type {
             TokenType::BangEQUAL => return Ok(Literal::Bool(!left.is_equal(&right))),
@@ -78,62 +82,44 @@ impl expr::Visitor<LiteralResult> for Interpreter {
             _ => (),
         }
 
-        if expr.operator.token_type  == TokenType::PLUS  {
+        if expr.operator.token_type == TokenType::PLUS {
             if left.is_string() && right.is_string() {
-
-                let left  = left.unwrap_string();
+                let left = left.unwrap_string();
                 let right = right.unwrap_string();
 
                 let str_lit = format!("{left}{right}");
                 return Ok(Literal::String(str_lit));
-
             } else if !left.is_num() || !right.is_num() {
                 return Err(RuntimeError {
                     token: expr.operator.clone(),
-                    msg: "OOpsie, I was expecting two numbers or two strings (scratches head)".to_string()
-                })
+                    msg: "OOpsie, I was expecting two numbers or two strings (scratches head)"
+                        .to_string(),
+                });
             }
         }
 
         if !left.is_num() && !right.is_num() {
             return Err(RuntimeError {
                 token: expr.operator.clone(),
-                msg: "OOpsie, I was expecting two numbers (scratches head)".to_string()
-            })
+                msg: "OOpsie, I was expecting two numbers (scratches head)".to_string(),
+            });
         }
 
-        let left  = left.unwrap_num();
+        let left = left.unwrap_num();
         let right = right.unwrap_num();
 
         match expr.operator.token_type {
-
-            TokenType::PLUS => {
-                return Ok(Literal::Number(left + right))
-            },
-            TokenType::MINUS => {
-                return Ok(Literal::Number(left - right))
-            },
-            TokenType::SLASH => {
-                return Ok(Literal::Number(left / right))
-            },
-            TokenType::STAR  => {
-                return Ok(Literal::Number(left * right))
-            },
-            TokenType::GREATER      =>  {
-                return Ok(Literal::Bool(left > right))
-            },
-            TokenType::GreaterEQUAL => {
-                return Ok(Literal::Bool(left >= right))
-            },
-            TokenType::LESS  => {
-                return Ok(Literal::Bool(left < right))
-            },
-            TokenType::LessEQUAL    => {
-                return Ok(Literal::Bool(left <= right))
-            },
+            TokenType::PLUS => return Ok(Literal::Number(left + right)),
+            TokenType::MINUS => return Ok(Literal::Number(left - right)),
+            TokenType::SLASH => return Ok(Literal::Number(left / right)),
+            TokenType::STAR => return Ok(Literal::Number(left * right)),
+            TokenType::GREATER => return Ok(Literal::Bool(left > right)),
+            TokenType::GreaterEQUAL => return Ok(Literal::Bool(left >= right)),
+            TokenType::LESS => return Ok(Literal::Bool(left < right)),
+            TokenType::LessEQUAL => return Ok(Literal::Bool(left <= right)),
 
             // unreachable
-            _ => panic!()
+            _ => panic!(),
         }
     }
 
@@ -144,16 +130,22 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> LiteralResult {
+        println!("{:?}", self.environment);
         let value = self.evaluate(&expr.value)?;
-        self.environment.borrow_mut().assign(&expr.name, value.clone()).unwrap();
+        (*self.environment)
+            .borrow_mut()
+            .assign(&expr.name, value.clone())?;
+        println!("{:?}", self.environment);
+
         Ok(value)
     }
 }
 
 impl Interpreter {
-
     pub fn new() -> Self {
-        Interpreter { environment: Rc::new(RefCell::new(Environment::new())) }
+        Interpreter {
+            environment: Rc::new(RefCell::new(Environment::new())),
+        }
     }
 
     pub fn interpret(&mut self, statements: Vec<Stmt>) -> () {
