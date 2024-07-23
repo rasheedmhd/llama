@@ -103,7 +103,10 @@ impl Parser {
     }
 
     fn var_declaration(&mut self) -> StmtResult {
-        let name = self.consume(&TokenType::IDENTIFIER, "Expect variable name")?;
+        let name = self.consume(
+            &TokenType::IDENTIFIER,
+            "Aww snap! [*_*], looks like you forgot to add a name for the variable",
+        )?;
         let mut initializer = Box::new(Expr::Literal(LiteralExpr {
             value: Literal::Nil,
         }));
@@ -112,7 +115,7 @@ impl Parser {
         };
         self.consume(
             &TokenType::SEMICOLON,
-            "Expect ';' after variable declaration.",
+            "I was expecting a ';' after the variable declaration, (scratches head).",
         )?;
         let var_statement = VarStmt { name, initializer };
         Ok(Stmt::Var(var_statement))
