@@ -17,6 +17,7 @@ impl ParseError {
         Self
     }
 }
+
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Parse Error")
@@ -140,8 +141,8 @@ impl Parser {
     fn expression_statement(&mut self) -> StmtResult {
         let expr = self.expression()?;
         self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
-        // let expr = ExpressionStmt { expression: expr };
-        Ok(Stmt::Expression(ExpressionStmt { expression: expr }))
+        let expr = ExpressionStmt { expression: expr };
+        Ok(Stmt::Expression(expr))
     }
 
     fn assignment(&mut self) -> ExprResult {
@@ -158,7 +159,8 @@ impl Parser {
                 })));
             }
 
-            // self.error(equals, "Invalid assignment target.");
+            // To Do
+            // Impl delightful error msgs
             Llama::error(equals, "Invalid argument target");
         }
 
