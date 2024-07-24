@@ -1,24 +1,27 @@
-## Syntax
+# Syntax
 
 # Comments
 
 ```
-// comments
+// This is a comment
 ```
 
 # Printing to Std Output
 
 ```
-print "Hello, world!";
+> print "Hello, world!";
+Hello, world!
 ```
 
-## DATA TYPES
+# DATA TYPES
 
 # Booleans
 
 ```
-true; // Not false.
-false; // Not _not_ false
+> true; // Not false.
+true
+> false; // Not False
+false
 ```
 
 # Numbers
@@ -42,9 +45,9 @@ false; // Not _not_ false
 nil
 ```
 
-## Expressions
+# Expressions
 
-# Arithmetic
+## Arithmetic
 
 ```
 add + me;
@@ -55,9 +58,9 @@ divide / me;
 -negateMe;
 ```
 
-## Comparison and Equality
+# Comparison and Equality
 
-# Comparison Operators.
+## Comparison Operators.
 
 ```
 less < than;
@@ -105,7 +108,7 @@ print "Hello, world!";
 ```
 
 # Variables
-
+Llama is dynamically typed, so you can assign a value of any type to variables declared prior.
 ```
 
 var breakfast 	= "bagels";
@@ -116,9 +119,22 @@ print breakfast; // "beignets".
 
 ```
 
-## Control Flow
+# Shadowing
+```
 
-# if
+var breakfast = "bagels";
+> print breakfast;
+bagels;
+var breakfast = "croissant";
+> print breakfast;
+croissant
+
+```
+
+
+# Control Flow
+
+## if
 
 ```
 if (condition) {
@@ -128,7 +144,7 @@ if (condition) {
 }
 ```
 
-# while
+## while
 
 ```
 var a = 1;
@@ -139,7 +155,7 @@ while (a < 10) {
 }
 ```
 
-# for
+## for
 
 ```
 for (var a = 1; a < 10; a = a + 1) {
@@ -147,7 +163,7 @@ for (var a = 1; a < 10; a = a + 1) {
 }
 ```
 
-## Functions
+# Functions
 
 ```
 // Functions that take arguments
@@ -169,9 +185,10 @@ fun returnSum(a, b) {
 }
 ```
 
-## Closures
+# Closures
 
 ```
+
 fun addPair(a, b) {
     return a + b;
 }
@@ -200,9 +217,10 @@ var outside = "outside";
 
 var fn = returnFunction();
 fn();
+
 ```
 
-## Classes
+# Classes
 
 ```
 // The body of a class contains its methods.
@@ -220,17 +238,19 @@ class Breakfast {
 }
 ```
 
-# Classes are First Class
+## Classes are First Class
 
 ```
+
 // Storing Classes in Variables.
 var someVariable = Breakfast;
 
 // Passing Classes to Functions.
 someFunction(Breakfast);
+
 ```
 
-# Class Instances
+## Class Instances
 
 ```
 // Calling a class like a function, produces a new instance of itself.
@@ -238,9 +258,10 @@ var breakfast = Breakfast();
 print breakfast; // "Breakfast instance".
 ```
 
-# Instantiation and Initialization
+## Instantiation and Initialization
 
 ```
+
 // Assigning to a field creates it if it doesn’t already exist
 breakfast.meat = "sausage";
 breakfast.bread = "sourdough";
@@ -268,11 +289,13 @@ var baconAndToast = Breakfast("bacon", "toast");
 
 baconAndToast.serve("Dear Reader");
 // "Enjoy your bacon and toast, Dear Reader."
+
 ```
 
 # Inheritance
 
 ```
+
 class Brunch < Breakfast {
     drink() {
         print "How about a Bloody Mary?";
@@ -291,4 +314,5 @@ class Brunch < Breakfast {
         this.drink = drink;
     }
 }
+
 ```
