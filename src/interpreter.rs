@@ -10,20 +10,20 @@ use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
 use crate::token_type::TokenType;
 // use std::cell::RefCell;
 // use std::rc::Rc;
-use lazy_static::lazy_static;
-use std::collections::HashMap;
-use std::sync::RwLock;
+// use lazy_static::lazy_static;
+// use std::collections::HashMap;
+// use std::sync::RwLock;
 
 // Hack for global variables
-lazy_static! {
-    static ref ENVIRONMENT: RwLock<HashMap<String, Literal>> = {
-        let values = HashMap::new();
-        RwLock::new(values)
-    };
-}
+// lazy_static! {
+//     static ref ENVIRONMENT: RwLock<HashMap<String, Literal>> = {
+//         let values = HashMap::new();
+//         RwLock::new(values)
+//     };
+// }
 
 pub struct Interpreter {
-    // environment: Environment,
+    environment: Environment,
 }
 
 type LiteralResult = Result<Literal, RuntimeError>;
@@ -50,10 +50,11 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         // NOTE:
         // Stopped using Environment to use lazy_static
         let literal = self.evaluate(&stmt.initializer)?;
-        let mut env = ENVIRONMENT.write().unwrap();
-        env.insert(stmt.name.lexeme.clone(), literal);
-
-        // self.environment.define(stmt.name.lexeme.clone(), literal);
+        // let mut env = ENVIRONMENT.write().unwrap();
+        // env.insert(stmt.name.lexeme.clone(), literal);
+        println!("before var stmt {:?}", self.environment);
+        self.environment.define(stmt.name.lexeme.clone(), literal);
+        println!("after var stmt {:?}", self.environment);
         Ok(())
     }
 }
@@ -145,23 +146,23 @@ impl expr::Visitor<LiteralResult> for Interpreter {
         //     // println!("Value for 'key1': {:?}", value);
         //     Ok(value)
         // }
-
-        Ok(ENVIRONMENT
-            .read()
-            .unwrap()
-            .get(&expr.name.lexeme)
-            .unwrap()
-            .clone())
+        self.environment.get(&expr.name)
+        // Ok(ENVIRONMENT
+        //     .read()
+        //     .unwrap()
+        //     .get(&expr.name.lexeme)
+        //     .unwrap()
+        //     .clone())
     }
 
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> LiteralResult {
         let value = self.evaluate(&expr.value)?;
-        // self.environment.assign(&expr.name, value.clone())?;
+        self.environment.assign(&expr.name, value.clone())?;
         // ENVIRONMENT.write().unwrap().get_mut(&(expr.name.lexeme)).insert(&mut value.clone());
-        let mut env = ENVIRONMENT.write().unwrap();
-        if let Some(val) = env.get_mut(&expr.name.lexeme) {
-            *val = value.clone();
-        }
+        // let mut env = ENVIRONMENT.write().unwrap();
+        // if let Some(val) = env.get_mut(&expr.name.lexeme) {
+        //     *val = value.clone();
+        // }
         Ok(value)
     }
 }
@@ -169,7 +170,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
 impl Interpreter {
     pub fn new() -> Self {
         Interpreter {
-            // environment: Environment::new(),
+            environment: Environment::new(),
         }
     }
 
