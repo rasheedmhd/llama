@@ -8,8 +8,8 @@ use crate::runtime_error::RuntimeError;
 use crate::stmt;
 use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
 use crate::token_type::TokenType;
-// use std::cell::RefCell;
-// use std::rc::Rc;
+use std::cell::RefCell;
+use std::rc::Rc;
 // use lazy_static::lazy_static;
 // use std::collections::HashMap;
 // use std::sync::RwLock;
@@ -23,7 +23,7 @@ use crate::token_type::TokenType;
 // }
 
 pub struct Interpreter {
-    environment: Environment,
+    environment: Rc<RefCell<Environment>>,
 }
 
 type LiteralResult = Result<Literal, RuntimeError>;
@@ -53,7 +53,7 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         // let mut env = ENVIRONMENT.write().unwrap();
         // env.insert(stmt.name.lexeme.clone(), literal);
         println!("before var stmt {:?}", self.environment);
-        self.environment.define(stmt.name.lexeme.clone(), literal);
+        self.environment.borrow_mut().define(stmt.name.lexeme.clone(), literal);
         println!("after var stmt {:?}", self.environment);
         Ok(())
     }
@@ -146,7 +146,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
         //     // println!("Value for 'key1': {:?}", value);
         //     Ok(value)
         // }
-        self.environment.get(&expr.name)
+        self.environment.borrow().get(&expr.name)
         // Ok(ENVIRONMENT
         //     .read()
         //     .unwrap()
@@ -157,7 +157,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
 
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> LiteralResult {
         let value = self.evaluate(&expr.value)?;
-        self.environment.assign(&expr.name, value.clone())?;
+        self.environment.borrow_mut().assign(&expr.name, value.clone())?;
         // ENVIRONMENT.write().unwrap().get_mut(&(expr.name.lexeme)).insert(&mut value.clone());
         // let mut env = ENVIRONMENT.write().unwrap();
         // if let Some(val) = env.get_mut(&expr.name.lexeme) {
@@ -169,8 +169,8 @@ impl expr::Visitor<LiteralResult> for Interpreter {
 
 impl Interpreter {
     pub fn new() -> Self {
-        Interpreter {
-            environment: Environment::new(),
+        Self {
+            environment: Llama::new(),
         }
     }
 

@@ -1,15 +1,17 @@
+use std::cell::{RefCell, RefMut};
 #[allow(unused_variables)]
-
 use std::env;
 use std::fs;
 use std::io::{stdin, stdout, Write};
 use std::process;
+use std::rc::Rc;
+use crate::environment::Environment;
 
-use crate::scanner::Scanner;
-use crate::parser::Parser;
 use crate::interpreter::Interpreter;
-use crate::token::Token;
+use crate::parser::Parser;
 use crate::runtime_error::RuntimeError;
+use crate::scanner::Scanner;
+use crate::token::Token;
 use crate::token_type::TokenType;
 
 // TO DO
@@ -18,10 +20,13 @@ use crate::token_type::TokenType;
 static mut HAD_ERROR: bool = false;
 static mut HAD_RUNTIME_ERROR: bool = false;
 
-pub struct Llama {
-}
+pub struct Llama {}
 
 impl Llama {
+    pub fn new() -> Rc<RefCell<Environment>> {
+        let mut env = Rc::new(RefCell::new(Environment::new()));
+        env
+    }
     // Exit Codes
     // https://man.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
     pub fn start() {
@@ -43,26 +48,27 @@ impl Llama {
         // so Scanner::new only declares the Scanner
         // I use Scanner::from to initialize the Scanner, with the source
         // of the input language
-        let mut scanner   = Scanner::from(source);
-        let tokens     = scanner.scan_tokens();
-        let mut parser     = Parser::new(tokens);
-        let statements  = match parser.parse() {
+        let mut scanner = Scanner::from(source);
+        let tokens = scanner.scan_tokens();
+        let mut parser = Parser::new(tokens);
+        let statements = match parser.parse() {
             Ok(statements) => statements,
             Err(e) => {
                 eprintln!("Failed to parse expression: {}", e);
-                return
-            },
+                return;
+            }
         };
+
         let mut interpreter = Interpreter::new();
 
         unsafe {
-            if HAD_ERROR { return };
+            if HAD_ERROR {
+                return;
+            };
         }
 
         interpreter.interpret(statements);
-        
     }
-
 
     // Llama is a scripting language, which means it executes directly from source.
     // Our interpreter supports two ways of running code. If you start llama from the
@@ -73,8 +79,12 @@ impl Llama {
         let code = fs::read_to_string(path).expect("File doesn't exist");
         Llama::run(code);
         unsafe {
-            if HAD_ERROR { process::exit(65)}
-            if HAD_RUNTIME_ERROR { process::exit(70)}
+            if HAD_ERROR {
+                process::exit(65)
+            }
+            if HAD_RUNTIME_ERROR {
+                process::exit(70)
+            }
         }
     }
 
@@ -100,18 +110,18 @@ impl Llama {
     //                            ^-- Here
 
     #[allow(dead_code)]
-    fn report(line: usize, location: String,  message: &str) {
+    fn report(line: usize, location: String, message: &str) {
         eprintln!("line {line} Error {location}: {message}");
         unsafe {
             HAD_ERROR = true;
         }
     }
 
-    pub fn error(token: Token,  message: &str) {
+    pub fn error(token: Token, message: &str) {
         if token.token_type == TokenType::EOF {
-            Llama::report(token.line, "at end".to_string(),  message);
+            Llama::report(token.line, "at end".to_string(), message);
         } else {
-            Llama::report(token.line, format!("at '{}'", token.lexeme ),  message);
+            Llama::report(token.line, format!("at '{}'", token.lexeme), message);
         }
     }
 
@@ -121,5 +131,4 @@ impl Llama {
             HAD_RUNTIME_ERROR = true;
         }
     }
-
 }

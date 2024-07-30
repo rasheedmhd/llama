@@ -9,7 +9,11 @@ pub struct Environment {
 }
 
 type EnvResult = Result<Literal, RuntimeError>;
-
+impl Drop for Environment {
+    fn drop(&mut self) {
+        println!("Dropping Environment with data `{:?}`!", self.values);
+    }
+}
 impl Environment {
     pub fn new() -> Self {
         let mut env = HashMap::new();
