@@ -1,15 +1,14 @@
 #[allow(unused_variables)]
-
 use std::env;
 use std::fs;
 use std::io::{stdin, stdout, Write};
 use std::process;
 
-use crate::scanner::Scanner;
-use crate::parser::Parser;
 use crate::interpreter::Interpreter;
-use crate::token::Token;
+use crate::parser::{ParseError, Parser};
 use crate::runtime_error::RuntimeError;
+use crate::scanner::Scanner;
+use crate::token::Token;
 use crate::token_type::TokenType;
 
 // TO DO
@@ -18,7 +17,53 @@ use crate::token_type::TokenType;
 static mut HAD_ERROR: bool = false;
 static mut HAD_RUNTIME_ERROR: bool = false;
 
-pub struct Llama {
+pub struct Llama {}
+
+struct Repl {
+    interpreter: Interpreter,
+    scanner: Scanner,
+    parser: Parser,
+}
+
+impl Repl {
+    fn new() -> Self {
+        Self {
+            interpreter: Interpreter::new(),
+            scanner: Scanner::new(),
+            parser: Parser::new(),
+        }
+    }
+
+    fn run_prompt(&mut self) {
+        loop {
+            print!("> ");
+            let _ = stdout().flush();
+            let mut code_snippet = String::new();
+            stdin().read_line(&mut code_snippet).unwrap();
+            self.run(code_snippet.clone());
+        }
+    }
+
+    pub fn run(&mut self, source: String) {
+        let mut scanner = Scanner::from(source);
+        let tokens = scanner.scan_tokens();
+        let mut parser = Parser::from(tokens);
+        let statements = match parser.parse() {
+            Ok(statements) => statements,
+            Err(e) => {
+                eprintln!("Failed to parse expression: {}", e);
+                return;
+            }
+        };
+
+        unsafe {
+            if HAD_ERROR {
+                return;
+            };
+        }
+
+        self.interpreter.interpret(statements);
+    }
 }
 
 impl Llama {
@@ -33,36 +78,9 @@ impl Llama {
         } else if args.len() == 2 {
             Llama::run_file(args[1].clone());
         } else {
-            Llama::run_prompt();
+            Repl::new().run_prompt()
         }
     }
-
-    pub fn run(source: String) {
-        // There is a Scanner::new associated method
-        // I try to make to follow Rust's method/function name convention
-        // so Scanner::new only declares the Scanner
-        // I use Scanner::from to initialize the Scanner, with the source
-        // of the input language
-        let mut scanner   = Scanner::from(source);
-        let tokens     = scanner.scan_tokens();
-        let mut parser     = Parser::new(tokens);
-        let statements  = match parser.parse() {
-            Ok(statements) => statements,
-            Err(e) => {
-                eprintln!("Failed to parse expression: {}", e);
-                return
-            },
-        };
-        let mut interpreter = Interpreter::new();
-
-        unsafe {
-            if HAD_ERROR { return };
-        }
-
-        interpreter.interpret(statements);
-        
-    }
-
 
     // Llama is a scripting language, which means it executes directly from source.
     // Our interpreter supports two ways of running code. If you start llama from the
@@ -71,47 +89,30 @@ impl Llama {
         // TO DO
         // Handle file error properly
         let code = fs::read_to_string(path).expect("File doesn't exist");
-        Llama::run(code);
+        Repl::new().run(code);
         unsafe {
-            if HAD_ERROR { process::exit(65)}
-            if HAD_RUNTIME_ERROR { process::exit(70)}
-        }
-    }
-
-    fn run_prompt() {
-        loop {
-            print!("> ");
-            let _ = stdout().flush();
-            let mut code_snippet = String::new();
-            stdin().read_line(&mut code_snippet).unwrap();
-            Llama::run(code_snippet.clone());
-            // We need to reset this flag in the interactive loop.
-            // If the user makes a mistake, it shouldn’t kill their entire session.
-            unsafe {
-                HAD_ERROR = false;
+            if HAD_ERROR {
+                process::exit(65)
+            }
+            if HAD_RUNTIME_ERROR {
+                process::exit(70)
             }
         }
     }
 
-    // Error Handling
-    // Example
-    // Error: Unexpected "," in argument list.
-    // 15 | function(first, second,);
-    //                            ^-- Here
-
     #[allow(dead_code)]
-    fn report(line: usize, location: String,  message: &str) {
+    fn report(line: usize, location: String, message: &str) {
         eprintln!("line {line} Error {location}: {message}");
         unsafe {
             HAD_ERROR = true;
         }
     }
 
-    pub fn error(token: Token,  message: &str) {
+    pub fn error(token: Token, message: &str) {
         if token.token_type == TokenType::EOF {
-            Llama::report(token.line, "at end".to_string(),  message);
+            Llama::report(token.line, "at end".to_string(), message);
         } else {
-            Llama::report(token.line, format!("at '{}'", token.lexeme ),  message);
+            Llama::report(token.line, format!("at '{}'", token.lexeme), message);
         }
     }
 
@@ -121,5 +122,4 @@ impl Llama {
             HAD_RUNTIME_ERROR = true;
         }
     }
-
 }

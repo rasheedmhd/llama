@@ -13,7 +13,6 @@ type EnvResult = Result<Literal, RuntimeError>;
 impl Environment {
     pub fn new() -> Self {
         let mut env = HashMap::new();
-        env.insert("test".to_string(), Literal::String("Empty Env".to_string()));
         Self { values: env }
     }
     pub fn define(&mut self, name: String, value: Literal) {

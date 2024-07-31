@@ -8,22 +8,9 @@ use crate::runtime_error::RuntimeError;
 use crate::stmt;
 use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
 use crate::token_type::TokenType;
-// use std::cell::RefCell;
-// use std::rc::Rc;
-use lazy_static::lazy_static;
-use std::collections::HashMap;
-use std::sync::RwLock;
-
-// Hack for global variables
-lazy_static! {
-    static ref ENVIRONMENT: RwLock<HashMap<String, Literal>> = {
-        let values = HashMap::new();
-        RwLock::new(values)
-    };
-}
 
 pub struct Interpreter {
-    // environment: Environment,
+    environment: Environment,
 }
 
 type LiteralResult = Result<Literal, RuntimeError>;
@@ -42,18 +29,8 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_var_stmt(&mut self, stmt: &VarStmt) -> StmtResult {
-        // To Do
-        // CHECKPOINT
-        // define works but doesn't persist the changes to environment
-        //
-        // CHECKPOINT
-        // NOTE:
-        // Stopped using Environment to use lazy_static
         let literal = self.evaluate(&stmt.initializer)?;
-        let mut env = ENVIRONMENT.write().unwrap();
-        env.insert(stmt.name.lexeme.clone(), literal);
-
-        // self.environment.define(stmt.name.lexeme.clone(), literal);
+        self.environment.define(stmt.name.lexeme.clone(), literal);
         Ok(())
     }
 }
@@ -138,38 +115,20 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> LiteralResult {
-        // returns a literal of the variable or
-        // a runtime error, if variable wasn't declared [properly]
-        // let env = ENVIRONMENT.read().unwrap();
-        // if let Some(value) = env.get(&expr.name) {
-        //     // println!("Value for 'key1': {:?}", value);
-        //     Ok(value)
-        // }
-
-        Ok(ENVIRONMENT
-            .read()
-            .unwrap()
-            .get(&expr.name.lexeme)
-            .unwrap()
-            .clone())
+        self.environment.get(&expr.name)
     }
 
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> LiteralResult {
         let value = self.evaluate(&expr.value)?;
-        // self.environment.assign(&expr.name, value.clone())?;
-        // ENVIRONMENT.write().unwrap().get_mut(&(expr.name.lexeme)).insert(&mut value.clone());
-        let mut env = ENVIRONMENT.write().unwrap();
-        if let Some(val) = env.get_mut(&expr.name.lexeme) {
-            *val = value.clone();
-        }
+        self.environment.assign(&expr.name, value.clone())?;
         Ok(value)
     }
 }
 
 impl Interpreter {
     pub fn new() -> Self {
-        Interpreter {
-            // environment: Environment::new(),
+        Self {
+            environment: Environment::new(),
         }
     }
 
@@ -189,10 +148,4 @@ impl Interpreter {
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {
         expr.accept(self)
     }
-    // second Impl
-    // fn is_truthy(lit: &Literal) -> bool {
-    //     // https://doc.rust-lang.org/std/macro.matches.html
-    //     // Anything that is not Nil or False is true
-    //     !matches!(lit, Literal::Nil | Literal::Bool(false))
-    // }
 }
