@@ -1,14 +1,11 @@
-use std::cell::{RefCell, RefMut};
 #[allow(unused_variables)]
 use std::env;
 use std::fs;
 use std::io::{stdin, stdout, Write};
 use std::process;
-use std::rc::Rc;
-use crate::environment::Environment;
 
 use crate::interpreter::Interpreter;
-use crate::parser::Parser;
+use crate::parser::{ParseError, Parser};
 use crate::runtime_error::RuntimeError;
 use crate::scanner::Scanner;
 use crate::token::Token;
@@ -22,11 +19,54 @@ static mut HAD_RUNTIME_ERROR: bool = false;
 
 pub struct Llama {}
 
-impl Llama {
-    pub fn new() -> Rc<RefCell<Environment>> {
-        let mut env = Rc::new(RefCell::new(Environment::new()));
-        env
+struct Repl {
+    interpreter: Interpreter,
+    scanner: Scanner,
+    parser: Parser,
+}
+
+impl Repl {
+    fn new() -> Self {
+        Self {
+            interpreter: Interpreter::new(),
+            scanner: Scanner::new(),
+            parser: Parser::new(),
+        }
     }
+
+    fn run_prompt(&mut self) {
+        loop {
+            print!("> ");
+            let _ = stdout().flush();
+            let mut code_snippet = String::new();
+            stdin().read_line(&mut code_snippet).unwrap();
+            self.run(code_snippet.clone());
+        }
+    }
+
+    pub fn run(&mut self, source: String) {
+        let mut scanner = Scanner::from(source);
+        let tokens = scanner.scan_tokens();
+        let mut parser = Parser::from(tokens);
+        let statements = match parser.parse() {
+            Ok(statements) => statements,
+            Err(e) => {
+                eprintln!("Failed to parse expression: {}", e);
+                return;
+            }
+        };
+
+        unsafe {
+            if HAD_ERROR {
+                return;
+            };
+        }
+
+        self.interpreter.interpret(statements);
+    }
+}
+
+impl Llama {
     // Exit Codes
     // https://man.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
     pub fn start() {
@@ -38,36 +78,8 @@ impl Llama {
         } else if args.len() == 2 {
             Llama::run_file(args[1].clone());
         } else {
-            Llama::run_prompt();
+            Repl::new().run_prompt()
         }
-    }
-
-    pub fn run(source: String) {
-        // There is a Scanner::new associated method
-        // I try to make to follow Rust's method/function name convention
-        // so Scanner::new only declares the Scanner
-        // I use Scanner::from to initialize the Scanner, with the source
-        // of the input language
-        let mut scanner = Scanner::from(source);
-        let tokens = scanner.scan_tokens();
-        let mut parser = Parser::new(tokens);
-        let statements = match parser.parse() {
-            Ok(statements) => statements,
-            Err(e) => {
-                eprintln!("Failed to parse expression: {}", e);
-                return;
-            }
-        };
-
-        let mut interpreter = Interpreter::new();
-
-        unsafe {
-            if HAD_ERROR {
-                return;
-            };
-        }
-
-        interpreter.interpret(statements);
     }
 
     // Llama is a scripting language, which means it executes directly from source.
@@ -77,7 +89,7 @@ impl Llama {
         // TO DO
         // Handle file error properly
         let code = fs::read_to_string(path).expect("File doesn't exist");
-        Llama::run(code);
+        Repl::new().run(code);
         unsafe {
             if HAD_ERROR {
                 process::exit(65)
@@ -87,27 +99,6 @@ impl Llama {
             }
         }
     }
-
-    fn run_prompt() {
-        loop {
-            print!("> ");
-            let _ = stdout().flush();
-            let mut code_snippet = String::new();
-            stdin().read_line(&mut code_snippet).unwrap();
-            Llama::run(code_snippet.clone());
-            // We need to reset this flag in the interactive loop.
-            // If the user makes a mistake, it shouldn’t kill their entire session.
-            unsafe {
-                HAD_ERROR = false;
-            }
-        }
-    }
-
-    // Error Handling
-    // Example
-    // Error: Unexpected "," in argument list.
-    // 15 | function(first, second,);
-    //                            ^-- Here
 
     #[allow(dead_code)]
     fn report(line: usize, location: String, message: &str) {

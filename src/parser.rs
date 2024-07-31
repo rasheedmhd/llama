@@ -54,7 +54,11 @@ pub struct Parser {
 // primary         → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;
 
 impl Parser {
-    pub fn new(tokens: Vec<Token>) -> Self {
+    pub fn new() -> Self {
+        Parser { current: 0, tokens: Vec::new() }
+    }
+
+    pub fn from(tokens: Vec<Token>) -> Self {
         Parser { current: 0, tokens }
     }
 

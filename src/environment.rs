@@ -9,15 +9,10 @@ pub struct Environment {
 }
 
 type EnvResult = Result<Literal, RuntimeError>;
-impl Drop for Environment {
-    fn drop(&mut self) {
-        println!("Dropping Environment with data `{:?}`!", self.values);
-    }
-}
+
 impl Environment {
     pub fn new() -> Self {
         let mut env = HashMap::new();
-        env.insert("test".to_string(), Literal::String("Empty Env".to_string()));
         Self { values: env }
     }
     pub fn define(&mut self, name: String, value: Literal) {

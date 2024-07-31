@@ -1,0 +1,4 @@
+var age = 55;
+print age;
+
+print age * 77;
