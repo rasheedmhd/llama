@@ -5,11 +5,12 @@ use crate::token::Token;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Environment {
     pub values: HashMap<String, Literal>,
     pub enclosing: Option<Rc<RefCell<Environment>>>,
 }
+// var a = 5; print a;  { var a = 7; print a; } print a;
 
 type EnvResult = Result<Literal, RuntimeError>;
 

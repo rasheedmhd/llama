@@ -35,7 +35,9 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_block_stmt(&mut self, stmt: &BlockStmt) -> StmtResult {
-        todo!()
+        let block_env = self.environment.clone();
+        self.execute_block(stmt.statements.clone(), block_env)?;
+        Ok(())
     }
 }
 
@@ -147,6 +149,21 @@ impl Interpreter {
 
     fn execute(&mut self, stmt: Stmt) -> StmtResult {
         stmt.accept(self)
+    }
+
+    pub fn execute_block(&mut self, statements: Vec<Stmt>, block_env: Environment) -> Result<(), RuntimeError> {
+        let previous_env = std::mem::replace(&mut self.environment, block_env);
+
+        let result = (|| {
+            for statement in statements {
+                self.execute(statement)?;
+            }
+            Ok(())
+        })();
+
+        self.environment = previous_env;
+
+        result
     }
 
     fn evaluate(&mut self, expr: &Box<Expr>) -> LiteralResult {

@@ -2,13 +2,14 @@ use crate::expr::Expr;
 use crate::token::Token;
 
 type BoxedExpr = Box<Expr>;
+#[derive(Clone, Debug, PartialEq)]
 pub enum Stmt {
     Expression(ExpressionStmt),
     Print(PrintStmt),
     Var(VarStmt),
     Block(BlockStmt),
 }
-
+#[derive(Clone, Debug, PartialEq)]
 pub struct ExpressionStmt {
     pub expression : BoxedExpr,
 }
@@ -19,7 +20,7 @@ impl ExpressionStmt {
         }
     }
 }
-
+#[derive(Clone, Debug, PartialEq)]
 pub struct PrintStmt {
     pub expression : BoxedExpr,
 }
@@ -30,7 +31,7 @@ impl PrintStmt {
         }
     }
 }
-
+#[derive(Clone, Debug, PartialEq)]
 pub struct VarStmt {
     pub name : Token,
     pub initializer : BoxedExpr,
@@ -43,7 +44,7 @@ impl VarStmt {
         }
     }
 }
-
+#[derive(Clone, Debug, PartialEq)]
 pub struct BlockStmt {
     pub statements: Vec<Stmt>,
 }

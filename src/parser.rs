@@ -42,10 +42,12 @@ pub struct Parser {
 // program         → declaration* EOF ;
 // declaration 	   → varDecl | statement ;
 // varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
+
 // statement 	   → exprStmt | printStmt | block ;
-// block           → "{" declaration* "}" ;
 // exprStmt        → expression ";" ;
 // printStmt       → "print" expression ";" ;
+// block           → "{" declaration* "}"
+
 // expression      → assigment ;
 // assignment 	   → IDENTIFIER "=" assignment | equality ;
 // equality        → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -75,6 +77,7 @@ impl Parser {
         Ok(statements)
     }
 
+    // declaration  → varDecl | statement ;
     fn declaration(&mut self) -> StmtResult {
         // If we hit a var token, then we are dealing with a variable expr
         // So we pass control to var_declaration() to parse it
@@ -109,6 +112,7 @@ impl Parser {
         }
     }
 
+    // varDecl → "var" IDENTIFIER ( "=" expression )? ";" ;
     fn var_declaration(&mut self) -> StmtResult {
         let name = self.consume(
             &TokenType::IDENTIFIER,
@@ -128,16 +132,18 @@ impl Parser {
         Ok(Stmt::Var(var_statement))
     }
 
+    // statement    → exprStmt | printStmt | block ;
     fn statement(&mut self) -> StmtResult {
         if self.match_token(&[TokenType::PRINT]) {
             return Ok(self.print_statement()?);
         } else if  self.match_token(&[TokenType::LeftBRACE]) {
-            let block_stmts = self.block();
+            let block_stmts = self.block()?;
             return Ok(Stmt::Block( BlockStmt { statements: block_stmts }));
         };
         return Ok(self.expression_statement()?);
     }
 
+    // printStmt       → "print" expression ";" ;
     fn print_statement(&mut self) -> StmtResult {
         let value = self.expression()?;
         self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
@@ -147,6 +153,7 @@ impl Parser {
         Ok(Stmt::Print(value))
     }
 
+    // expression      → assigment ;
     fn expression_statement(&mut self) -> StmtResult {
         let expr = self.expression()?;
         self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
@@ -159,21 +166,24 @@ impl Parser {
 //     while (!check(RIGHTBRACE) && !isAtEnd()) {
 //     statements.add(declaration());
 //     }
-//     consume(RIGHTBRACE,
-//     "Expect '}' after block.");
+//     consume(RIGHTBRACE, "Expect '}' after block.");
 //     return statements;
 //     }
-    fn block(&mut self) -> Vec<Stmt> {
+
+
+//  block        → "{" declaration* "}" ;
+    fn block(&mut self) -> Result<Vec<Stmt>, ParseError> {
         let mut statements: Vec<Stmt> = Vec::new();
-        while !self.check(&TokenType::LeftBRACE) && !self.is_at_end() {
-            statements.push(self.declaration().unwrap())
+        while !self.check(&TokenType::RightBRACE) && !self.is_at_end() {
+            statements.push(self.declaration()?)
         }
         self.consume(&TokenType::RightBRACE,
-                     "I was expecting a '}' to close the most current block that you created \
-                      when you typed '{' after block. You might need to add a '}' to create a valid Llama block"
+                     "I was expecting a '}' to close the most current block that you created\n \
+                      when you typed '{' after block. \n You might need to add a '}' to create a valid Llama block"
         )?;
-        statements
+        Ok(statements)
     }
+    // assignment   → IDENTIFIER "=" assignment | equality ;
     fn assignment(&mut self) -> ExprResult {
         let expr = self.equality()?;
 

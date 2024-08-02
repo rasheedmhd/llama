@@ -38,6 +38,7 @@ protein         → "really"+ "crispy" "bacon"
                 | ( "scrambled" | "poached" | "fried" ) "eggs";
 
 bread           → "toast" | "biscuits" | "English muffin" ;
+
 STATEMENT PRECEDENCE
 program      → declaration* EOF ;
 declaration  → varDecl
@@ -101,16 +102,20 @@ unary → ( "!" | "-" ) unary | primary;
 
 factor → unary ( ( "/" | "*" ) unary )* ;
 
+
 COMPLETE GRAMMAR FOR LLAMA
-program         → statement* EOF ;
+
+program         → declaration* EOF ;
+declaration     → varDecl | statement
+varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
 statement       → exprStmt
-                | printStmt ;
-declaration     → varDecl
-                | statement ;
-varDecl         → "var" IDENTIFIER ( "=" expression )? ";"
+                | printStmt
+                | block ;
 exprStmt        → expression ";" ;
 printStmt       → "print" expression ";" ;
-expression      → equality ;
+expression      → assigment ;
+block           → "{" declaration* "}"
+assignment 	   → IDENTIFIER "=" assignment | equality ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
