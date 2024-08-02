@@ -42,7 +42,8 @@ pub struct Parser {
 // program         → declaration* EOF ;
 // declaration 	   → varDecl | statement ;
 // varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
-// statement 	   → exprStmt | printStmt ;
+// statement 	   → exprStmt | printStmt | block ;
+// block           → "{" declaration* "}" ;
 // exprStmt        → expression ";" ;
 // printStmt       → "print" expression ";" ;
 // expression      → assigment ;
@@ -130,6 +131,10 @@ impl Parser {
     fn statement(&mut self) -> StmtResult {
         if self.match_token(&[TokenType::PRINT]) {
             return Ok(self.print_statement()?);
+            // if (match(LEFTBRACE)) return new Stmt.Block(block());
+        } else if  self.match_token(&[TokenType::LeftBRACE]) {
+            let block_statement = self.block();
+            return Ok(Stmt::Block(block_statement))
         };
         return Ok(self.expression_statement()?);
     }

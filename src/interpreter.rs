@@ -6,7 +6,7 @@ use crate::expr::{
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
-use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
+use crate::stmt::{BlockStmt, ExpressionStmt, PrintStmt, Stmt, VarStmt};
 use crate::token_type::TokenType;
 
 pub struct Interpreter {
@@ -32,6 +32,10 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         let literal = self.evaluate(&stmt.initializer)?;
         self.environment.define(stmt.name.lexeme.clone(), literal);
         Ok(())
+    }
+
+    fn visit_block_stmt(&mut self, stmt: &BlockStmt) -> StmtResult {
+        todo!()
     }
 }
 

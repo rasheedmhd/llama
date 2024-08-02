@@ -59,6 +59,9 @@ STATEMENTS AND STATE
 program      → statement* EOF ;
 statement    → exprStmt
              | printStmt ;
+             | block ;
+
+block        → "{" declaration* "}" ;
 exprStmt     → expression ";" ;
 printStmt    → "print" expression ";" ;
 
