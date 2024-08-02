@@ -4,7 +4,7 @@ use crate::expr::{
     AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr,
 };
 use crate::repl::Llama;
-use crate::stmt::{ExpressionStmt, PrintStmt, Stmt, VarStmt};
+use crate::stmt::{BlockStmt, ExpressionStmt, PrintStmt, Stmt, VarStmt};
 use crate::token::Token;
 use crate::token_type::TokenType;
 use std::fmt;
@@ -131,10 +131,9 @@ impl Parser {
     fn statement(&mut self) -> StmtResult {
         if self.match_token(&[TokenType::PRINT]) {
             return Ok(self.print_statement()?);
-            // if (match(LEFTBRACE)) return new Stmt.Block(block());
         } else if  self.match_token(&[TokenType::LeftBRACE]) {
-            let block_statement = self.block();
-            return Ok(Stmt::Block(block_statement))
+            let block_stmts = self.block();
+            return Ok(Stmt::Block( BlockStmt { statements: block_stmts }));
         };
         return Ok(self.expression_statement()?);
     }
@@ -155,6 +154,26 @@ impl Parser {
         Ok(Stmt::Expression(expr))
     }
 
+//     private List<Stmt> block() {
+//     List<Stmt> statements = new ArrayList<>();
+//     while (!check(RIGHTBRACE) && !isAtEnd()) {
+//     statements.add(declaration());
+//     }
+//     consume(RIGHTBRACE,
+//     "Expect '}' after block.");
+//     return statements;
+//     }
+    fn block(&mut self) -> Vec<Stmt> {
+        let mut statements: Vec<Stmt> = Vec::new();
+        while !self.check(&TokenType::LeftBRACE) && !self.is_at_end() {
+            statements.push(self.declaration().unwrap())
+        }
+        self.consume(&TokenType::RightBRACE,
+                     "I was expecting a '}' to close the most current block that you created \
+                      when you typed '{' after block. You might need to add a '}' to create a valid Llama block"
+        )?;
+        statements
+    }
     fn assignment(&mut self) -> ExprResult {
         let expr = self.equality()?;
 
