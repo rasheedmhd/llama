@@ -50,7 +50,9 @@ pub struct Parser {
 // ifStmt          → "if" "(" expression ")" statement ( "else" statement )? ;
 
 // expression      → assigment ;
-// assignment 	   → IDENTIFIER "=" assignment | equality ;
+// assignment 	   → IDENTIFIER "=" assignment | equality | logic_or ;
+// logic_or        → logic_and ( "or" logic_and )* ;
+// logic_and       → equality ( "and" equality )* ;
 // equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 // comparison      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 // term            → factor ( ( "-" | "+" ) factor )* ;
@@ -161,7 +163,7 @@ impl Parser {
             then_branch,
             else_branch,
         };
-        return Ok(Stmt::If( if_stmt))
+        return Ok(Stmt::If( if_stmt ))
     }
 
     // printStmt       → "print" expression ";" ;
@@ -182,17 +184,7 @@ impl Parser {
         Ok(Stmt::Expression(expr))
     }
 
-//     private List<Stmt> block() {
-//     List<Stmt> statements = new ArrayList<>();
-//     while (!check(RIGHTBRACE) && !isAtEnd()) {
-//     statements.add(declaration());
-//     }
-//     consume(RIGHTBRACE, "Expect '}' after block.");
-//     return statements;
-//     }
-
-
-//  block        → "{" declaration* "}" ;
+    //  block        → "{" declaration* "}" ;
     fn block(&mut self) -> Result<Vec<Stmt>, ParseError> {
         let mut statements: Vec<Stmt> = Vec::new();
         while !self.check(&TokenType::RightBRACE) && !self.is_at_end() {

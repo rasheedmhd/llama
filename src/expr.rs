@@ -10,6 +10,7 @@ pub enum Expr {
     Unary(UnaryExpr),
     Variable(VariableExpr),
     Assign(AssignExpr),
+    Logical(LogicalExpr),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -139,6 +140,13 @@ pub struct AssignExpr {
     pub value: BoxedExpr,
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct LogicalExpr {
+    pub left : BoxedExpr,
+    pub operator : Token,
+    pub right : BoxedExpr,
+}
+
 // EXPRESSION AST Nodes' new() IMPLEMENTATIONS
 // Takes the Expression's constituent parts as arguments
 // and creates a new Expression initializing it
@@ -183,6 +191,16 @@ impl AssignExpr {
     }
 }
 
+impl LogicalExpr {
+    pub fn new(left : BoxedExpr, operator : Token, right : BoxedExpr) -> Self {
+        Self {
+            left,
+            operator,
+            right,
+        }
+    }
+}
+
 pub trait Visitor<T> {
     fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> T;
     fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> T;
@@ -190,6 +208,7 @@ pub trait Visitor<T> {
     fn visit_binary_expr(&mut self, expr: &BinaryExpr) -> T;
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> T;
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> T;
+    fn visit_logical_expr(&mut self, expr: &LogicalExpr) -> T;
 }
 
 impl Expr {
@@ -201,6 +220,7 @@ impl Expr {
             Expr::Binary(expr) => visitor.visit_binary_expr(expr),
             Expr::Variable(expr) => visitor.visit_variable_expr(expr),
             Expr::Assign(expr) => visitor.visit_assign_expr(expr),
+            Expr::Logical(expr) => visitor.visit_logical_expr(expr),
         }
     }
 }

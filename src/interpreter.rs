@@ -1,8 +1,6 @@
 use crate::environment::Environment;
 use crate::expr;
-use crate::expr::{
-    AssignExpr, BinaryExpr, Expr, GroupingExpr, Literal, LiteralExpr, UnaryExpr, VariableExpr,
-};
+use crate::expr::{AssignExpr, BinaryExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr};
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
@@ -139,6 +137,10 @@ impl expr::Visitor<LiteralResult> for Interpreter {
         let value = self.evaluate(&expr.value)?;
         self.environment.assign(&expr.name, value.clone())?;
         Ok(value)
+    }
+
+    fn visit_logical_expr(&mut self, expr: &LogicalExpr) -> LiteralResult {
+        todo!()
     }
 }
 
