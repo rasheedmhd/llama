@@ -41,8 +41,15 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_if_stmt(&mut self, stmt: &IfStmt) -> StmtResult {
-        todo!()
+        let cond = self.evaluate(&stmt.condition)?;
+        if cond.is_truthy() {
+            self.execute(stmt.then_branch.as_ref().clone())?.clone();
+        } else if let Some(else_branch) = &stmt.else_branch {
+            self.execute(*else_branch.clone())?;
+        }
+        Ok(())
     }
+
 }
 
 impl expr::Visitor<LiteralResult> for Interpreter {
