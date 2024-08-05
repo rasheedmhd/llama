@@ -43,10 +43,11 @@ pub struct Parser {
 // declaration 	   → varDecl | statement ;
 // varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
 
-// statement 	   → exprStmt | printStmt | block ;
+// statement 	   → exprStmt | ifSmt | printStmt | block ;
 // exprStmt        → expression ";" ;
 // printStmt       → "print" expression ";" ;
 // block           → "{" declaration* "}"
+// ifStmt          → "if" "(" expression ")" statement ( "else" statement )? ;
 
 // expression      → assigment ;
 // assignment 	   → IDENTIFIER "=" assignment | equality ;
