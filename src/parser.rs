@@ -4,7 +4,7 @@ use crate::expr::{
     AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr,
 };
 use crate::repl::Llama;
-use crate::stmt::{BlockStmt, ExpressionStmt, PrintStmt, Stmt, VarStmt};
+use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt};
 use crate::token::Token;
 use crate::token_type::TokenType;
 use std::fmt;
@@ -135,13 +135,33 @@ impl Parser {
 
     // statement    → exprStmt | printStmt | block ;
     fn statement(&mut self) -> StmtResult {
-        if self.match_token(&[TokenType::PRINT]) {
+        if self.match_token(&[TokenType::IF]) {
+            return self.if_statement();
+        } else if self.match_token(&[TokenType::PRINT]) {
             return Ok(self.print_statement()?);
         } else if  self.match_token(&[TokenType::LeftBRACE]) {
             let block_stmts = self.block()?;
             return Ok(Stmt::Block( BlockStmt { statements: block_stmts }));
         };
         return Ok(self.expression_statement()?);
+    }
+
+    // ifStmt  → "if" "(" expression ")" statement ( "else" statement )? ;
+    fn if_statement(&mut self) -> StmtResult {
+        self.consume(&TokenType::LeftPAREN, "Expect '(' after 'if'")?;
+        let condition  = self.expression()?;
+        self.consume(&TokenType::RightPAREN, "Expect ')' after if condition")?;
+        let then_branch = Box::new(self.statement()?);
+        let mut else_branch = None;
+        if self.match_token(&[TokenType::ELSE]) {
+            else_branch = Some(Box::new(self.statement()?))
+        }
+        let if_stmt = IfStmt {
+            condition,
+            then_branch,
+            else_branch,
+        };
+        return Ok(Stmt::If( if_stmt))
     }
 
     // printStmt       → "print" expression ";" ;
