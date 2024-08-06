@@ -140,7 +140,13 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_logical_expr(&mut self, expr: &LogicalExpr) -> LiteralResult {
-        todo!()
+        let left = self.evaluate(&expr.left)?;
+        if expr.operator.token_type == TokenType::OR {
+            if left.is_truthy() { return Ok(left); }
+        } else {
+            if !left.is_truthy() { return Ok(left); }
+        }
+        self.evaluate(&expr.right)
     }
 }
 

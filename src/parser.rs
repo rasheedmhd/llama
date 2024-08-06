@@ -1,5 +1,5 @@
 
-use crate::expr::Literal;
+use crate::expr::{Literal, LogicalExpr};
 use crate::expr::{
     AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr,
 };
@@ -50,7 +50,7 @@ pub struct Parser {
 // ifStmt          → "if" "(" expression ")" statement ( "else" statement )? ;
 
 // expression      → assigment ;
-// assignment 	   → IDENTIFIER "=" assignment | equality | logic_or ;
+// assignment 	   → IDENTIFIER "=" assignment | logic_or ;
 // logic_or        → logic_and ( "or" logic_and )* ;
 // logic_and       → equality ( "and" equality )* ;
 // equality        → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -135,7 +135,7 @@ impl Parser {
         Ok(Stmt::Var(var_statement))
     }
 
-    // statement    → exprStmt | printStmt | block ;
+    // statement → exprStmt | IfStmt printStmt | block ;
     fn statement(&mut self) -> StmtResult {
         if self.match_token(&[TokenType::IF]) {
             return self.if_statement();
@@ -148,7 +148,15 @@ impl Parser {
         return Ok(self.expression_statement()?);
     }
 
-    // ifStmt  → "if" "(" expression ")" statement ( "else" statement )? ;
+    // expression → assigment ;
+    fn expression_statement(&mut self) -> StmtResult {
+        let expr = self.expression()?;
+        self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
+        let expr = ExpressionStmt { expression: expr };
+        Ok(Stmt::Expression(expr))
+    }
+
+    // ifStmt → "if" "(" expression ")" statement ( "else" statement )? ;
     fn if_statement(&mut self) -> StmtResult {
         self.consume(&TokenType::LeftPAREN, "Expect '(' after 'if'")?;
         let condition  = self.expression()?;
@@ -166,7 +174,7 @@ impl Parser {
         return Ok(Stmt::If( if_stmt ))
     }
 
-    // printStmt       → "print" expression ";" ;
+    // printStmt → "print" expression ";" ;
     fn print_statement(&mut self) -> StmtResult {
         let value = self.expression()?;
         self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
@@ -176,15 +184,7 @@ impl Parser {
         Ok(Stmt::Print(value))
     }
 
-    // expression      → assigment ;
-    fn expression_statement(&mut self) -> StmtResult {
-        let expr = self.expression()?;
-        self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
-        let expr = ExpressionStmt { expression: expr };
-        Ok(Stmt::Expression(expr))
-    }
-
-    //  block        → "{" declaration* "}" ;
+    //  block → "{" declaration* "}" ;
     fn block(&mut self) -> Result<Vec<Stmt>, ParseError> {
         let mut statements: Vec<Stmt> = Vec::new();
         while !self.check(&TokenType::RightBRACE) && !self.is_at_end() {
@@ -196,9 +196,9 @@ impl Parser {
         )?;
         Ok(statements)
     }
-    // assignment   → IDENTIFIER "=" assignment | equality ;
+    // assignment → IDENTIFIER "=" assignment | logic_or ;
     fn assignment(&mut self) -> ExprResult {
-        let expr = self.equality()?;
+        let expr = self.or()?;
 
         if self.match_token(&[TokenType::EQUAL]) {
             let equals = self.previous();
@@ -219,7 +219,41 @@ impl Parser {
         Ok(expr)
     }
 
-    // expression      → equality
+    // logic_or → logic_and ( "or" logic_and )* ;
+    fn or(&mut self) -> ExprResult {
+        let mut expr = self.and()?;
+
+        while self.match_token(&[TokenType::OR]) {
+            let operator = self.previous();
+            let right: BoxedExpr = self.and()?;
+
+            expr = Box::new(Expr::Logical(LogicalExpr {
+                left: expr,
+                operator,
+                right,
+            }));
+        }
+        Ok(expr)
+    }
+
+    // logic_and → equality ( "and" equality )* ;
+    fn and(&mut self) -> ExprResult {
+        let mut expr = self.equality()?;
+
+        while self.match_token(&[TokenType::AND]) {
+            let operator = self.previous();
+            let right: BoxedExpr = self.equality()?;
+
+            expr = Box::new(Expr::Logical(LogicalExpr {
+                left: expr,
+                operator,
+                right,
+            }));
+        }
+        Ok(expr)
+    }
+
+    // expression → assignment
     fn expression(&mut self) -> ExprResult {
         self.assignment()
     }
