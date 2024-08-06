@@ -4,7 +4,7 @@ use crate::expr::{
     AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr,
 };
 use crate::repl::Llama;
-use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt};
+use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
 use crate::token::Token;
 use crate::token_type::TokenType;
 use std::fmt;
@@ -43,9 +43,10 @@ pub struct Parser {
 // declaration 	   → varDecl | statement ;
 // varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
 
-// statement 	   → exprStmt | ifSmt | printStmt | block ;
+// statement 	   → exprStmt | ifSmt | printStmt | whileStmt | block ;
 // exprStmt        → expression ";" ;
 // printStmt       → "print" expression ";" ;
+// whileStmt       → "while" "(" expression ")" statement ;
 // block           → "{" declaration* "}"
 // ifStmt          → "if" "(" expression ")" statement ( "else" statement )? ;
 
@@ -141,6 +142,8 @@ impl Parser {
             return self.if_statement();
         } else if self.match_token(&[TokenType::PRINT]) {
             return Ok(self.print_statement()?);
+        } else if self.match_token(&[TokenType::WHILE]) {
+            return Ok(self.while_statement()?);
         } else if  self.match_token(&[TokenType::LeftBRACE]) {
             let block_stmts = self.block()?;
             return Ok(Stmt::Block( BlockStmt { statements: block_stmts }));
@@ -182,6 +185,14 @@ impl Parser {
         // I believe it helps with readability
         let value = PrintStmt { expression: value };
         Ok(Stmt::Print(value))
+    }
+
+    fn while_statement(&mut self) -> StmtResult {
+        self.consume(&TokenType::LeftPAREN, "Expect '(' after 'while")?;
+        let condition = self.expression()?;
+        self.consume(&TokenType::RightPAREN, "Expect ')' after condition")?;
+        let body = Box::new(self.statement()?);
+        Ok(Stmt::While( WhileStmt { condition, body } ))
     }
 
     //  block → "{" declaration* "}" ;

@@ -4,7 +4,7 @@ use crate::expr::{AssignExpr, BinaryExpr, Expr, GroupingExpr, Literal, LiteralEx
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
-use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt};
+use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
 use crate::token_type::TokenType;
 
 pub struct Interpreter {
@@ -48,6 +48,13 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         Ok(())
     }
 
+    fn visit_while_stmt(&mut self, stmt: &WhileStmt) -> StmtResult {
+        let cond = self.evaluate(&stmt.condition)?;
+        while cond.is_truthy() {
+            self.execute(stmt.body.as_ref().clone())?.clone();
+        }
+        Ok(())
+    }
 }
 
 impl expr::Visitor<LiteralResult> for Interpreter {

@@ -11,6 +11,7 @@ pub enum Stmt {
     Var(VarStmt),
     Block(BlockStmt),
     If(IfStmt),
+    While(WhileStmt),
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ExpressionStmt {
@@ -52,13 +53,6 @@ pub struct BlockStmt {
     pub statements: Vec<Stmt>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct IfStmt {
-    pub condition : BoxedExpr,
-    pub then_branch : BoxedStmt,
-    pub else_branch : Option<BoxedStmt>,
-}
-
 impl BlockStmt {
     pub fn new(statements: Vec<Stmt>) -> Self {
         Self {
@@ -67,6 +61,12 @@ impl BlockStmt {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct IfStmt {
+    pub condition : BoxedExpr,
+    pub then_branch : BoxedStmt,
+    pub else_branch : Option<BoxedStmt>,
+}
 
 impl IfStmt {
     pub fn new(condition : BoxedExpr, then_branch : BoxedStmt, else_branch : Option<BoxedStmt>) -> Self {
@@ -78,12 +78,28 @@ impl IfStmt {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct WhileStmt {
+    pub condition : BoxedExpr,
+    pub body : BoxedStmt,
+}
+
+
+impl WhileStmt {
+    pub fn new(condition : BoxedExpr, body : BoxedStmt) -> Self {
+        Self {
+            condition,
+            body,
+        }
+    }
+}
 pub trait Visitor<T> {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> T;
     fn visit_print_stmt(&mut self, stmt: &PrintStmt) -> T;
     fn visit_var_stmt(&mut self, stmt: &VarStmt) -> T;
     fn visit_block_stmt(&mut self, stmt: &BlockStmt) -> T;
     fn visit_if_stmt(&mut self, stmt: &IfStmt) -> T;
+    fn visit_while_stmt(&mut self, stmt: &WhileStmt) -> T;
 }
 
 impl Stmt {
@@ -94,6 +110,8 @@ impl Stmt {
             Stmt::Var(stmt) => visitor.visit_var_stmt(stmt),
             Stmt::Block(stmt) => visitor.visit_block_stmt(stmt),
             Stmt::If(stmt) => visitor.visit_if_stmt(stmt),
+            Stmt::While(stmt) => visitor.visit_while_stmt(stmt),
+
         }
     }
 }
