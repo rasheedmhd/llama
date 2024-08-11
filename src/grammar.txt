@@ -109,11 +109,16 @@ program         → declaration* EOF ;
 declaration     → varDecl | statement
 varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
 statement       → exprStmt
+                | forStmt
                 | ifStmt
                 | printStmt
                 | whileStmt
                 | block ;
 exprStmt        → expression ";" ;
+forStmt         → "for" "("
+                    ( varDecl | exprStmt | ";" ) expression? ";"  expression?
+                ")"
+                statement ;
 ifStmt          → "if" "(" expression ")" statement
                 ( "else" statement )? ;
 printStmt       → "print" expression ";" ;
@@ -148,3 +153,6 @@ Stmt     → if Expr then Stmt
 
 WithElse → if Expr then WithElse else WithElse
          | Other
+
+
+         for (var b = 1; a < 10000; b = temp + b) { print a; temp = a; a = b; }
