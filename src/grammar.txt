@@ -154,5 +154,7 @@ Stmt     → if Expr then Stmt
 WithElse → if Expr then WithElse else WithElse
          | Other
 
-
-         for (var b = 1; a < 10000; b = temp + b) { print a; temp = a; a = b; }
+var a = 0; var temp = 0;
+for (var b = 1; a < 10000; b = temp + b) { print a; temp = a; a = b; }
+for (a = 0; a < 10; a+1) { print a; }
+for (var i = 0; i < 10; i = i + 1) print i;
