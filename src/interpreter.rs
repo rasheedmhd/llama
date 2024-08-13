@@ -16,7 +16,8 @@ type StmtResult = Result<(), RuntimeError>;
 
 impl stmt::Visitor<StmtResult> for Interpreter {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
-        self.evaluate(&stmt.expression)?;
+        let value = self.evaluate(&stmt.expression)?;
+        println!("{value}");
         Ok(())
     }
 

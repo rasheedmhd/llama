@@ -10,7 +10,6 @@ pub struct Environment {
     pub values: HashMap<String, Literal>,
     pub enclosing: Option<Rc<RefCell<Environment>>>,
 }
-// var a = 5; print a;  { var a = 7; print a; } print a;
 
 type EnvResult = Result<Literal, RuntimeError>;
 
@@ -32,9 +31,8 @@ impl Environment {
             return Ok(self.values.get(&name.lexeme).unwrap().clone());
         };
 
-        if self.enclosing.is_some() {
-            let enclosing = self.enclosing.clone();
-            return Ok(enclosing.unwrap().borrow_mut().get(&name).unwrap());
+        if let Some(enclosing) = &self.enclosing {
+            return Ok(enclosing.borrow_mut().get(&name)?);
         }
 
         return Err(RuntimeError {
@@ -47,9 +45,8 @@ impl Environment {
         if let Some(entry) = self.values.get_mut(&name.lexeme) {
             *entry = value;
             Ok(())
-        } else if self.enclosing.is_some() {
-            let enclosing = self.enclosing.clone();
-            enclosing.unwrap().borrow_mut().assign(&name, value).unwrap();
+        } else if let Some(enclosing) = &self.enclosing {
+            enclosing.borrow_mut().assign(&name, value)?;
             return Ok(())
         } else {
             Err(RuntimeError {

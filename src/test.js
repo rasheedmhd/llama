@@ -1,8 +1,4 @@
 // SCOPING
-print "one";
-print true;
-print 2 + 1;
-
 var a = "global a";
 var b = "global b";
 var c = "global c";
@@ -30,6 +26,7 @@ print c;
 
 var test = 1;
 {
+    print test;
     test = "test + 2 inside {}";
     print test;
 }
@@ -42,6 +39,8 @@ print test;
 //     temp = a;
 //     a = b;
 // }
+
+// var x = 7; print x; { print x; bush = "name"; print bush; } print x;
 
 // for (var i = 1; i <= 5; i + 1) { print i; }
 
