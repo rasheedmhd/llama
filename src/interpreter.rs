@@ -1,7 +1,7 @@
 use crate::environment::Environment;
 use crate::expr;
 use crate::expr::{AssignExpr, BinaryExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr};
-use crate::repl::Llama;
+use crate::repl::{Llama, Repl};
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
 use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
@@ -17,7 +17,9 @@ type StmtResult = Result<(), RuntimeError>;
 impl stmt::Visitor<StmtResult> for Interpreter {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
         let value = self.evaluate(&stmt.expression)?;
-        println!("{value}");
+        // TO DO
+        // Prints assignments if you pass a text file, not what I wanted.
+        // println!("{value}");
         Ok(())
     }
 
@@ -35,6 +37,7 @@ impl stmt::Visitor<StmtResult> for Interpreter {
 
     fn visit_block_stmt(&mut self, stmt: &BlockStmt) -> StmtResult {
         let block_env = self.environment.clone();
+        // let block_env = Repl::block_env();
         self.execute_block(stmt.statements.clone(), block_env)?;
         Ok(())
     }
@@ -163,6 +166,10 @@ impl Interpreter {
         Self {
             environment: Environment::new(),
         }
+    }
+
+    pub fn block_env() -> Environment {
+        Environment::new()
     }
 
     pub fn interpret(&mut self, statements: Vec<Stmt>) -> () {

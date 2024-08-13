@@ -2,6 +2,7 @@ use std::env;
 use std::fs;
 use std::io::{stdin, stdout, Write};
 use std::process;
+use crate::environment::Environment;
 
 use crate::scanner::Scanner;
 use crate::parser::Parser;
@@ -18,7 +19,7 @@ static mut HAD_RUNTIME_ERROR: bool = false;
 
 pub struct Llama {}
 
-struct Repl {
+pub struct Repl {
     interpreter: Interpreter,
     scanner: Scanner,
     parser: Parser,
@@ -31,6 +32,10 @@ impl Repl {
             scanner: Scanner::new(),
             parser: Parser::new(),
         }
+    }
+
+    pub fn block_env() -> Environment {
+        Environment::new()
     }
 
     fn run_prompt(&mut self) {

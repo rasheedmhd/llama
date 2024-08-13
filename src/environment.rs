@@ -5,6 +5,13 @@ use crate::token::Token;
 use std::collections::HashMap;
 use std::rc::Rc;
 
+
+impl Drop for Environment {
+    fn drop(&mut self) {
+        println!("Dropping Environment!");
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Environment {
     pub values: HashMap<String, Literal>,
@@ -18,9 +25,9 @@ impl Environment {
         Self { values: HashMap::new(), enclosing: None }
     }
 
-    pub fn new_enclosing(enclosing: Option<Rc<RefCell<Environment>>>) -> Self {
-        Self { values: HashMap::new(), enclosing }
-    }
+    // pub fn new_enclosing(enclosing: Option<Rc<RefCell<Environment>>>) -> Self {
+    //     Self { values: HashMap::new(), enclosing }
+    // }
 
     pub fn define(&mut self, name: String, value: Literal) {
         self.values.insert(name, value);
@@ -37,7 +44,7 @@ impl Environment {
 
         return Err(RuntimeError {
             token: name.clone(),
-            msg: format!("Oopsie, looks like you forgot to define {} as a variable, (scratches head)", name.lexeme),
+            msg: format!("Oopsie, looks like you forgot to declare {} as a variable", name.lexeme),
         });
     }
 
@@ -51,7 +58,7 @@ impl Environment {
         } else {
             Err(RuntimeError {
                 token: name.clone(),
-                msg: format!("Assign here!, Oopsie, looks like you forgot to define '{}' as a variable, (scratches head)", name.lexeme),
+                msg: format!("I can't assign a value to an undeclared variable, looks like you forgot to define '{}' as a variable", name.lexeme),
             })
         }
     }
