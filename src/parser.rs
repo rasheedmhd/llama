@@ -421,20 +421,6 @@ impl Parser {
         self.call()
     }
 
-    // private Expr call() {
-    // Expr expr = primary();
-    // while (true) {
-    // if (match(LEFT
-    // _
-    // PAREN)) {
-    // expr = finishCall(expr);
-    // } else {
-    // break;
-    // }
-    // }
-    // return expr;
-    // }
-
     fn call(&mut self) -> ExprResult {
         let mut expr = self.primary()?;
 
@@ -452,6 +438,9 @@ impl Parser {
 
         if !self.check(&TokenType::RightPAREN) {
             loop {
+                if arguments.len() > 255 {
+                    self.error(self.peek(), "Can't have more than 255 arguments");
+                }
                 arguments.push(self.expression()?);
                 if !self.match_token(&[TokenType::COMMA]) {
                     break;
