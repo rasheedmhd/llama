@@ -1,5 +1,5 @@
 
-use crate::expr::{Literal, LogicalExpr};
+use crate::expr::{CallExpr, Literal, LogicalExpr};
 use crate::expr::{
     AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr,
 };
@@ -418,7 +418,49 @@ impl Parser {
 
             return Ok(expr);
         };
-        self.primary()
+        self.call()
+    }
+
+    // private Expr call() {
+    // Expr expr = primary();
+    // while (true) {
+    // if (match(LEFT
+    // _
+    // PAREN)) {
+    // expr = finishCall(expr);
+    // } else {
+    // break;
+    // }
+    // }
+    // return expr;
+    // }
+
+    fn call(&mut self) -> ExprResult {
+        let mut expr = self.primary()?;
+
+        loop {
+            if self.match_token(&[TokenType::LeftPAREN]) {
+                expr = self.finish_call(expr)?;
+            } else { break; }
+        }
+
+        Ok(expr)
+    }
+
+    fn finish_call(&mut self, callee: BoxedExpr) -> ExprResult {
+        let mut arguments: Vec<BoxedExpr> = Vec::new();
+
+        if !self.check(&TokenType::RightPAREN) {
+            loop {
+                arguments.push(self.expression()?);
+                if !self.match_token(&[TokenType::COMMA]) {
+                    break;
+                }
+            }
+        }
+
+        let paren = self.consume(&TokenType::RightPAREN, "Expect ')' after arguments")?;
+        Ok(Box::new(Expr::Call( CallExpr { callee, paren, arguments })))
     }
 
     // primary  → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
