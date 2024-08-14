@@ -1,7 +1,9 @@
+use std::cell::RefCell;
 use std::env;
 use std::fs;
 use std::io::{stdin, stdout, Write};
 use std::process;
+use std::rc::Rc;
 use crate::environment::Environment;
 
 use crate::scanner::Scanner;
@@ -32,10 +34,6 @@ impl Repl {
             scanner: Scanner::new(),
             parser: Parser::new(),
         }
-    }
-
-    pub fn block_env() -> Environment {
-        Environment::new()
     }
 
     fn run_prompt(&mut self) {

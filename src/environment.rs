@@ -25,9 +25,9 @@ impl Environment {
         Self { values: HashMap::new(), enclosing: None }
     }
 
-    // pub fn new_enclosing(enclosing: Option<Rc<RefCell<Environment>>>) -> Self {
-    //     Self { values: HashMap::new(), enclosing }
-    // }
+    pub fn new_enclosing(enclosing: Rc<RefCell<Environment>>) -> Self {
+        Self { values: HashMap::new(), enclosing: Some(enclosing) }
+    }
 
     pub fn define(&mut self, name: String, value: Literal) {
         self.values.insert(name, value);

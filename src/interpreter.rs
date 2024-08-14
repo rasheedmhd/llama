@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use crate::environment::Environment;
 use crate::expr;
 use crate::expr::{AssignExpr, BinaryExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr};
@@ -36,8 +38,7 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_block_stmt(&mut self, stmt: &BlockStmt) -> StmtResult {
-        let block_env = self.environment.clone();
-        // let block_env = Repl::block_env();
+        let block_env = Environment::new_enclosing(Rc::new(RefCell::new(self.environment.clone())));
         self.execute_block(stmt.statements.clone(), block_env)?;
         Ok(())
     }
@@ -168,10 +169,6 @@ impl Interpreter {
         }
     }
 
-    pub fn block_env() -> Environment {
-        Environment::new()
-    }
-
     pub fn interpret(&mut self, statements: Vec<Stmt>) -> () {
         for statement in statements {
             if let Err(e) = self.execute(statement) {
@@ -186,11 +183,13 @@ impl Interpreter {
     }
 
     pub fn execute_block(&mut self, statements: Vec<Stmt>, block_env: Environment) -> Result<(), RuntimeError> {
-        let previous_env = std::mem::replace(&mut self.environment, block_env);
+        let previous_env = std::mem::replace(&mut self.environment, block_env.clone());
 
         let result = (|| {
             for statement in statements {
                 self.execute(statement)?;
+                // println!("block_env {:?}", block_env);
+                // println!("previous_env {:?}", previous_env);
             }
             Ok(())
         })();

@@ -1,4 +1,4 @@
-// // SCOPING
+// SCOPING
 var a = "global a";
 var b = "global b";
 var c = "global c";
@@ -18,12 +18,14 @@ var c = "global c";
     print a;
     print b;
     print c;
+    c = "redefined global c";
+    print c;
 }
 
 print a;
 print b;
 print c;
-print dropped;
+// print dropped;
 
 
 
@@ -51,14 +53,20 @@ print dropped;
 // for (var i = 1; i <= 5; i + 1) { print i; }
 
 // Llama while can do for loops, like so
-{
-    var i = 0;
-    while (i < 10)
-    {
-        print i;
-        i = i + 1;
-        print i;
-    }
-}
+// {
+//     var i = 0;
+//     while (i < 10)
+//     {
+//         print i;
+//         i = i + 1;
+//         print i;
+//     }
+// }
 
 // var i = 0; for (; i < 10; i = i + 1) print i;
+
+// {
+// var i = 0; while (i < 10)  { i = i + 1; print i; }
+// // }
+//
+// var age = 44; print age; { age = 88; print age; } print age;
