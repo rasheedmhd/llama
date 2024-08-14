@@ -53,20 +53,18 @@ print c;
 // for (var i = 1; i <= 5; i + 1) { print i; }
 
 // Llama while can do for loops, like so
-// {
-//     var i = 0;
-//     while (i < 10)
-//     {
-//         print i;
-//         i = i + 1;
-//         print i;
-//     }
-// }
+{
+    var i = 0;
+    while (i < 10)
+    {
+        print i;
+        i = i + 1;
+        print i;
+    }
+}
 
 // var i = 0; for (; i < 10; i = i + 1) print i;
 
-// {
-// var i = 0; while (i < 10)  { i = i + 1; print i; }
-// // }
+{ var i = 0; while (i < 10)  { i = i + 1; print i; } }
 //
 // var age = 44; print age; { age = 88; print age; } print age;

@@ -183,7 +183,7 @@ impl Interpreter {
     }
 
     pub fn execute_block(&mut self, statements: Vec<Stmt>, block_env: Environment) -> Result<(), RuntimeError> {
-        let previous_env = std::mem::replace(&mut self.environment, block_env.clone());
+        let previous_env = std::mem::replace(&mut self.environment, block_env);
 
         let result = (|| {
             for statement in statements {

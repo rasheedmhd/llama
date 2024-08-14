@@ -11,6 +11,7 @@ pub enum Expr {
     Variable(VariableExpr),
     Assign(AssignExpr),
     Logical(LogicalExpr),
+    Call(CallExpr),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -201,6 +202,23 @@ impl LogicalExpr {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct CallExpr {
+    pub callee : BoxedExpr,
+    pub paren : Token,
+    pub arguments : Vec<BoxedExpr>,
+}
+
+impl CallExpr {
+    pub fn new(callee : BoxedExpr, paren : Token, arguments : Vec<BoxedExpr>) -> Self {
+        Self {
+            callee,
+            paren,
+            arguments,
+        }
+    }
+}
+
 pub trait Visitor<T> {
     fn visit_literal_expr(&mut self, expr: &LiteralExpr) -> T;
     fn visit_unary_expr(&mut self, expr: &UnaryExpr) -> T;
@@ -209,6 +227,8 @@ pub trait Visitor<T> {
     fn visit_variable_expr(&mut self, expr: &VariableExpr) -> T;
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> T;
     fn visit_logical_expr(&mut self, expr: &LogicalExpr) -> T;
+    fn visit_call_expr(&mut self, expr: &CallExpr) -> T;
+
 }
 
 impl Expr {
@@ -221,6 +241,7 @@ impl Expr {
             Expr::Variable(expr) => visitor.visit_variable_expr(expr),
             Expr::Assign(expr) => visitor.visit_assign_expr(expr),
             Expr::Logical(expr) => visitor.visit_logical_expr(expr),
+            Expr::Call(expr) => visitor.visit_call_expr(expr),
         }
     }
 }
