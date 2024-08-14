@@ -32,6 +32,8 @@ pub enum Literal {
     Number(f64),
     Bool(bool),
     Nil,
+    Function,
+    Callable,
 }
 
 impl Literal {

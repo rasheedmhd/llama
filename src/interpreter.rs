@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use crate::environment::Environment;
 use crate::expr;
-use crate::expr::{AssignExpr, BinaryExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr};
-use crate::repl::{Llama, Repl};
+use crate::expr::{AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr};
+use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
 use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
@@ -15,6 +15,7 @@ pub struct Interpreter {
 
 type LiteralResult = Result<Literal, RuntimeError>;
 type StmtResult = Result<(), RuntimeError>;
+Result<T, E>
 
 impl stmt::Visitor<StmtResult> for Interpreter {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
@@ -159,6 +160,23 @@ impl expr::Visitor<LiteralResult> for Interpreter {
             if !left.is_truthy() { return Ok(left); }
         }
         self.evaluate(&expr.right)
+    }
+
+    fn visit_call_expr(&mut self, expr: &CallExpr) -> LiteralResult {
+        // Object callee = evaluate(expr.callee);
+        // List<Object> arguments = new ArrayList<>();
+        // for (Expr argument : expr.arguments) {
+        //     arguments.add(evaluate(argument));
+        // }
+        // LoxCallable function = (LoxCallable)callee;
+        // return function.call(this, arguments);
+        let callee = self.evaluate(expr.callee());
+        let mut arguments = Vec::new();
+        for argument in expr.arguments {
+            arguments.push(self.evaluate(argument));
+        }
+        let function = callee as Literal::Callable;
+        Ok(function.call(this, arguments))
     }
 }
 
