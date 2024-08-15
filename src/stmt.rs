@@ -15,37 +15,30 @@ pub enum Stmt {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ExpressionStmt {
-    pub expression : BoxedExpr,
+    pub expression: BoxedExpr,
 }
 impl ExpressionStmt {
-    pub fn new(expression : BoxedExpr) -> Self {
-        Self {
-            expression,
-        }
+    pub fn new(expression: BoxedExpr) -> Self {
+        Self { expression }
     }
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PrintStmt {
-    pub expression : BoxedExpr,
+    pub expression: BoxedExpr,
 }
 impl PrintStmt {
-    pub fn new(expression : BoxedExpr) -> Self {
-        Self {
-            expression,
-        }
+    pub fn new(expression: BoxedExpr) -> Self {
+        Self { expression }
     }
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct VarStmt {
-    pub name : Token,
-    pub initializer : BoxedExpr,
+    pub name: Token,
+    pub initializer: BoxedExpr,
 }
 impl VarStmt {
-    pub fn new(name : Token, initializer : BoxedExpr) -> Self {
-        Self {
-            name,
-            initializer,
-        }
+    pub fn new(name: Token, initializer: BoxedExpr) -> Self {
+        Self { name, initializer }
     }
 }
 #[derive(Clone, Debug, PartialEq)]
@@ -55,21 +48,23 @@ pub struct BlockStmt {
 
 impl BlockStmt {
     pub fn new(statements: Vec<Stmt>) -> Self {
-        Self {
-            statements,
-        }
+        Self { statements }
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct IfStmt {
-    pub condition : BoxedExpr,
-    pub then_branch : BoxedStmt,
-    pub else_branch : Option<BoxedStmt>,
+    pub condition: BoxedExpr,
+    pub then_branch: BoxedStmt,
+    pub else_branch: Option<BoxedStmt>,
 }
 
 impl IfStmt {
-    pub fn new(condition : BoxedExpr, then_branch : BoxedStmt, else_branch : Option<BoxedStmt>) -> Self {
+    pub fn new(
+        condition: BoxedExpr,
+        then_branch: BoxedStmt,
+        else_branch: Option<BoxedStmt>,
+    ) -> Self {
         Self {
             condition,
             then_branch,
@@ -80,17 +75,13 @@ impl IfStmt {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct WhileStmt {
-    pub condition : BoxedExpr,
-    pub body : BoxedStmt,
+    pub condition: BoxedExpr,
+    pub body: BoxedStmt,
 }
 
-
 impl WhileStmt {
-    pub fn new(condition : BoxedExpr, body : BoxedStmt) -> Self {
-        Self {
-            condition,
-            body,
-        }
+    pub fn new(condition: BoxedExpr, body: BoxedStmt) -> Self {
+        Self { condition, body }
     }
 }
 pub trait Visitor<T> {
@@ -111,7 +102,6 @@ impl Stmt {
             Stmt::Block(stmt) => visitor.visit_block_stmt(stmt),
             Stmt::If(stmt) => visitor.visit_if_stmt(stmt),
             Stmt::While(stmt) => visitor.visit_while_stmt(stmt),
-
         }
     }
 }

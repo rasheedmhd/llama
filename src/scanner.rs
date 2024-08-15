@@ -1,8 +1,8 @@
+use crate::expr::Literal;
 use crate::token::Token;
 use crate::token_type::TokenType;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-use crate::expr::Literal;
 
 // TO DO
 // Add support to Llamaʼs scanner for C-style /* ... */ block comments.
@@ -199,13 +199,14 @@ impl Scanner {
         if token_type.is_none() {
             token_type = Some(&TokenType::IDENTIFIER);
         }
-        self.add_token_with_literal(token_type.unwrap().clone(), Some(Literal::String(identifier_literal)))
+        self.add_token_with_literal(
+            token_type.unwrap().clone(),
+            Some(Literal::String(identifier_literal)),
+        )
     }
 
     fn is_alpha(&self, char: char) -> bool {
-        return (char >= 'a' && char <= 'z')
-            || (char >= 'A' && char <= 'Z')
-            || char == '_';
+        return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || char == '_';
     }
 
     fn is_alphanumeric(&self, char: char) -> bool {
@@ -296,7 +297,9 @@ impl Scanner {
                 self.advance();
             }
         }
-        let num = self.source[self.start..self.current].parse::<f64>().unwrap();
+        let num = self.source[self.start..self.current]
+            .parse::<f64>()
+            .unwrap();
         self.add_token_with_literal(TokenType::NUMBER, Some(Literal::Number(num)))
     }
 

@@ -12,12 +12,16 @@ fn main() -> io::Result<()> {
 
     let output_dir = &args[1];
 
-    define_ast(output_dir, "Expr", vec![
-        "Binary   . left : Box<Expr>, operator : Token, right : Box<Expr>",
-        "Grouping . expression : Box<Expr>",
-        "Literal  . value : String",
-        "Unary    . operator : Token, right : Box<Expr>",
-    ])
+    define_ast(
+        output_dir,
+        "Expr",
+        vec![
+            "Binary   . left : Box<Expr>, operator : Token, right : Box<Expr>",
+            "Grouping . expression : Box<Expr>",
+            "Literal  . value : String",
+            "Unary    . operator : Token, right : Box<Expr>",
+        ],
+    )
 }
 
 fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) -> io::Result<()> {
@@ -54,7 +58,12 @@ fn define_ast(output_dir: &str, base_name: &str, types: Vec<&str>) -> io::Result
     Ok(())
 }
 
-fn define_type<W: Write>(writer: &mut W, base_name: &str, struct_name: &str, field_list: &str) -> io::Result<()> {
+fn define_type<W: Write>(
+    writer: &mut W,
+    base_name: &str,
+    struct_name: &str,
+    field_list: &str,
+) -> io::Result<()> {
     writeln!(writer)?;
     writeln!(writer, "    pub struct {}{} {{", struct_name, base_name)?;
 
@@ -86,20 +95,38 @@ fn define_visitor<W: Write>(writer: &mut W, base_name: &str, types: &[&str]) -> 
 
     for type_def in types {
         let type_name = type_def.split('.').next().unwrap().trim();
-        writeln!(writer, "        fn visit_{}_{}(&mut self, {}: &{}{}) -> T;",
-                 type_name.to_lowercase(), base_name.to_lowercase(),
-                 base_name.to_lowercase(), type_name, base_name)?;
+        writeln!(
+            writer,
+            "        fn visit_{}_{}(&mut self, {}: &{}{}) -> T;",
+            type_name.to_lowercase(),
+            base_name.to_lowercase(),
+            base_name.to_lowercase(),
+            type_name,
+            base_name
+        )?;
     }
 
     writeln!(writer, "    }}")?;
     writeln!(writer)?;
 
     writeln!(writer, "    impl {} {{", base_name)?;
-    writeln!(writer, "        pub fn accept<T>(&self, visitor: &mut dyn Visitor<T>) -> T {{")?;
+    writeln!(
+        writer,
+        "        pub fn accept<T>(&self, visitor: &mut dyn Visitor<T>) -> T {{"
+    )?;
     writeln!(writer, "            match self {{")?;
     for type_def in types {
         let struct_name = type_def.split('.').next().unwrap().trim();
-        writeln!(writer, "                {}::{}({}) => visitor.visit_{}_{}({}),", base_name, struct_name, base_name.to_lowercase(), struct_name.to_lowercase(), base_name.to_lowercase(), base_name.to_lowercase())?;
+        writeln!(
+            writer,
+            "                {}::{}({}) => visitor.visit_{}_{}({}),",
+            base_name,
+            struct_name,
+            base_name.to_lowercase(),
+            struct_name.to_lowercase(),
+            base_name.to_lowercase(),
+            base_name.to_lowercase()
+        )?;
     }
     writeln!(writer, "            }}")?;
     writeln!(writer, "        }}")?;

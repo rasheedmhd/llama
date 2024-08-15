@@ -16,14 +16,14 @@ pub enum TokenType {
     STAR,       // *
 
     // One or two character tokens.
-    BANG,        // !
-    BangEQUAL,   // !=
-    EQUAL,       // =
-    EqualEQUAL,  // ==
-    GREATER,     // >
-    GreaterEQUAL,// >=
-    LESS,        // <
-    LessEQUAL,   // <=
+    BANG,         // !
+    BangEQUAL,    // !=
+    EQUAL,        // =
+    EqualEQUAL,   // ==
+    GREATER,      // >
+    GreaterEQUAL, // >=
+    LESS,         // <
+    LessEQUAL,    // <=
 
     // Literals.
     // IDENTIFIER "" 1
@@ -32,24 +32,24 @@ pub enum TokenType {
     NUMBER,
 
     // Keywords.
-    AND,         // and
-    CLASS,       // class
-    ELSE,        // else
-    FALSE,       // false
-    FUN,         // fun
-    FOR,         // for
-    IF,          // if
-    NIL,         // nil
-    OR,          // or
-    PRINT,       // print
-    RETURN,      // return
-    SUPER,       // super
-    THIS,        // this
-    TRUE,        // true
-    VAR,         // var
-    WHILE,       // while
+    AND,    // and
+    CLASS,  // class
+    ELSE,   // else
+    FALSE,  // false
+    FUN,    // fun
+    FOR,    // for
+    IF,     // if
+    NIL,    // nil
+    OR,     // or
+    PRINT,  // print
+    RETURN, // return
+    SUPER,  // super
+    THIS,   // this
+    TRUE,   // true
+    VAR,    // var
+    WHILE,  // while
 
-    EOF
+    EOF,
 }
 
 impl fmt::Display for TokenType {

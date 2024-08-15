@@ -1,8 +1,7 @@
-
-use crate::expr::{CallExpr, Literal, LogicalExpr};
 use crate::expr::{
     AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr,
 };
+use crate::expr::{CallExpr, Literal, LogicalExpr};
 use crate::repl::Llama;
 use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
 use crate::token::Token;
@@ -66,7 +65,10 @@ pub struct Parser {
 
 impl Parser {
     pub fn new() -> Self {
-        Parser { current: 0, tokens: Vec::new() }
+        Parser {
+            current: 0,
+            tokens: Vec::new(),
+        }
     }
 
     pub fn from(tokens: Vec<Token>) -> Self {
@@ -149,9 +151,11 @@ impl Parser {
             return Ok(self.print_statement()?);
         } else if self.match_token(&[TokenType::WHILE]) {
             return Ok(self.while_statement()?);
-        } else if  self.match_token(&[TokenType::LeftBRACE]) {
+        } else if self.match_token(&[TokenType::LeftBRACE]) {
             let block_stmts = self.block()?;
-            return Ok(Stmt::Block( BlockStmt { statements: block_stmts }));
+            return Ok(Stmt::Block(BlockStmt {
+                statements: block_stmts,
+            }));
         };
         return Ok(self.expression_statement()?);
     }
@@ -187,7 +191,7 @@ impl Parser {
 
         let mut increment = None;
         if !self.check(&TokenType::RightPAREN) {
-            increment =  Some(self.expression()?);
+            increment = Some(self.expression()?);
         };
 
         self.consume(&TokenType::RightPAREN, "Expect ')' after for clauses")?;
@@ -196,7 +200,12 @@ impl Parser {
 
         if increment != None {
             body = Stmt::Block(BlockStmt {
-                statements: vec![body, Stmt::Expression(ExpressionStmt { expression: increment.unwrap() })],
+                statements: vec![
+                    body,
+                    Stmt::Expression(ExpressionStmt {
+                        expression: increment.unwrap(),
+                    }),
+                ],
             });
         }
 
@@ -216,14 +225,12 @@ impl Parser {
             condition: condition.unwrap(),
             body: Box::new(body),
         }))
-
     }
-
 
     // ifStmt → "if" "(" expression ")" statement ( "else" statement )? ;
     fn if_statement(&mut self) -> StmtResult {
         self.consume(&TokenType::LeftPAREN, "Expect '(' after 'if'")?;
-        let condition  = self.expression()?;
+        let condition = self.expression()?;
         self.consume(&TokenType::RightPAREN, "Expect ')' after if condition")?;
         let then_branch = Box::new(self.statement()?);
         let mut else_branch = None;
@@ -235,7 +242,7 @@ impl Parser {
             then_branch,
             else_branch,
         };
-        return Ok(Stmt::If( if_stmt ))
+        return Ok(Stmt::If(if_stmt));
     }
 
     // printStmt → "print" expression ";" ;
@@ -251,7 +258,7 @@ impl Parser {
         let condition = self.expression()?;
         self.consume(&TokenType::RightPAREN, "Expect ')' after condition")?;
         let body = Box::new(self.statement()?);
-        Ok(Stmt::While( WhileStmt { condition, body } ))
+        Ok(Stmt::While(WhileStmt { condition, body }))
     }
 
     //  block → "{" declaration* "}" ;
@@ -427,7 +434,9 @@ impl Parser {
         loop {
             if self.match_token(&[TokenType::LeftPAREN]) {
                 expr = self.finish_call(expr)?;
-            } else { break; }
+            } else {
+                break;
+            }
         }
 
         Ok(expr)
@@ -449,7 +458,11 @@ impl Parser {
         }
 
         let paren = self.consume(&TokenType::RightPAREN, "Expect ')' after arguments")?;
-        Ok(Box::new(Expr::Call( CallExpr { callee, paren, arguments })))
+        Ok(Box::new(Expr::Call(CallExpr {
+            callee,
+            paren,
+            arguments,
+        })))
     }
 
     // primary  → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;

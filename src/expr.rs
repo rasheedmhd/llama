@@ -145,9 +145,9 @@ pub struct AssignExpr {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct LogicalExpr {
-    pub left : BoxedExpr,
-    pub operator : Token,
-    pub right : BoxedExpr,
+    pub left: BoxedExpr,
+    pub operator: Token,
+    pub right: BoxedExpr,
 }
 
 // EXPRESSION AST Nodes' new() IMPLEMENTATIONS
@@ -195,7 +195,7 @@ impl AssignExpr {
 }
 
 impl LogicalExpr {
-    pub fn new(left : BoxedExpr, operator : Token, right : BoxedExpr) -> Self {
+    pub fn new(left: BoxedExpr, operator: Token, right: BoxedExpr) -> Self {
         Self {
             left,
             operator,
@@ -206,13 +206,13 @@ impl LogicalExpr {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct CallExpr {
-    pub callee : BoxedExpr,
-    pub paren : Token,
-    pub arguments : Vec<BoxedExpr>,
+    pub callee: BoxedExpr,
+    pub paren: Token,
+    pub arguments: Vec<BoxedExpr>,
 }
 
 impl CallExpr {
-    pub fn new(callee : BoxedExpr, paren : Token, arguments : Vec<BoxedExpr>) -> Self {
+    pub fn new(callee: BoxedExpr, paren: Token, arguments: Vec<BoxedExpr>) -> Self {
         Self {
             callee,
             paren,
@@ -230,7 +230,6 @@ pub trait Visitor<T> {
     fn visit_assign_expr(&mut self, expr: &AssignExpr) -> T;
     fn visit_logical_expr(&mut self, expr: &LogicalExpr) -> T;
     fn visit_call_expr(&mut self, expr: &CallExpr) -> T;
-
 }
 
 impl Expr {

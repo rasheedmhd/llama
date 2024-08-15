@@ -1,15 +1,15 @@
+use crate::environment::Environment;
 use std::cell::RefCell;
 use std::env;
 use std::fs;
 use std::io::{stdin, stdout, Write};
 use std::process;
 use std::rc::Rc;
-use crate::environment::Environment;
 
-use crate::scanner::Scanner;
-use crate::parser::Parser;
 use crate::interpreter::Interpreter;
+use crate::parser::Parser;
 use crate::runtime_error::RuntimeError;
+use crate::scanner::Scanner;
 use crate::token::Token;
 use crate::token_type::TokenType;
 

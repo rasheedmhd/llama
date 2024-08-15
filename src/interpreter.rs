@@ -1,13 +1,16 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 use crate::environment::Environment;
 use crate::expr;
-use crate::expr::{AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr};
+use crate::expr::{
+    AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr,
+    UnaryExpr, VariableExpr,
+};
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
 use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
 use crate::token_type::TokenType;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 pub struct Interpreter {
     environment: Environment,
@@ -15,7 +18,6 @@ pub struct Interpreter {
 
 type LiteralResult = Result<Literal, RuntimeError>;
 type StmtResult = Result<(), RuntimeError>;
-Result<T, E>
 
 impl stmt::Visitor<StmtResult> for Interpreter {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
@@ -155,9 +157,13 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     fn visit_logical_expr(&mut self, expr: &LogicalExpr) -> LiteralResult {
         let left = self.evaluate(&expr.left)?;
         if expr.operator.token_type == TokenType::OR {
-            if left.is_truthy() { return Ok(left); }
+            if left.is_truthy() {
+                return Ok(left);
+            }
         } else {
-            if !left.is_truthy() { return Ok(left); }
+            if !left.is_truthy() {
+                return Ok(left);
+            }
         }
         self.evaluate(&expr.right)
     }
@@ -175,8 +181,9 @@ impl expr::Visitor<LiteralResult> for Interpreter {
         for argument in expr.arguments {
             arguments.push(self.evaluate(argument));
         }
-        let function = callee as Literal::Callable;
-        Ok(function.call(this, arguments))
+        let function = callee.downcast_ref::<Callable>().unwrap();
+        Ok(function.call(self, arguments))
+
     }
 }
 
@@ -200,7 +207,11 @@ impl Interpreter {
         stmt.accept(self)
     }
 
-    pub fn execute_block(&mut self, statements: Vec<Stmt>, block_env: Environment) -> Result<(), RuntimeError> {
+    pub fn execute_block(
+        &mut self,
+        statements: Vec<Stmt>,
+        block_env: Environment,
+    ) -> Result<(), RuntimeError> {
         let previous_env = std::mem::replace(&mut self.environment, block_env);
 
         let result = (|| {

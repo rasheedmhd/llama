@@ -1,10 +1,9 @@
-use std::cell::RefCell;
 use crate::expr::Literal;
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-
 
 impl Drop for Environment {
     fn drop(&mut self) {
@@ -22,11 +21,17 @@ type EnvResult = Result<Literal, RuntimeError>;
 
 impl Environment {
     pub fn new() -> Self {
-        Self { values: HashMap::new(), enclosing: None }
+        Self {
+            values: HashMap::new(),
+            enclosing: None,
+        }
     }
 
     pub fn new_enclosing(enclosing: Rc<RefCell<Environment>>) -> Self {
-        Self { values: HashMap::new(), enclosing: Some(enclosing) }
+        Self {
+            values: HashMap::new(),
+            enclosing: Some(enclosing),
+        }
     }
 
     pub fn define(&mut self, name: String, value: Literal) {
@@ -44,7 +49,10 @@ impl Environment {
 
         return Err(RuntimeError {
             token: name.clone(),
-            msg: format!("Oopsie, looks like you forgot to declare {} as a variable", name.lexeme),
+            msg: format!(
+                "Oopsie, looks like you forgot to declare {} as a variable",
+                name.lexeme
+            ),
         });
     }
 
@@ -54,7 +62,7 @@ impl Environment {
             Ok(())
         } else if let Some(enclosing) = &self.enclosing {
             enclosing.borrow_mut().assign(&name, value)?;
-            return Ok(())
+            return Ok(());
         } else {
             Err(RuntimeError {
                 token: name.clone(),
