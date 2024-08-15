@@ -12,6 +12,11 @@ use crate::token_type::TokenType;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+
+trait LoxCallable {
+    fn call(&self, interpreter: &Interpreter, arguments: &[Literal]) -> Literal;
+}
+
 pub struct Interpreter {
     environment: Environment,
 }
