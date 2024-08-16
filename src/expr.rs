@@ -36,14 +36,20 @@ pub enum Literal {
     Number(f64),
     Bool(bool),
     Nil,
-    Function(Callable),
+    Function(ToCall),
+}
+
+pub(crate) trait Callable {
+    fn call(&self, interpreter: &Interpreter, arguments: Vec<Literal>) -> LiteralResult;
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Callable;
+pub struct ToCall {
+    pub arity : usize,
+}
 
-impl Callable {
-    pub fn call(&self, _interpreter: &Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
+impl Callable for ToCall {
+    fn call(&self, _interpreter: &Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
         todo!()
     }
 }

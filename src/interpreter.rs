@@ -1,8 +1,9 @@
 use crate::environment::Environment;
 use crate::expr;
+use crate::expr::Literal::Function;
 use crate::expr::{
     AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr,
-    UnaryExpr, VariableExpr,
+    UnaryExpr, VariableExpr, Callable,
 };
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
@@ -11,12 +12,6 @@ use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, W
 use crate::token_type::TokenType;
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::expr::Literal::Function;
-
-
-trait _LoxCallable {
-    fn call(&self, interpreter: &Interpreter, arguments: &[Literal]) -> Literal;
-}
 
 pub struct Interpreter {
     environment: Environment,
@@ -175,24 +170,35 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_call_expr(&mut self, expr: &CallExpr) -> LiteralResult {
-
         let callee = self.evaluate(&expr.callee)?;
 
-        let arguments: Result<Vec<Literal>, RuntimeError> = expr.arguments
+        let arguments: Result<Vec<Literal>, RuntimeError> = expr
+            .arguments
             .iter()
             .map(|arg| self.evaluate(arg))
             .collect();
 
         let arguments = arguments?;
 
-        match callee {
-            Function(function) => Ok(function.call(self, arguments)?),
-            _  => Err(RuntimeError::new(
-                        expr.paren.clone(),
-                        "You can only call functions and classes".to_string(),
+        if let Function(function) = callee {
+            if arguments.len() != function.arity {
+                return Err(RuntimeError::new(
+                    expr.paren.clone(),
+                    format!(
+                        "I was expecting {} arguments to be passed to the function but I got {}",
+                        function.arity,
+                        arguments.len()
+                    ),
+                ));
+            }
+
+            function.call(self, arguments)
+        } else  {
+            Err(RuntimeError::new(
+                expr.paren.clone(),
+                "Only functions and classes are callable.".to_string(),
             ))
         }
-
     }
 }
 
