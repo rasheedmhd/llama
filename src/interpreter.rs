@@ -29,7 +29,7 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
         self.evaluate(&stmt.expression)?;
         // TO DO
-        // Prints assignments if you pass a text file, not what I wanted.
+        // It prints assignments if you pass a text file, not what I wanted.
         // println!("{value}");
         Ok(())
     }
@@ -177,19 +177,20 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     fn visit_call_expr(&mut self, expr: &CallExpr) -> LiteralResult {
 
         let callee = self.evaluate(&expr.callee)?;
-        let mut arguments = Vec::new();
 
-        for argument in expr.arguments.clone() {
-            arguments.push(self.evaluate(&argument)?);
-        }
+        let arguments: Result<Vec<Literal>, RuntimeError> = expr.arguments
+            .iter()
+            .map(|arg| self.evaluate(arg))
+            .collect();
 
-        if let Function(function) = callee  {
-            return Ok(function.call(self, arguments)?);
-        } else {
-            Err(RuntimeError {
-                token: expr.paren.clone(),
-                msg: "You can only call functions and classes".to_string(),
-            })
+        let arguments = arguments?;
+
+        match callee {
+            Function(function) => Ok(function.call(self, arguments)?),
+            _  => Err(RuntimeError::new(
+                        expr.paren.clone(),
+                        "You can only call functions and classes".to_string(),
+            ))
         }
 
     }
