@@ -1,10 +1,7 @@
-use crate::environment::Environment;
-use std::cell::RefCell;
 use std::env;
 use std::fs;
 use std::io::{stdin, stdout, Write};
 use std::process;
-use std::rc::Rc;
 
 use crate::interpreter::Interpreter;
 use crate::parser::Parser;
@@ -23,16 +20,17 @@ pub struct Llama {}
 
 pub struct Repl {
     interpreter: Interpreter,
-    scanner: Scanner,
-    parser: Parser,
+    // TO DO
+    // scanner: Scanner,
+    // parser: Parser,
 }
 
 impl Repl {
     fn new() -> Self {
         Self {
             interpreter: Interpreter::new(),
-            scanner: Scanner::new(),
-            parser: Parser::new(),
+            // scanner: Scanner::new(),
+            // parser: Parser::new(),
         }
     }
 

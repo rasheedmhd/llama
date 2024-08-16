@@ -14,7 +14,7 @@ use std::rc::Rc;
 use crate::expr::Literal::Function;
 
 
-trait LoxCallable {
+trait _LoxCallable {
     fn call(&self, interpreter: &Interpreter, arguments: &[Literal]) -> Literal;
 }
 
@@ -27,7 +27,7 @@ type StmtResult = Result<(), RuntimeError>;
 
 impl stmt::Visitor<StmtResult> for Interpreter {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
-        let value = self.evaluate(&stmt.expression)?;
+        self.evaluate(&stmt.expression)?;
         // TO DO
         // Prints assignments if you pass a text file, not what I wanted.
         // println!("{value}");
@@ -55,7 +55,7 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     fn visit_if_stmt(&mut self, stmt: &IfStmt) -> StmtResult {
         let cond = self.evaluate(&stmt.condition)?;
         if cond.is_truthy() {
-            self.execute(stmt.then_branch.as_ref().clone())?.clone();
+            self.execute(stmt.then_branch.as_ref().clone())?;
         } else if let Some(else_branch) = &stmt.else_branch {
             self.execute(*else_branch.clone())?;
         }

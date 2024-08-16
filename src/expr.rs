@@ -1,4 +1,3 @@
-use std::fmt::Arguments;
 use crate::interpreter::Interpreter;
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
@@ -44,7 +43,7 @@ pub enum Literal {
 pub struct Callable;
 
 impl Callable {
-    pub fn call(&self, interpreter: &Interpreter, arguments: Vec<Literal>) -> LiteralResult {
+    pub fn call(&self, _interpreter: &Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
         todo!()
     }
 }

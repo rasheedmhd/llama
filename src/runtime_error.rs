@@ -6,7 +6,7 @@ pub struct RuntimeError {
 }
 
 impl RuntimeError {
-    fn new(token: Token, msg: String) -> Self {
+    fn _new(token: Token, msg: String) -> Self {
         Self { token, msg }
     }
 }
