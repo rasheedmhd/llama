@@ -1,6 +1,11 @@
+use std::fmt::Arguments;
+use crate::interpreter::Interpreter;
+use crate::runtime_error::RuntimeError;
 use crate::token::Token;
 
 type BoxedExpr = Box<Expr>;
+type LiteralResult = Result<Literal, RuntimeError>;
+
 // EXPRESSIONS
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
@@ -32,8 +37,16 @@ pub enum Literal {
     Number(f64),
     Bool(bool),
     Nil,
-    Function,
-    Callable,
+    Function(Callable),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Callable;
+
+impl Callable {
+    pub fn call(&self, interpreter: &Interpreter, arguments: Vec<Literal>) -> LiteralResult {
+        todo!()
+    }
 }
 
 impl Literal {
@@ -115,6 +128,9 @@ impl std::fmt::Display for Literal {
             }
             Literal::Nil => {
                 write!(f, "nil")
+            }
+            Literal::Function(_) => {
+                write!(f, "<Function>")
             }
         };
         literal

@@ -11,6 +11,7 @@ use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, W
 use crate::token_type::TokenType;
 use std::cell::RefCell;
 use std::rc::Rc;
+use crate::expr::Literal::Function;
 
 
 trait LoxCallable {
@@ -174,20 +175,22 @@ impl expr::Visitor<LiteralResult> for Interpreter {
     }
 
     fn visit_call_expr(&mut self, expr: &CallExpr) -> LiteralResult {
-        // Object callee = evaluate(expr.callee);
-        // List<Object> arguments = new ArrayList<>();
-        // for (Expr argument : expr.arguments) {
-        //     arguments.add(evaluate(argument));
-        // }
-        // LoxCallable function = (LoxCallable)callee;
-        // return function.call(this, arguments);
-        let callee = self.evaluate(expr.callee());
+
+        let callee = self.evaluate(&expr.callee)?;
         let mut arguments = Vec::new();
-        for argument in expr.arguments {
-            arguments.push(self.evaluate(argument));
+
+        for argument in expr.arguments.clone() {
+            arguments.push(self.evaluate(&argument)?);
         }
-        let function = callee.downcast_ref::<Callable>().unwrap();
-        Ok(function.call(self, arguments))
+
+        if let Function(function) = callee  {
+            return Ok(function.call(self, arguments)?);
+        } else {
+            Err(RuntimeError {
+                token: expr.paren.clone(),
+                msg: "You can only call functions and classes".to_string(),
+            })
+        }
 
     }
 }
