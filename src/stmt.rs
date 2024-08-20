@@ -12,6 +12,7 @@ pub enum Stmt {
     Block(BlockStmt),
     If(IfStmt),
     While(WhileStmt),
+    Function(FunctionStmt),
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ExpressionStmt {
@@ -84,6 +85,23 @@ impl WhileStmt {
         Self { condition, body }
     }
 }
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct FunctionStmt {
+    pub name : Token,
+    pub params: Vec<Token>,
+    pub body : Vec<Stmt>,
+}
+
+impl FunctionStmt {
+    pub fn new(name : Token, params: Vec<Token>, body : Vec<Stmt>) -> Self {
+        Self {
+            name,
+            params,
+            body,
+        }
+    }
+}
 pub trait Visitor<T> {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> T;
     fn visit_print_stmt(&mut self, stmt: &PrintStmt) -> T;
@@ -91,6 +109,8 @@ pub trait Visitor<T> {
     fn visit_block_stmt(&mut self, stmt: &BlockStmt) -> T;
     fn visit_if_stmt(&mut self, stmt: &IfStmt) -> T;
     fn visit_while_stmt(&mut self, stmt: &WhileStmt) -> T;
+    fn visit_function_stmt(&mut self, expr: &FunctionStmt) -> T;
+
 }
 
 impl Stmt {
@@ -102,6 +122,8 @@ impl Stmt {
             Stmt::Block(stmt) => visitor.visit_block_stmt(stmt),
             Stmt::If(stmt) => visitor.visit_if_stmt(stmt),
             Stmt::While(stmt) => visitor.visit_while_stmt(stmt),
+            Stmt::Function(stmt) => visitor.visit_function_stmt(stmt),
+
         }
     }
 }

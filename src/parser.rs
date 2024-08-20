@@ -3,7 +3,7 @@ use crate::expr::{
 };
 use crate::expr::{CallExpr, Literal, LogicalExpr};
 use crate::repl::Llama;
-use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
+use crate::stmt::{BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
 use crate::token::Token;
 use crate::token_type::TokenType;
 use std::fmt;
@@ -39,7 +39,10 @@ pub struct Parser {
 
 // THIS IS THE GRAMMAR THE PARSER DESCENDS ON
 // program         → declaration* EOF ;
-// declaration 	   → varDecl | statement ;
+// declaration 	   → funDecl | varDecl | statement ;
+// funDecl         → "fun" function ;
+// function        → IDENTIFIER "(" parameters? ")" block ;
+// parameters         → IDENTIFIER ( " , " IDENTIFIER )* ;
 // varDecl         → "var" IDENTIFIER ( "=" expression )? ";" ;
 
 // statement 	   → exprStmt | forStmt | ifSmt | printStmt | whileStmt | block ;
@@ -86,12 +89,14 @@ impl Parser {
         Ok(statements)
     }
 
-    // declaration  → varDecl | statement ;
+    // declaration  → funDecl | varDecl | statement ;
     fn declaration(&mut self) -> StmtResult {
         // If we hit a var token, then we are dealing with a variable expr
         // So we pass control to var_declaration() to parse it
         // Else executing falls through to statement() to parse
-        if self.match_token(&[TokenType::VAR]) {
+        if self.match_token(&[TokenType::FUN]) {
+            return self.function("function");
+        } else if self.match_token(&[TokenType::VAR]) {
             return self.var_declaration();
         }
 
@@ -166,6 +171,30 @@ impl Parser {
         self.consume(&TokenType::SEMICOLON, "Expect ';' after value")?;
         let expr = ExpressionStmt { expression: expr };
         Ok(Stmt::Expression(expr))
+    }
+
+    fn function(&mut self, kind : &str)  -> StmtResult {
+        let name : Token = self.consume(&TokenType::IDENTIFIER, &format!("Expect {} name", kind))?;
+        let mut params : Vec<Token> = Vec::new();
+        if !self.check(&TokenType::RightPAREN) {
+            loop {
+                if params.len() > 255 {
+                    self.error(self.peek(), "Can't have more than 255 arguments");
+                }
+                params.push(self.consume(&TokenType::IDENTIFIER, "I was expecting a parameter name")?);
+                if !self.match_token(&[TokenType::COMMA]) {
+                    break;
+                }
+            }
+        }
+
+        self.consume(&TokenType::LeftBRACE, "I was expecting a '{' after the arguments")?;
+        let body = self.block()?;
+        Ok(Stmt::Function( FunctionStmt {
+            name,
+            params,
+            body,
+        }))
     }
 
     // forStmt → "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;

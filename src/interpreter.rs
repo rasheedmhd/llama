@@ -8,7 +8,7 @@ use crate::expr::{
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
-use crate::stmt::{BlockStmt, ExpressionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
+use crate::stmt::{BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
 use crate::token_type::TokenType;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -63,6 +63,10 @@ impl stmt::Visitor<StmtResult> for Interpreter {
             self.execute(*stmt.body.clone())?
         }
         Ok(())
+    }
+
+    fn visit_function_stmt(&mut self, _expr: &FunctionStmt) -> StmtResult {
+        todo!()
     }
 }
 
