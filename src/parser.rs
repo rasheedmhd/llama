@@ -197,6 +197,7 @@ impl Parser {
         }))
     }
 
+
     // forStmt → "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
     fn for_statement(&mut self) -> StmtResult {
         self.consume(&TokenType::LeftPAREN, "Expect '(' after 'for'")?;

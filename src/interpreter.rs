@@ -14,11 +14,11 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 pub struct Interpreter {
-    environment: Environment,
+    pub(crate) environment: Environment,
 }
 
-type LiteralResult = Result<Literal, RuntimeError>;
-type StmtResult = Result<(), RuntimeError>;
+pub(crate) type LiteralResult = Result<Literal, RuntimeError>;
+pub(crate) type StmtResult = Result<(), RuntimeError>;
 
 impl stmt::Visitor<StmtResult> for Interpreter {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> StmtResult {
@@ -196,7 +196,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
                 ));
             }
 
-            function.call(self, arguments)
+            function.call(&self, arguments)
         } else  {
             Err(RuntimeError::new(
                 expr.paren.clone(),

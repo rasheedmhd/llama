@@ -123,7 +123,6 @@ impl Stmt {
             Stmt::If(stmt) => visitor.visit_if_stmt(stmt),
             Stmt::While(stmt) => visitor.visit_while_stmt(stmt),
             Stmt::Function(stmt) => visitor.visit_function_stmt(stmt),
-
         }
     }
 }

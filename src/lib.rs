@@ -8,3 +8,4 @@ pub mod scanner;
 mod stmt;
 pub mod token;
 pub mod token_type;
+mod function;
