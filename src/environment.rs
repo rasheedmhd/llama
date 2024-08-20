@@ -1,4 +1,4 @@
-use crate::expr::Literal;
+use crate::expr::{Literal, ToCall};
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
 use std::cell::RefCell;
@@ -21,8 +21,11 @@ type EnvResult = Result<Literal, RuntimeError>;
 
 impl Environment {
     pub fn new() -> Self {
+        let mut globals = HashMap::new();
+        let callable = Literal::Function(ToCall::new());
+        globals.insert("clock".to_string(), callable);
         Self {
-            values: HashMap::new(),
+            values: globals,
             enclosing: None,
         }
     }

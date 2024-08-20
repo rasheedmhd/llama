@@ -48,10 +48,35 @@ pub struct ToCall {
     pub arity : usize,
 }
 
+impl ToCall {
+    pub fn new() -> Self {
+        Self {
+            arity: 0
+        }
+    }
+
+    pub fn call(&self, _interpreter: &Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
+        let now = std::time::SystemTime::now();
+        let time = now.duration_since(std::time::UNIX_EPOCH)
+            .expect("Failed to  properly read Time")
+            .as_secs_f64();
+
+        Ok(Literal::Number(time))
+    }
+
+    pub fn arity() -> u8 { 0 }
+
+    pub fn to_string(&self) -> String {
+        "<native function>".to_string()
+    }
+}
+
 impl Callable for ToCall {
     fn call(&self, _interpreter: &Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
         todo!()
     }
+
+
 }
 
 impl Literal {
