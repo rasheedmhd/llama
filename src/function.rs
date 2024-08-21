@@ -9,6 +9,11 @@ pub struct Function {
 }
 
 impl Function {
+    pub(crate) fn new(declaration: FunctionStmt) -> Self {
+        Self {
+            declaration,
+        }
+    }
     fn declaration(declaration: FunctionStmt) -> Self {
         Self { declaration }
     }
@@ -30,4 +35,5 @@ impl Callable for Function {
         interpreter.execute_block(self.declaration.body.clone(), environment)?;
         Ok(Literal::Nil)
     }
+
 }

@@ -1,6 +1,7 @@
 use crate::environment::Environment;
 use crate::expr;
 use crate::expr::Literal::Function;
+use crate::function;
 use crate::expr::{
     AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr,
     UnaryExpr, VariableExpr, Callable,
@@ -65,8 +66,13 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         Ok(())
     }
 
-    fn visit_function_stmt(&mut self, _expr: &FunctionStmt) -> StmtResult {
-        todo!()
+    fn visit_function_stmt(&mut self, stmt: &FunctionStmt) -> StmtResult {
+        let function = function::Function::new(stmt.clone());
+        // if let Function(function) = function {
+        // }
+        let fl = Literal::Function(function);
+        self.environment.define(stmt.name.lexeme.clone(), fl);
+        Ok(())
     }
 }
 
