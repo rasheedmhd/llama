@@ -5,23 +5,31 @@ use crate::stmt::FunctionStmt;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Function {
-    declaration: FunctionStmt
+    pub arity: u8,
+    declaration: Box<Option<FunctionStmt>>
 }
 
 impl Function {
-    pub(crate) fn new(declaration: FunctionStmt) -> Self {
+    pub(crate) fn new() -> Self {
         Self {
+            arity : 0,
+            declaration : Box::new(None),
+        }
+    }
+    pub(crate) fn from(declaration: Box<Option<FunctionStmt>>) -> Self {
+        Self {
+            arity : 0,
             declaration,
         }
     }
-    fn declaration(declaration: FunctionStmt) -> Self {
-        Self { declaration }
+    fn declaration(declaration: Box<Option<FunctionStmt>>) -> Self {
+        Self { arity : 0,  declaration }
     }
 
-    pub fn arity(&self) -> u8 { self.declaration.params.len() as u8 }
+    pub fn arity(&self) -> u8 { self.declaration.clone().unwrap().params.len() as u8 }
 
     pub fn to_string(&self) -> String {
-        format!("<function {}>", self.declaration.name.lexeme)
+        format!("<function {}>", self.declaration.clone().unwrap().name.lexeme)
     }
 
 }
@@ -29,10 +37,10 @@ impl Function {
 impl Callable for Function {
     fn call(&self, interpreter: &mut Interpreter, arguments: Vec<Literal>) -> crate::interpreter::LiteralResult {
         let environment = Environment::new();
-        for (i, param) in self.declaration.params.iter().enumerate() {
+        for (i, param) in self.declaration.clone().unwrap().params.iter().enumerate() {
             interpreter.environment.define(param.lexeme.clone(), arguments[i].clone());
         }
-        interpreter.execute_block(self.declaration.body.clone(), environment)?;
+        interpreter.execute_block(self.declaration.clone().unwrap().body.clone(), environment)?;
         Ok(Literal::Nil)
     }
 

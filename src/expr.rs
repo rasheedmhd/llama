@@ -1,3 +1,4 @@
+use crate::function;
 use crate::interpreter::Interpreter;
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
@@ -36,7 +37,7 @@ pub enum Literal {
     Number(f64),
     Bool(bool),
     Nil,
-    Function(ToCall),
+    Function(function::Function),
 }
 
 pub(crate) trait Callable {

@@ -2,10 +2,7 @@ use crate::environment::Environment;
 use crate::expr;
 use crate::expr::Literal::Function;
 use crate::function;
-use crate::expr::{
-    AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr,
-    UnaryExpr, VariableExpr, Callable,
-};
+use crate::expr::{AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr, Callable, ToCall};
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
@@ -67,7 +64,7 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_function_stmt(&mut self, stmt: &FunctionStmt) -> StmtResult {
-        let function = function::Function::new(stmt.clone());
+        let function = function::Function::from(Box::new(Some(stmt.clone())));
         // if let Function(function) = function {
         // }
         let fl = Literal::Function(function);
@@ -191,7 +188,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
         let arguments = arguments?;
 
         if let Function(function) = callee {
-            if arguments.len() != function.arity {
+            if arguments.len() != function.arity as usize {
                 return Err(RuntimeError::new(
                     expr.paren.clone(),
                     format!(
