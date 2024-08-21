@@ -196,7 +196,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
                 ));
             }
 
-            function.call(&self, arguments)
+            function.call(self, arguments)
         } else  {
             Err(RuntimeError::new(
                 expr.paren.clone(),

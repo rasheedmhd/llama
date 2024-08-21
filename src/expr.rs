@@ -40,7 +40,7 @@ pub enum Literal {
 }
 
 pub(crate) trait Callable {
-    fn call(&self, interpreter: &Interpreter, arguments: Vec<Literal>) -> LiteralResult;
+    fn call(&self, interpreter: &mut Interpreter, arguments: Vec<Literal>) -> LiteralResult;
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -63,7 +63,7 @@ impl ToCall {
 }
 
 impl Callable for ToCall {
-    fn call(&self, _interpreter: &Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
+    fn call(&self, _interpreter: &mut Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
         let now = std::time::SystemTime::now();
         let time = now.duration_since(std::time::UNIX_EPOCH)
             .expect("Failed to  properly read Time")
