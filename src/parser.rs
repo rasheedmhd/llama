@@ -175,6 +175,7 @@ impl Parser {
 
     fn function(&mut self, kind : &str)  -> StmtResult {
         let name : Token = self.consume(&TokenType::IDENTIFIER, &format!("Expect {} name", kind))?;
+        self.consume(&TokenType::LeftPAREN, &format!("Expect {} name", kind))?;
         let mut params : Vec<Token> = Vec::new();
         if !self.check(&TokenType::RightPAREN) {
             loop {
@@ -187,7 +188,7 @@ impl Parser {
                 }
             }
         }
-
+        self.consume(&TokenType::RightPAREN, &format!("Expect {} name", kind))?;
         self.consume(&TokenType::LeftBRACE, "I was expecting a '{' after the arguments")?;
         let body = self.block()?;
         Ok(Stmt::Function( FunctionStmt {

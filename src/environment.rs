@@ -4,7 +4,7 @@ use crate::token::Token;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use crate::callable::Clock;
+use crate::function::Clock;
 
 impl Drop for Environment {
     fn drop(&mut self) {
