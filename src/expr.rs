@@ -1,4 +1,5 @@
-use crate::callable::Callee;
+use std::rc::Rc;
+use crate::callable::Callable;
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
 
@@ -36,7 +37,7 @@ pub enum Literal {
     Number(f64),
     Bool(bool),
     Nil,
-    Function(Callee),
+    Function(Rc<dyn Callable>),
 }
 impl Literal {
     pub fn is_equal(&self, other: &Self) -> bool {

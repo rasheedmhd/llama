@@ -192,12 +192,12 @@ impl expr::Visitor<LiteralResult> for Interpreter {
         // Here is where we turn a literal in to a function
         // that can be called
         if let Function(function) = callee {
-            if arguments.len() != function.arity as usize {
+            if arguments.len() != function.arity() {
                 return Err(RuntimeError::new(
                     expr.paren.clone(),
                     format!(
                         "I was expecting {} arguments to be passed to the function but I got {}",
-                        function.arity,
+                        function.arity(),
                         arguments.len()
                     ),
                 ));

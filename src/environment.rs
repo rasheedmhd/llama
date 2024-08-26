@@ -4,7 +4,7 @@ use crate::token::Token;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use crate::callable::Callee;
+use crate::callable::Clock;
 
 impl Drop for Environment {
     fn drop(&mut self) {
@@ -23,7 +23,7 @@ type EnvResult = Result<Literal, RuntimeError>;
 impl Environment {
     pub fn new() -> Self {
         let mut globals = HashMap::new();
-        let callable = Literal::Function(Callee::new());
+        let callable = Literal::Function(Rc::new(Clock::new()));
         globals.insert("clock".to_string(), callable);
         Self {
             values: globals,

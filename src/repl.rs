@@ -13,6 +13,11 @@ use crate::token_type::TokenType;
 // TO DO
 // Use AtomicBool
 // https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html
+
+// TO DO
+// Make the Llama repl receive and interpret
+// the up and bottom keys and return the previous
+// code entered
 static mut HAD_ERROR: bool = false;
 static mut HAD_RUNTIME_ERROR: bool = false;
 

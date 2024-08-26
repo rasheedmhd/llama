@@ -36,6 +36,10 @@ impl Function {
 }
 
 impl Callable for Function {
+    fn arity(&self) -> usize {
+        todo!()
+    }
+
     fn call(&self, interpreter: &mut Interpreter, arguments: Vec<Literal>) -> crate::interpreter::LiteralResult {
         let environment = Environment::new();
         for (i, param) in self.declaration.clone().unwrap().params.iter().enumerate() {
