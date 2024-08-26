@@ -1,5 +1,4 @@
-use crate::function;
-use crate::interpreter::Interpreter;
+use crate::callable::Callee;
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
 
@@ -37,44 +36,8 @@ pub enum Literal {
     Number(f64),
     Bool(bool),
     Nil,
-    Function(function::Function),
+    Function(Callee),
 }
-
-pub(crate) trait Callable {
-    fn call(&self, interpreter: &mut Interpreter, arguments: Vec<Literal>) -> LiteralResult;
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct ToCall {
-    pub arity : usize,
-}
-
-impl ToCall {
-    pub fn new() -> Self {
-        Self {
-            arity: 0
-        }
-    }
-
-    pub fn arity() -> u8 { 0 }
-
-    pub fn to_string(&self) -> String {
-        "<native function>".to_string()
-    }
-}
-
-impl Callable for ToCall {
-    fn call(&self, _interpreter: &mut Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
-        let now = std::time::SystemTime::now();
-        let time = now.duration_since(std::time::UNIX_EPOCH)
-            .expect("Failed to  properly read Time")
-            .as_secs_f64();
-
-        Ok(Literal::Number(time))
-    }
-
-}
-
 impl Literal {
     pub fn is_equal(&self, other: &Self) -> bool {
         if let Self::Nil = self {

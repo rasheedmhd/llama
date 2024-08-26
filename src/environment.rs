@@ -1,10 +1,10 @@
-use crate::expr::{Literal, ToCall};
+use crate::expr::Literal;
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use crate::function;
+use crate::callable::Callee;
 
 impl Drop for Environment {
     fn drop(&mut self) {
@@ -23,7 +23,7 @@ type EnvResult = Result<Literal, RuntimeError>;
 impl Environment {
     pub fn new() -> Self {
         let mut globals = HashMap::new();
-        let callable = Literal::Function(function::Function::new());
+        let callable = Literal::Function(Callee::new());
         globals.insert("clock".to_string(), callable);
         Self {
             values: globals,

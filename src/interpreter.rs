@@ -1,8 +1,7 @@
 use crate::environment::Environment;
 use crate::expr;
 use crate::expr::Literal::Function;
-use crate::function;
-use crate::expr::{AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr, Callable, ToCall};
+use crate::expr::{AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr};
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
@@ -10,6 +9,7 @@ use crate::stmt::{BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, St
 use crate::token_type::TokenType;
 use std::cell::RefCell;
 use std::rc::Rc;
+use crate::callable::Callable;
 
 pub struct Interpreter {
     pub(crate) environment: Environment,
@@ -64,12 +64,13 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_function_stmt(&mut self, stmt: &FunctionStmt) -> StmtResult {
-        let function = function::Function::from(Box::new(Some(stmt.clone())));
-        // if let Function(function) = function {
-        // }
-        let fl = Literal::Function(function);
-        self.environment.define(stmt.name.lexeme.clone(), fl);
-        Ok(())
+        // let function = function::Function::from(Box::new(Some(stmt.clone())));
+        // // if let Function(function) = function {
+        // // }
+        // let fl = Literal::Function(function);
+        // self.environment.define(stmt.name.lexeme.clone(), fl);
+        // Ok(())
+        todo!()
     }
 }
 
@@ -187,6 +188,9 @@ impl expr::Visitor<LiteralResult> for Interpreter {
 
         let arguments = arguments?;
 
+        // Making a Literal Callable
+        // Here is where we turn a literal in to a function
+        // that can be called
         if let Function(function) = callee {
             if arguments.len() != function.arity as usize {
                 return Err(RuntimeError::new(

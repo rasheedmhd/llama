@@ -1,5 +1,6 @@
+use crate::callable::Callable;
 use crate::environment::Environment;
-use crate::expr::{Callable, Literal};
+use crate::expr::Literal;
 use crate::interpreter::Interpreter;
 use crate::stmt::FunctionStmt;
 
