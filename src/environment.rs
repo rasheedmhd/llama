@@ -1,10 +1,10 @@
 use crate::expr::Literal;
+use crate::function::Clock;
 use crate::runtime_error::RuntimeError;
 use crate::token::Token;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use crate::function::Clock;
 
 impl Drop for Environment {
     fn drop(&mut self) {

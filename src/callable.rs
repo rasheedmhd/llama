@@ -1,10 +1,9 @@
-use std::fmt;
 use crate::expr::Literal;
 use crate::interpreter::Interpreter;
 use crate::runtime_error::RuntimeError;
+use std::fmt;
 
 type LiteralResult = Result<Literal, RuntimeError>;
-
 
 pub(crate) trait Callable {
     fn arity(&self) -> usize;

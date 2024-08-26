@@ -1,15 +1,20 @@
+use crate::callable::Callable;
 use crate::environment::Environment;
-use crate::{expr, function};
 use crate::expr::Literal::Function;
-use crate::expr::{AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr};
+use crate::expr::{
+    AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr,
+    UnaryExpr, VariableExpr,
+};
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
-use crate::stmt::{BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
+use crate::stmt::{
+    BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt,
+};
 use crate::token_type::TokenType;
+use crate::{expr, function};
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::callable::Callable;
 
 pub struct Interpreter {
     pub(crate) environment: Environment,
@@ -201,7 +206,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
             }
 
             function.call(self, arguments)
-        } else  {
+        } else {
             Err(RuntimeError::new(
                 expr.paren.clone(),
                 "Only functions and classes are callable.".to_string(),

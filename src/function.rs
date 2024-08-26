@@ -5,46 +5,53 @@ use crate::interpreter::Interpreter;
 use crate::runtime_error::RuntimeError;
 use crate::stmt::FunctionStmt;
 
-
 type LiteralResult = Result<Literal, RuntimeError>;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Function {
-    declaration: Box<Option<FunctionStmt>>
+    declaration: Box<Option<FunctionStmt>>,
 }
 
 impl Function {
     pub(crate) fn new() -> Self {
         Self {
-            declaration : Box::new(None),
+            declaration: Box::new(None),
         }
     }
     pub(crate) fn from(declaration: Box<Option<FunctionStmt>>) -> Self {
-        Self {
-            declaration,
-        }
+        Self { declaration }
     }
     fn declaration(declaration: Box<Option<FunctionStmt>>) -> Self {
         Self { declaration }
     }
-
 }
 
 impl Callable for Function {
-    fn arity(&self) -> usize { self.declaration.clone().unwrap().params.len() }
+    fn arity(&self) -> usize {
+        self.declaration.clone().unwrap().params.len()
+    }
 
-    fn call(&self, interpreter: &mut Interpreter, arguments: Vec<Literal>) -> crate::interpreter::LiteralResult {
+    fn call(
+        &self,
+        interpreter: &mut Interpreter,
+        arguments: Vec<Literal>,
+    ) -> crate::interpreter::LiteralResult {
         let environment = Environment::new();
         // Properly handle the unwrapping
         for (i, param) in self.declaration.clone().unwrap().params.iter().enumerate() {
-            interpreter.environment.define(param.lexeme.clone(), arguments[i].clone());
+            interpreter
+                .environment
+                .define(param.lexeme.clone(), arguments[i].clone());
         }
         interpreter.execute_block(self.declaration.clone().unwrap().body.clone(), environment)?;
         Ok(Literal::Nil)
     }
 
     fn to_string(&self) -> String {
-        format!("<function {}>", self.declaration.clone().unwrap().name.lexeme)
+        format!(
+            "<function {}>",
+            self.declaration.clone().unwrap().name.lexeme
+        )
     }
 }
 
@@ -71,7 +78,8 @@ impl Callable for Clock {
 
     fn call(&self, _interpreter: &mut Interpreter, _arguments: Vec<Literal>) -> LiteralResult {
         let now = std::time::SystemTime::now();
-        let time = now.duration_since(std::time::UNIX_EPOCH)
+        let time = now
+            .duration_since(std::time::UNIX_EPOCH)
             .expect("Failed to  properly read Time")
             .as_millis() as f64;
 

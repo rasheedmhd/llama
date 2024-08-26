@@ -3,7 +3,9 @@ use crate::expr::{
 };
 use crate::expr::{CallExpr, Literal, LogicalExpr};
 use crate::repl::Llama;
-use crate::stmt::{BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt};
+use crate::stmt::{
+    BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt,
+};
 use crate::token::Token;
 use crate::token_type::TokenType;
 use std::fmt;
@@ -173,31 +175,31 @@ impl Parser {
         Ok(Stmt::Expression(expr))
     }
 
-    fn function(&mut self, kind : &str)  -> StmtResult {
-        let name : Token = self.consume(&TokenType::IDENTIFIER, &format!("Expect {} name", kind))?;
+    fn function(&mut self, kind: &str) -> StmtResult {
+        let name: Token = self.consume(&TokenType::IDENTIFIER, &format!("Expect {} name", kind))?;
         self.consume(&TokenType::LeftPAREN, &format!("Expect {} name", kind))?;
-        let mut params : Vec<Token> = Vec::new();
+        let mut params: Vec<Token> = Vec::new();
         if !self.check(&TokenType::RightPAREN) {
             loop {
                 if params.len() > 255 {
                     self.error(self.peek(), "Can't have more than 255 arguments");
                 }
-                params.push(self.consume(&TokenType::IDENTIFIER, "I was expecting a parameter name")?);
+                params.push(
+                    self.consume(&TokenType::IDENTIFIER, "I was expecting a parameter name")?,
+                );
                 if !self.match_token(&[TokenType::COMMA]) {
                     break;
                 }
             }
         }
         self.consume(&TokenType::RightPAREN, &format!("Expect {} name", kind))?;
-        self.consume(&TokenType::LeftBRACE, "I was expecting a '{' after the arguments")?;
+        self.consume(
+            &TokenType::LeftBRACE,
+            "I was expecting a '{' after the arguments",
+        )?;
         let body = self.block()?;
-        Ok(Stmt::Function( FunctionStmt {
-            name,
-            params,
-            body,
-        }))
+        Ok(Stmt::Function(FunctionStmt { name, params, body }))
     }
-
 
     // forStmt → "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
     fn for_statement(&mut self) -> StmtResult {
@@ -590,6 +592,9 @@ impl Parser {
         ParseError::new()
     }
 
+    // TO DO
+    // I think there is an issue here
+    // Llama confuses when it synchronises
     fn synchronize(&mut self) {
         self.advance();
         while !self.is_at_end() {

@@ -88,18 +88,14 @@ impl WhileStmt {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct FunctionStmt {
-    pub name : Token,
+    pub name: Token,
     pub params: Vec<Token>,
-    pub body : Vec<Stmt>,
+    pub body: Vec<Stmt>,
 }
 
 impl FunctionStmt {
-    pub fn new(name : Token, params: Vec<Token>, body : Vec<Stmt>) -> Self {
-        Self {
-            name,
-            params,
-            body,
-        }
+    pub fn new(name: Token, params: Vec<Token>, body: Vec<Stmt>) -> Self {
+        Self { name, params, body }
     }
 }
 pub trait Visitor<T> {
@@ -110,7 +106,6 @@ pub trait Visitor<T> {
     fn visit_if_stmt(&mut self, stmt: &IfStmt) -> T;
     fn visit_while_stmt(&mut self, stmt: &WhileStmt) -> T;
     fn visit_function_stmt(&mut self, expr: &FunctionStmt) -> T;
-
 }
 
 impl Stmt {
