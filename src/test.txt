@@ -13,6 +13,7 @@ var c = "global c";
         print a;
         print b;
         print c;
+        print c + a;
     }
 
     print a;
@@ -20,13 +21,23 @@ var c = "global c";
     print c;
     c = "redefined global c";
     print c;
+
 }
 
 print a;
 print b;
 print c;
 
+fun add(a, b) {
+    // var a = a; var b = b;
+    print true;
+    print a + b;
+    print nil;
+}
 
+var a = "hello";
+var b = "world";
+print add(a, b);
 
 // print dropped;
 // var test = 1;

@@ -275,6 +275,7 @@ impl Parser {
             then_branch,
             else_branch,
         };
+        println!("{:#?}", if_stmt);
         return Ok(Stmt::If(if_stmt));
     }
 
@@ -291,7 +292,9 @@ impl Parser {
         let condition = self.expression()?;
         self.consume(&TokenType::RightPAREN, "Expect ')' after condition")?;
         let body = Box::new(self.statement()?);
-        Ok(Stmt::While(WhileStmt { condition, body }))
+        let while_stmt = Stmt::While(WhileStmt { condition, body });
+        println!("{:#?}", while_stmt);
+        Ok(while_stmt)
     }
 
     //  block → "{" declaration* "}" ;

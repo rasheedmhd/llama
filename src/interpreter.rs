@@ -60,11 +60,12 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         Ok(())
     }
 
+    // whileStmt       → "while" "(" expression ")" statement ;
     fn visit_while_stmt(&mut self, stmt: &WhileStmt) -> StmtResult {
         let cond = self.evaluate(&stmt.condition)?;
-        while cond.is_truthy() {
-            self.execute(*stmt.body.clone())?
-        }
+        // while cond.is_truthy() {
+        //     self.execute(*stmt.body.clone())?
+        // }
         Ok(())
     }
 

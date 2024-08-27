@@ -14,8 +14,12 @@ impl Drop for Environment {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Environment {
-    pub values: HashMap<String, Literal>,
+    // Serves as the outer block
+    // When it is set to None, it means the environment
+    // that is created is the last environment alias
+    // the global environment
     pub enclosing: Option<Rc<RefCell<Environment>>>,
+    pub values: HashMap<String, Literal>,
 }
 
 type EnvResult = Result<Literal, RuntimeError>;
@@ -26,15 +30,15 @@ impl Environment {
         let callable = Literal::Function(Rc::new(Clock::new()));
         globals.insert("clock".to_string(), callable);
         Self {
-            values: globals,
             enclosing: None,
+            values: globals,
         }
     }
 
     pub fn new_enclosing(enclosing: Rc<RefCell<Environment>>) -> Self {
         Self {
-            values: HashMap::new(),
             enclosing: Some(enclosing),
+            values: HashMap::new(),
         }
     }
 
