@@ -45,7 +45,7 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     }
 
     fn visit_block_stmt(&mut self, stmt: &BlockStmt) -> StmtResult {
-        let block_env = Environment::new_enclosing(Rc::new(RefCell::new(self.environment.clone())));
+        let block_env = Environment::from(Rc::new(RefCell::new(self.environment.clone())));
         self.execute_block(stmt.statements.clone(), block_env)?;
         Ok(())
     }
@@ -63,9 +63,9 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     // whileStmt       → "while" "(" expression ")" statement ;
     fn visit_while_stmt(&mut self, stmt: &WhileStmt) -> StmtResult {
         let cond = self.evaluate(&stmt.condition)?;
-        // while cond.is_truthy() {
-        //     self.execute(*stmt.body.clone())?
-        // }
+        while cond.is_truthy() {
+            self.execute(*stmt.body.clone())?
+        }
         Ok(())
     }
 
@@ -241,18 +241,19 @@ impl Interpreter {
         statements: Vec<Stmt>,
         block_env: Environment,
     ) -> Result<(), RuntimeError> {
-        let previous_env = std::mem::replace(&mut self.environment, block_env);
+        // let parent_env = std::mem::replace(&mut self.environment, block_env.clone());
 
         let result = (|| {
             for statement in statements {
                 self.execute(statement)?;
-                // println!("block_env {:?}", block_env);
-                // println!("previous_env {:?}", previous_env);
+                println!("self.environment.. {:#?}", self.environment);
+                println!("block_env......... {:#?}", block_env);
+                // println!("parent_env........ {:#?}", parent_env);
             }
             Ok(())
         })();
 
-        self.environment = previous_env;
+        // self.environment = parent_env;
 
         result
     }

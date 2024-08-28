@@ -14,30 +14,41 @@ impl Drop for Environment {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Environment {
-    // Serves as the outer block
+    // enclosing Serves as the outer block
     // When it is set to None, it means the environment
     // that is created is the last environment alias
     // the global environment
-    pub enclosing: Option<Rc<RefCell<Environment>>>,
+    pub parent: Option<Rc<RefCell<Environment>>>,
     pub values: HashMap<String, Literal>,
 }
 
 type EnvResult = Result<Literal, RuntimeError>;
 
 impl Environment {
+    // The new constructor is for the global scope’s environment,
+    // which ends the chain.
+    // The parent: None, shows that it is not enclosed in any outer Environment
+    // it is the last/global/ultimate environment
     pub fn new() -> Self {
         let mut globals = HashMap::new();
         let callable = Literal::Function(Rc::new(Clock::new()));
+        // Adding Native Functions
+        // We only have one called clock to tell time between
+        // two successive periods of code execution
         globals.insert("clock".to_string(), callable);
         Self {
-            enclosing: None,
+            parent: None,
             values: globals,
         }
     }
 
-    pub fn new_enclosing(enclosing: Rc<RefCell<Environment>>) -> Self {
+    // The from constructor creates a new local scope
+    // nested inside the given outer one.
+    // new and from? Yeah, why not! following Rust's
+    // code convention, Head it is called the Factory Pattern
+    pub fn from(parent: Rc<RefCell<Environment>>) -> Self {
         Self {
-            enclosing: Some(enclosing),
+            parent: Some(parent),
             values: HashMap::new(),
         }
     }
@@ -47,12 +58,16 @@ impl Environment {
     }
 
     pub fn get(&mut self, name: &Token) -> EnvResult {
-        if self.values.contains_key(&name.lexeme) {
-            return Ok(self.values.get(&name.lexeme).unwrap().clone());
-        };
+        // if self.values.contains_key(&name.lexeme) {
+        //     return Ok(self.values.get(&name.lexeme).unwrap().clone());
+        // };
 
-        if let Some(enclosing) = &self.enclosing {
-            return Ok(enclosing.borrow_mut().get(&name)?);
+        if let Some(value) = self.values.get(&name.lexeme) {
+            return Ok(value.clone());
+        }
+
+        if let Some(parent) = &self.parent {
+            return Ok(parent.borrow_mut().get(&name)?);
         }
 
         return Err(RuntimeError {
@@ -68,8 +83,8 @@ impl Environment {
         if let Some(entry) = self.values.get_mut(&name.lexeme) {
             *entry = value;
             Ok(())
-        } else if let Some(enclosing) = &self.enclosing {
-            enclosing.borrow_mut().assign(&name, value)?;
+        } else if let Some(parent) = &self.parent {
+            parent.borrow_mut().assign(&name, value)?;
             return Ok(());
         } else {
             Err(RuntimeError {
