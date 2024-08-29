@@ -1,4 +1,3 @@
-use crate::callable::Callable;
 use crate::environment::Environment;
 use crate::expr::Literal::Function;
 use crate::expr::{
@@ -9,7 +8,8 @@ use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
 use crate::stmt::{
-    BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt,
+    BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, ReturnStmt, Stmt, VarStmt,
+    WhileStmt,
 };
 use crate::token_type::TokenType;
 use crate::{expr, function};
@@ -74,6 +74,10 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         let fn_lit = Function(Rc::new(function));
         self.environment.define(stmt.name.lexeme.clone(), fn_lit);
         Ok(())
+    }
+
+    fn visit_return_stmt(&mut self, expr: &ReturnStmt) -> StmtResult {
+        todo!()
     }
 }
 
@@ -241,19 +245,19 @@ impl Interpreter {
         statements: Vec<Stmt>,
         block_env: Environment,
     ) -> Result<(), RuntimeError> {
-        // let parent_env = std::mem::replace(&mut self.environment, block_env.clone());
+        let parent_env = std::mem::replace(&mut self.environment, block_env.clone());
 
         let result = (|| {
             for statement in statements {
                 self.execute(statement)?;
-                println!("self.environment.. {:#?}", self.environment);
+                println!("parent_env........ {:#?}", parent_env);
                 println!("block_env......... {:#?}", block_env);
-                // println!("parent_env........ {:#?}", parent_env);
+                println!("self.environment.. {:#?}", self.environment);
             }
             Ok(())
         })();
 
-        // self.environment = parent_env;
+        self.environment = parent_env;
 
         result
     }

@@ -13,6 +13,7 @@ pub enum Stmt {
     If(IfStmt),
     While(WhileStmt),
     Function(FunctionStmt),
+    Return(ReturnStmt),
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ExpressionStmt {
@@ -98,6 +99,18 @@ impl FunctionStmt {
         Self { name, params, body }
     }
 }
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ReturnStmt {
+    pub keyword: Token,
+    pub value: BoxedExpr,
+}
+
+impl ReturnStmt {
+    pub fn new(keyword: Token, value: BoxedExpr) -> Self {
+        Self { keyword, value }
+    }
+}
 pub trait Visitor<T> {
     fn visit_expression_stmt(&mut self, stmt: &ExpressionStmt) -> T;
     fn visit_print_stmt(&mut self, stmt: &PrintStmt) -> T;
@@ -106,6 +119,7 @@ pub trait Visitor<T> {
     fn visit_if_stmt(&mut self, stmt: &IfStmt) -> T;
     fn visit_while_stmt(&mut self, stmt: &WhileStmt) -> T;
     fn visit_function_stmt(&mut self, expr: &FunctionStmt) -> T;
+    fn visit_return_stmt(&mut self, expr: &ReturnStmt) -> T;
 }
 
 impl Stmt {
@@ -118,6 +132,7 @@ impl Stmt {
             Stmt::If(stmt) => visitor.visit_if_stmt(stmt),
             Stmt::While(stmt) => visitor.visit_while_stmt(stmt),
             Stmt::Function(stmt) => visitor.visit_function_stmt(stmt),
+            Stmt::Return(stmt) => visitor.visit_return_stmt(stmt),
         }
     }
 }

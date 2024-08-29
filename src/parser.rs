@@ -4,7 +4,8 @@ use crate::expr::{
 use crate::expr::{CallExpr, Literal, LogicalExpr};
 use crate::repl::Llama;
 use crate::stmt::{
-    BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, Stmt, VarStmt, WhileStmt,
+    BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, PrintStmt, ReturnStmt, Stmt, VarStmt,
+    WhileStmt,
 };
 use crate::token::Token;
 use crate::token_type::TokenType;
@@ -156,6 +157,8 @@ impl Parser {
             return self.if_statement();
         } else if self.match_token(&[TokenType::PRINT]) {
             return Ok(self.print_statement()?);
+        } else if self.match_token(&[TokenType::RETURN]) {
+            return Ok(self.return_statement()?);
         } else if self.match_token(&[TokenType::WHILE]) {
             return Ok(self.while_statement()?);
         } else if self.match_token(&[TokenType::LeftBRACE]) {
@@ -285,6 +288,21 @@ impl Parser {
         self.consume(&TokenType::SEMICOLON, "Expect ';' after value.")?;
         let value = PrintStmt { expression: value };
         Ok(Stmt::Print(value))
+    }
+
+    fn return_statement(&mut self) -> StmtResult {
+        let keyword = self.previous();
+        let value: Option<Expr> = if !self.check(&TokenType::SEMICOLON) {
+            Some(*self.expression()?)
+        } else {
+            None
+        };
+        self.consume(&TokenType::SEMICOLON, "Expect ';' after value")?;
+        let value = ReturnStmt {
+            keyword,
+            value: Box::new(value.unwrap()),
+        };
+        Ok(Stmt::Return(value))
     }
 
     fn while_statement(&mut self) -> StmtResult {

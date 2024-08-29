@@ -13,7 +13,7 @@ pub struct Function {
 }
 
 impl Function {
-    pub(crate) fn new() -> Self {
+    pub(crate) fn _new() -> Self {
         Self {
             declaration: Box::new(None),
         }

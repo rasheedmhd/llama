@@ -1,0 +1,77 @@
+var parent_Var = "Should be in parent env";
+
+fun procedure() {
+  print "don't return anything";
+  var block_Var = "Should be in block/child env";
+}
+
+var result = procedure();
+print result; // ?
+
+don't return anything
+parent_env........ Environment {
+    parent: None,
+    values: {
+        "parent_Var": String(
+            "Should be in parent env",
+        ),
+        "procedure": Function(
+            Callable Function,
+        ),
+        "clock": Function(
+            Callable Function,
+        ),
+    },
+}
+block_env......... Environment {
+    parent: None,
+    values: {
+        "clock": Function(
+            Callable Function,
+        ),
+    },
+}
+self.environment.. Environment {
+    parent: None,
+    values: {
+        "clock": Function(
+            Callable Function,
+        ),
+    },
+}
+parent_env........ Environment {
+    parent: None,
+    values: {
+        "parent_Var": String(
+            "Should be in parent env",
+        ),
+        "procedure": Function(
+            Callable Function,
+        ),
+        "clock": Function(
+            Callable Function,
+        ),
+    },
+}
+block_env......... Environment {
+    parent: None,
+    values: {
+        "clock": Function(
+            Callable Function,
+        ),
+    },
+}
+self.environment.. Environment {
+    parent: None,
+    values: {
+        "clock": Function(
+            Callable Function,
+        ),
+        "block_Var": String(
+            "Should be in block/child env",
+        ),
+    },
+}
+Dropping Environment!
+Dropping Environment!
+nil

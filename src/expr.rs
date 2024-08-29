@@ -1,10 +1,8 @@
 use crate::callable::Callable;
-use crate::runtime_error::RuntimeError;
 use crate::token::Token;
 use std::rc::Rc;
 
 type BoxedExpr = Box<Expr>;
-type LiteralResult = Result<Literal, RuntimeError>;
 
 // EXPRESSIONS
 #[derive(Clone, Debug, PartialEq)]
