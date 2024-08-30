@@ -118,8 +118,8 @@ pub trait Visitor<T> {
     fn visit_block_stmt(&mut self, stmt: &BlockStmt) -> T;
     fn visit_if_stmt(&mut self, stmt: &IfStmt) -> T;
     fn visit_while_stmt(&mut self, stmt: &WhileStmt) -> T;
-    fn visit_function_stmt(&mut self, expr: &FunctionStmt) -> T;
-    fn visit_return_stmt(&mut self, expr: &ReturnStmt) -> T;
+    fn visit_function_stmt(&mut self, stmt: &FunctionStmt) -> T;
+    fn visit_return_stmt(&mut self, stmt: &ReturnStmt) -> T;
 }
 
 impl Stmt {

@@ -15,6 +15,7 @@ use crate::token_type::TokenType;
 use crate::{expr, function};
 use std::cell::RefCell;
 use std::rc::Rc;
+use crate::f_return::Return;
 
 pub struct Interpreter {
     pub(crate) environment: Environment,
@@ -76,8 +77,21 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         Ok(())
     }
 
-    fn visit_return_stmt(&mut self, expr: &ReturnStmt) -> StmtResult {
-        todo!()
+    // @Override
+    // public Void visitReturnStmt(Stmt.Return stmt) {
+    // Object value = null;
+    // if (stmt.value != null) value = evaluate(stmt.value);
+    // throw new Return(value);
+    // }
+
+    fn visit_return_stmt(&mut self, stmt: &ReturnStmt) -> StmtResult {
+        let mut value: Option<Literal> = None;
+        if let Some(expr) = &*(stmt.value) {
+            value = Some(self.evaluate(expr)?);
+        }
+        // TO DO
+        let _ = Err(Return::new(value.expect("LATER")));
+        Ok(())
     }
 }
 
