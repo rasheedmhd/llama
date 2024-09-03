@@ -4,6 +4,7 @@ use crate::expr::{
     AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr,
     UnaryExpr, VariableExpr,
 };
+use crate::f_return::Return;
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
@@ -15,7 +16,6 @@ use crate::token_type::TokenType;
 use crate::{expr, function};
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::f_return::Return;
 
 pub struct Interpreter {
     pub(crate) environment: Environment,
@@ -85,13 +85,14 @@ impl stmt::Visitor<StmtResult> for Interpreter {
     // }
 
     fn visit_return_stmt(&mut self, stmt: &ReturnStmt) -> StmtResult {
-        let mut value: Option<Literal> = None;
-        if let Some(expr) = &*(stmt.value) {
-            value = Some(self.evaluate(expr)?);
-        }
-        // TO DO
-        let _ = Err(Return::new(value.expect("LATER")));
-        Ok(())
+        // let mut value: Option<Literal> = None;
+        // if let Some(expr) = &*(stmt.value) {
+        //     value = Some(self.evaluate(expr)?);
+        // }
+        // // TO DO
+        // let _ = Err(Return::new(value.expect("LATER")));
+        // Ok(())
+        todo!()
     }
 }
 
@@ -264,9 +265,9 @@ impl Interpreter {
         let result = (|| {
             for statement in statements {
                 self.execute(statement)?;
-                println!("parent_env........ {:#?}", parent_env);
-                println!("block_env......... {:#?}", block_env);
-                println!("self.environment.. {:#?}", self.environment);
+                // println!("parent_env........ {:#?}", parent_env);
+                // println!("block_env......... {:#?}", block_env);
+                // println!("self.environment.. {:#?}", self.environment);
             }
             Ok(())
         })();
