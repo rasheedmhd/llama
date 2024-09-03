@@ -1,7 +1,7 @@
 mod callable;
 mod environment;
 pub mod expr;
-mod f_return;
+mod fun_return;
 mod function;
 mod interpreter;
 pub mod parser;

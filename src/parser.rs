@@ -297,10 +297,10 @@ impl Parser {
         } else {
             None
         };
-        self.consume(&TokenType::SEMICOLON, "Expect ';' after value")?;
+        self.consume(&TokenType::SEMICOLON, "I was expecting a ';' after value to conclude and parse a valid return statement")?;
         let value = ReturnStmt {
             keyword,
-            value: Box::new(value.unwrap()),
+            value: Some(Box::new(value.unwrap())),
         };
         Ok(Stmt::Return(value))
     }

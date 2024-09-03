@@ -103,11 +103,11 @@ impl FunctionStmt {
 #[derive(Clone, Debug, PartialEq)]
 pub struct ReturnStmt {
     pub keyword: Token,
-    pub value: BoxedExpr,
+    pub value: Option<BoxedExpr>,
 }
 
 impl ReturnStmt {
-    pub fn new(keyword: Token, value: BoxedExpr) -> Self {
+    pub fn new(keyword: Token, value: Option<BoxedExpr>) -> Self {
         Self { keyword, value }
     }
 }

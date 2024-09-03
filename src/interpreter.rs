@@ -4,7 +4,7 @@ use crate::expr::{
     AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, Literal, LiteralExpr, LogicalExpr,
     UnaryExpr, VariableExpr,
 };
-use crate::f_return::Return;
+use crate::fun_return::Return;
 use crate::repl::Llama;
 use crate::runtime_error::RuntimeError;
 use crate::stmt;
@@ -77,22 +77,13 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         Ok(())
     }
 
-    // @Override
-    // public Void visitReturnStmt(Stmt.Return stmt) {
-    // Object value = null;
-    // if (stmt.value != null) value = evaluate(stmt.value);
-    // throw new Return(value);
-    // }
-
     fn visit_return_stmt(&mut self, stmt: &ReturnStmt) -> StmtResult {
-        // let mut value: Option<Literal> = None;
-        // if let Some(expr) = &*(stmt.value) {
-        //     value = Some(self.evaluate(expr)?);
-        // }
-        // // TO DO
-        // let _ = Err(Return::new(value.expect("LATER")));
-        // Ok(())
-        todo!()
+        let mut value: Option<Literal> = None;
+        if let Some(expr) = stmt.value.as_ref() {
+            value = Some(self.evaluate(expr)?);
+        }
+        let _ = Err(Return::new(value.expect("LATER")));
+        Ok(())
     }
 }
 
