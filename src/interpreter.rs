@@ -82,7 +82,11 @@ impl stmt::Visitor<StmtResult> for Interpreter {
         if let Some(expr) = stmt.value.as_ref() {
             value = Some(self.evaluate(expr)?);
         }
-        let _ = Err(Return::new(value.expect("LATER")));
+        Err(RuntimeError {
+            token: stmt.keyword.clone(),
+            msg: "Returning from a function".to_string(),
+            r#return: value,
+        })?;
         Ok(())
     }
 }
@@ -102,6 +106,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
                     Err(RuntimeError {
                         token: expr.operator.clone(),
                         msg: "OOpsie, I was expecting a num but found something else ".to_string(),
+                        r#return: None,
                     })
                 } else {
                     Ok(Literal::Number(-right.unwrap_num()))
@@ -137,6 +142,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
                     token: expr.operator.clone(),
                     msg: "OOpsie, I was expecting two numbers or two strings (scratches head)"
                         .to_string(),
+                    r#return: None,
                 });
             }
         }
@@ -145,6 +151,7 @@ impl expr::Visitor<LiteralResult> for Interpreter {
             return Err(RuntimeError {
                 token: expr.operator.clone(),
                 msg: "OOpsie, I was expecting two numbers (scratches head)".to_string(),
+                r#return: None,
             });
         }
 

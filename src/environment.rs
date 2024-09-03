@@ -76,6 +76,7 @@ impl Environment {
                 "Oopsie, looks like you forgot to declare {} as a variable",
                 name.lexeme
             ),
+            r#return: None,
         });
     }
 
@@ -90,6 +91,7 @@ impl Environment {
             Err(RuntimeError {
                 token: name.clone(),
                 msg: format!("I can't assign a value to an undeclared variable, looks like you forgot to define '{}' as a variable", name.lexeme),
+                r#return: None,
             })
         }
     }
