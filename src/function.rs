@@ -43,7 +43,13 @@ impl Callable for Function {
                 .environment
                 .define(param.lexeme.clone(), arguments[i].clone());
         }
-        interpreter.execute_block(self.declaration.clone().unwrap().body.clone(), environment)?;
+        let block_execution = interpreter.execute_block(self.declaration.clone().unwrap().body.clone(), environment);
+        match block_execution {
+            Err(e) => {
+                return Err(e)
+            }
+            _ => block_execution?,
+        }
         Ok(Literal::Nil)
     }
 

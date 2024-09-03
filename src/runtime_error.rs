@@ -4,12 +4,16 @@ use crate::token::Token;
 pub struct RuntimeError {
     pub token: Token,
     pub msg: String,
-    pub r#return: Option<Literal>
+    pub r#return: Option<Literal>,
 }
 
 impl RuntimeError {
     pub fn new(token: Token, msg: String) -> Self {
-        Self { token, msg, r#return: None }
+        Self {
+            token,
+            msg,
+            r#return: None,
+        }
     }
 }
 
